@@ -11,7 +11,7 @@ set(OPENCV_ENABLE_ALLOCATOR_STATS OFF CACHE BOOL "")
 set(BUILD_opencv_gapi OFF CACHE BOOL "")
 set(CPU_DISPATCH "" CACHE STRING "")
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(
         -stdlib=libc++
         -fno-exceptions
@@ -21,7 +21,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         -fuse-ld=lld
         -lc++abi
     )
-endif ()
+endif()
 
 add_subdirectory(${OPENCV_PATH})
 

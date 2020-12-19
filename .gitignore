@@ -316,3 +316,6 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
+
+# Virtual environment
+venv*
