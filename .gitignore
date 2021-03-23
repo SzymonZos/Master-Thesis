@@ -171,6 +171,7 @@ acs-*.bib
 *.lg
 *.trc
 *.xref
+B
 
 # hyperref
 *.brf
@@ -180,6 +181,7 @@ acs-*.bib
 # TODO Comment the next line if you want to keep your tikz graphics files
 *.tikz
 *-tikzDictionary
+B
 
 # listings
 *.lol
@@ -218,6 +220,7 @@ _minted*
 
 # pdfpcnotes
 *.pdfpc
+B
 
 # sagetex
 *.sagetex.sage
@@ -319,3 +322,7 @@ TSWLatexianTemp*
 
 # Virtual environment
 venv*
+
+# External projects
+src/jp3d/
+

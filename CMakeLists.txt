@@ -24,6 +24,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 add_subdirectory(${OPENCV_PATH})
+add_subdirectory(src/jp3d)
 
 set(SOURCE_FILES src/main.cpp)
 add_executable(jpeg2000 ${SOURCE_FILES})
@@ -57,4 +58,5 @@ target_compile_options(jpeg2000 PRIVATE
 target_link_libraries(jpeg2000
     opencv_core
     opencv_imgcodecs
+    jp3d
 )
