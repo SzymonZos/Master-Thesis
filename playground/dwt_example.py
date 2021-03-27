@@ -1,10 +1,10 @@
-import numpy as np
+import os, shutil
 import matplotlib.pyplot as plt
 
 from pywt import dwt, dwt2, Wavelet
 from pywt.data import camera
 
-from itertools import product
+from itertools import product, takewhile
 
 
 def plot_subbands(ll, lh, hl, hh, titles):
@@ -40,26 +40,22 @@ def _no_dwt(image):
 
 def my_dwt(image, depth):
     cbs = [_dwt2, _dwt_cols, _dwt_rows, _no_dwt]
+    comps = {tuple(takewhile(lambda x: x != _no_dwt, comp)) for comp in product(cbs, repeat=depth)}
     results = []
-    for comp in product(cbs, repeat=depth):
+    for comp in comps:
         ll = image
         for cb in comp:
-            if cb.__name__ == "_no_dwt":
-                break
             ll = cb(ll)
-        results.append(ll)
+        results.append(("_".join(cb.__name__ for cb in comp), ll))
     return results
 
 
-def main():
+def example():
     print(Wavelet('bior1.3'))
     print(Wavelet('bior3.7'))
     print(Wavelet('db1'))
 
-    # Load image
     original = camera()
-    results = my_dwt(original, 3)
-    # Wavelet transform of image, and plot approximation and details
     titles = ['Approximation', ' Horizontal detail',
               'Vertical detail', 'Diagonal detail']
     LL, (LH, HL, HH) = dwt2(original, 'bior1.3')
@@ -67,6 +63,26 @@ def main():
 
     plot_subbands(LL, LH, HL, HH, titles)
     plot_subbands(ll, lh, hl, hh, titles)
+
+
+def save_results(results):
+    try:
+        os.mkdir("temp")
+    except FileExistsError:
+        shutil.rmtree("temp")
+        os.mkdir("temp")
+
+    for i, (title, res) in enumerate(results):
+        title = f"{i}_{title}"
+        plt.title(title, fontsize=10)
+        plt.tight_layout()
+        plt.imsave(f"temp/{title}.png", res, cmap=plt.cm.gray)
+
+
+def main():
+    original = camera()
+    results = my_dwt(original, 3)
+    save_results(results)
 
 
 if __name__ == "__main__":

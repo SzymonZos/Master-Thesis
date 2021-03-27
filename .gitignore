@@ -326,3 +326,6 @@ venv*
 # External projects
 src/jp3d/
 
+# Temporary directiores
+**/tmp/
+**/temp/
