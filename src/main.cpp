@@ -1,10 +1,10 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
-#include <new>
-#include <numeric>
 #include <thread>
+#include <vector>
 
+#include "dwt.hpp"
 #include "luts.hpp"
 
 namespace mgr {
@@ -53,14 +53,28 @@ void threadTesting() {
 } // namespace mgr
 
 int main() {
-    mgr::threadTesting();
+    //    mgr::threadTesting();
+    std::cout << "\n";
+    for (auto x : mgr::detail::lut_db2<float>) {
+        std::cout << x << " ";
+    }
     std::cout << "\n";
     for (auto x : mgr::lut_db2_f) {
         std::cout << x << " ";
     }
-    // std::cout << "\n";
-    // for (auto x : reversed_lut_db2) {
-    //     std::cout << x << " ";
-    // }
+    std::array<float, 4> in{1, 2, 3, 4};
+    std::vector<float> out;
+    out.reserve(128);
+    mgr::downsampling_convolution(in.data(),
+                                  in.size(),
+                                  mgr::lut_db2_f.data(),
+                                  mgr::lut_db2_f.size(),
+                                  out.data(),
+                                  2,
+                                  mgr::padding_mode::symmetric);
+    std::cout << "\n";
+    for (std::size_t i{}; i < 3; i++) {
+        std::cout << out[i] << " ";
+    }
     return 0;
 }
