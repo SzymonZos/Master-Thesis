@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
-project(jpeg2000)
 
 set(CMAKE_CXX_STANDARD 20)
+option(BUILD_EXTERNALS OFF)
 
 set(TOOLCHAIN_BUILD "${CMAKE_CXX_COMPILER_ID}${CMAKE_BUILD_TYPE}")
 set(OPENCV_PATH external/opencv)
@@ -23,20 +23,28 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     )
 endif()
 
-add_subdirectory(${OPENCV_PATH})
-add_subdirectory(src/jp3d)
+project(jpeg2000)
 
-set(SOURCE_FILES src/main.cpp)
-add_executable(jpeg2000 ${SOURCE_FILES})
+if(BUILD_EXTERNALS)
+    add_subdirectory(${OPENCV_PATH})
+    add_subdirectory(src/jp3d)
+endif()
 
-include_directories(jpeg2000 SYSTEM PRIVATE
-    ${OPENCV_PATH}/modules/core/include
-    ${OPENCV_PATH}/modules/imgcodecs/include
-    ${CMAKE_CURRENT_BINARY_DIR} # OpenCV is looking for opencv2/opencv_modules.hpp
-)
+file(GLOB_RECURSE SRC CONFIGURE_DEPENDS "src/*.cpp")
+#file(GLOB_RECURSE INCLUDES CONFIGURE_DEPENDS "include/*.hpp")
+add_executable(jpeg2000 ${SRC})
 
-include_directories(jpeg2000 PRIVATE
-    include
+if(BUILD_EXTERNALS)
+    target_include_directories(jpeg2000 SYSTEM PRIVATE
+        ${OPENCV_PATH}/modules/core/include
+        ${OPENCV_PATH}/modules/imgcodecs/include
+        ${CMAKE_CURRENT_BINARY_DIR} # OpenCV is looking for opencv2/opencv_modules.hpp
+    )
+endif()
+
+target_include_directories(jpeg2000 SYSTEM PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/include
 )
 
 target_compile_options(jpeg2000 PRIVATE
@@ -52,11 +60,15 @@ target_compile_options(jpeg2000 PRIVATE
     -Wsign-conversion # Warn on sign conversions
     -Wdouble-promotion # Warn if float is implicit promoted to double
     -Wold-style-cast # Warn if c style cast is performed
+    -Wno-float-conversion
+    -Wno-implicit-float-conversion
     -fconstexpr-depth=1024
 )
 
-target_link_libraries(jpeg2000
-    opencv_core
-    opencv_imgcodecs
-    jp3d
-)
+if (BUILD_EXTERNALS)
+    target_link_libraries(jpeg2000
+        opencv_core
+        opencv_imgcodecs
+        jp3d
+    )
+endif()

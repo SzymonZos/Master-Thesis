@@ -128,12 +128,18 @@ def get_lut(wavelet: str):
 
 
 def dwt_re(array: np.array, wavelet: str):
-    lut = get_lut(wavelet)
-    out_len = array.shape[0] // 2
+    lut = list(reversed(get_lut(wavelet)))
+    lut_len = len(lut)
+    out_len = array.shape[0] // 2 + lut_len // 2 - 1
     output = np.zeros(shape=out_len, dtype=np.float64)
+    array_extended = array.copy()
+    array_extended = np.insert(array_extended, 0, array[1])
+    array_extended = np.insert(array_extended, 1, array[0])
+    array_extended = np.append(array_extended, array[-1])
+    array_extended = np.append(array_extended, array[-2])
     for i in range(out_len):
-        for j in range(2):
-            output[i] += array[2 * i + j] * lut[(2 - 1) - j]
+        for j in range(lut_len):
+            output[i] += array_extended[2 * i + j] * lut[(lut_len - 1) - j]
     return output
 
 
@@ -147,5 +153,6 @@ if __name__ == "__main__":
     dummy = np.array([1, 2, 3, 4])
     print(dwt_re(dummy, 'haar'))
     print(dwt(dummy, 'haar')[0])
+    print(dwt_re(dummy, 'db2'))
     print(dwt(dummy, 'db2')[0])
     print(np.convolve([2, 1, 1, 2, 3, 4, 4, 3], list(reversed(lut_db2)), mode='valid'))
