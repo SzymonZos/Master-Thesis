@@ -63,17 +63,29 @@ int main() {
         std::cout << x << " ";
     }
     std::array<float, 4> in{1, 2, 3, 4};
-    std::vector<float> out;
-    out.reserve(128);
+    std::vector<float> out(128);
+
     mgr::downsampling_convolution(in.data(),
                                   in.size(),
                                   mgr::lut_db2_f.data(),
                                   mgr::lut_db2_f.size(),
                                   out.data(),
-                                  2,
                                   mgr::padding_mode::symmetric);
     std::cout << "\n";
     for (std::size_t i{}; i < 3; i++) {
+        std::cout << out[i] << " ";
+    }
+    std::cout << "\n";
+    std::array<float, 10> in_2d{1, 2, 3, 4, 5, 5, 6, 7, 8, 9};
+    for (std::size_t i{}; i < 2; i++) {
+        mgr::downsampling_convolution(in_2d.data() + i * 5,
+                                      5,
+                                      mgr::lut_bior2_2_f.data(),
+                                      mgr::lut_bior2_2_f.size(),
+                                      out.data() + i * 5,
+                                      mgr::padding_mode::symmetric);
+    }
+    for (std::size_t i{}; i < 10; i++) {
         std::cout << out[i] << " ";
     }
     return 0;

@@ -1,8 +1,7 @@
 #ifndef JPEG2000_DWT_HPP
 #define JPEG2000_DWT_HPP
 
-#include <cstddef>
-#define restrict __restrict__
+#include "config.hpp"
 
 namespace mgr {
 enum class padding_mode {
@@ -16,13 +15,14 @@ enum class padding_mode {
                 */
 };
 
+std::size_t get_n_dwt_output(std::size_t n_input, std::size_t n_filter);
+
 template<typename T, typename U>
 void downsampling_convolution(const T* restrict input,
-                              size_t N,
+                              size_t n_input,
                               const U* restrict filter,
-                              size_t F,
+                              size_t n_filter,
                               T* restrict output,
-                              size_t step,
                               padding_mode mode);
 } // namespace mgr
 

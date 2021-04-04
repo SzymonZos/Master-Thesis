@@ -21,17 +21,17 @@ def plot_subbands(ll, lh, hl, hh, titles):
 
 
 def _dwt2(image):
-    ll, (_, _, _) = dwt2(image, 'bior1.3')
-    return ll
-
-
-def _dwt_cols(image):
-    ll, _ = dwt(image, 'db3')
+    ll, (_, _, _) = dwt2(image, 'bior2.2')
     return ll
 
 
 def _dwt_rows(image):
-    ll, _ = dwt(image.T, 'db3')
+    ll, _ = dwt(image, 'bior2.2')
+    return ll
+
+
+def _dwt_cols(image):
+    ll, _ = dwt(image.T, 'bior2.2')
     return ll.T
 
 
@@ -80,21 +80,6 @@ def save_results(results):
         plt.imsave(f"temp/{title}.png", res, cmap=plt.cm.gray)
 
 
-def haar_dwt(image: np.array):
-    # This function assumes that input.length=2^n, n>1
-    output = np.zeros_like(image)
-    length = image.shape[0] // 2
-    while True:
-        length = length // 2
-        for i in range(length):
-            output[i] = image[2 * i] + image[2 * i + 1]
-            output[length + i] = image[2 * i] - image[2 * i + 1]
-
-        if length == 1:
-            return output
-        image = output
-
-
 lut_db1 = [
     7.071067811865475244008443621048490392848359376884740365883398e-01,
     7.071067811865475244008443621048490392848359376884740365883398e-01
@@ -116,31 +101,36 @@ lut_db3 = [
     3.522629188570953660274066471551002932775838791743161039893406e-02
 ]
 
+lut_bior2_2 = [
+    -0.1767766952966368811002110905262,
+    0.3535533905932737622004221810524,
+    1.0606601717798212866012665431573,
+    0.3535533905932737622004221810524,
+    -0.1767766952966368811002110905262,
+    0.0
+]
+
 
 def get_lut(wavelet: str):
     luts = {
         "db1": lut_db1,
         "haar": lut_db1,
         "db2": lut_db2,
-        "db3": lut_db3
+        "db3": lut_db3,
+        "bior2.2": lut_bior2_2
     }
     return luts.get(wavelet, 0)
 
 
-def dwt_re(array: np.array, wavelet: str):
+def dwt_re(arr_input: np.array, wavelet: str):
     lut = list(reversed(get_lut(wavelet)))
-    lut_len = len(lut)
-    out_len = array.shape[0] // 2 + lut_len // 2 - 1
-    output = np.zeros(shape=out_len, dtype=np.float64)
-    array_extended = array.copy()
-    array_extended = np.insert(array_extended, 0, array[1])
-    array_extended = np.insert(array_extended, 1, array[0])
-    array_extended = np.append(array_extended, array[-1])
-    array_extended = np.append(array_extended, array[-2])
-    for i in range(out_len):
-        for j in range(lut_len):
-            output[i] += array_extended[2 * i + j] * lut[(lut_len - 1) - j]
-    return output
+    symmetric_len = len(lut) - 2
+    if symmetric_len:
+        arr_input = np.concatenate(
+            (arr_input[symmetric_len - 1::-1], arr_input,
+             arr_input[:arr_input.shape[0] - symmetric_len - 1:-1]), axis=None)
+    output = np.convolve(arr_input, lut, mode='valid')
+    return output[::2]
 
 
 def main():
@@ -150,9 +140,16 @@ def main():
 
 
 if __name__ == "__main__":
-    dummy = np.array([1, 2, 3, 4])
+    dummy = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     print(dwt_re(dummy, 'haar'))
     print(dwt(dummy, 'haar')[0])
     print(dwt_re(dummy, 'db2'))
     print(dwt(dummy, 'db2')[0])
-    print(np.convolve([2, 1, 1, 2, 3, 4, 4, 3], list(reversed(lut_db2)), mode='valid'))
+    print(_dwt_rows(dummy))
+    print(dwt_re(dummy, 'bior2.2'))
+
+    dummy_2d = np.array([[1, 2, 3, 4, 5], [5, 6, 7, 8, 9]])
+    print(_dwt2(dummy_2d))
+    print(_dwt_rows(dummy_2d))
+    print(_dwt_cols(dummy_2d))
+    # print(dwt_re(dummy, 'bior2.2')) # TODO
