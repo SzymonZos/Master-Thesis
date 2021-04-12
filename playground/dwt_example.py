@@ -153,3 +153,5 @@ if __name__ == "__main__":
     print(_dwt_rows(dummy_2d))
     print(_dwt_cols(dummy_2d))
     # print(dwt_re(dummy, 'bior2.2')) # TODO
+    print(dwt_re(np.array([1, 5]), 'bior2.2'))
+    print(dwt(np.array([1, 5]), 'bior2.2')[0])

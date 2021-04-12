@@ -6,6 +6,7 @@
 
 #include "dwt.hpp"
 #include "luts.hpp"
+#include "matrix.hpp"
 
 namespace mgr {
 
@@ -54,7 +55,6 @@ void threadTesting() {
 
 int main() {
     //    mgr::threadTesting();
-    std::cout << "\n";
     for (auto x : mgr::detail::lut_db2<float>) {
         std::cout << x << " ";
     }
@@ -88,5 +88,34 @@ int main() {
     for (std::size_t i{}; i < 10; i++) {
         std::cout << out[i] << " ";
     }
+    std::cout << "\n";
+    mgr::matrix<float> test_mat{{1, 2, 3, 4, 5, 5, 6, 7, 8, 9}, 2, 5};
+    for (std::size_t i{}; i < test_mat.n_rows(); i++) {
+        mgr::downsampling_convolution(test_mat.get_row(i),
+                                      test_mat.n_cols(),
+                                      mgr::lut_bior2_2_f.data(),
+                                      mgr::lut_bior2_2_f.size(),
+                                      out.data() + i * test_mat.n_cols(),
+                                      mgr::padding_mode::symmetric);
+    }
+    for (std::size_t i{}; i < 10; i++) {
+        std::cout << out[i] << " ";
+    }
+    for (std::size_t i{}; i < test_mat.n_cols(); i++) {
+        mgr::downsampling_convolution(test_mat.get_col(i),
+                                      test_mat.n_rows(),
+                                      mgr::lut_bior2_2_f.data(),
+                                      mgr::lut_bior2_2_f.size(),
+                                      out.data() + i * (test_mat.n_rows() + 1),
+                                      mgr::padding_mode::symmetric);
+    }
+    for (std::size_t i{}; i < 15; i++) {
+        if (i && i % 3 == 0) {
+            std::cout << "\n";
+        }
+        std::cout << out[i] << " ";
+    }
+    std::cout << "\n";
+
     return 0;
 }
