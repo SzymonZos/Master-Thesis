@@ -109,6 +109,7 @@ int main() {
                                       out.data() + i * (test_mat.n_rows() + 1),
                                       mgr::padding_mode::symmetric);
     }
+    std::cout << "\n";
     for (std::size_t i{}; i < 15; i++) {
         if (i && i % 3 == 0) {
             std::cout << "\n";
