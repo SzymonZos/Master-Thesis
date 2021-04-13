@@ -6,7 +6,8 @@
                                                  const U* restrict filter, \
                                                  size_t n_filter, \
                                                  T* restrict output, \
-                                                 padding_mode mode)
+                                                 padding_mode mode, \
+                                                 std::size_t offset)
 
 namespace mgr {
 std::size_t get_n_dwt_output(std::size_t n_input, std::size_t n_filter) {
@@ -22,27 +23,28 @@ void downsampling_convolution(const T* restrict input,
                               const U* restrict filter,
                               size_t n_filter,
                               T* restrict output,
-                              padding_mode mode) {
+                              padding_mode mode,
+                              std::size_t offset) {
     constexpr std::size_t step = 2;
     std::size_t i = step - 1;
     std::size_t out_idx = 0;
 
     // left boundary overhang
-    for (; i < n_filter && i < n_input; i += step, ++out_idx) {
+    for (; i < n_filter && i < n_input; i += step, out_idx += offset) {
         T sum = 0;
         std::size_t j = 0;
         for (; j <= i; ++j) {
-            sum += filter[j] * input[i - j];
+            sum += filter[j] * input[(i - j) * offset];
         }
         switch (mode) {
         case padding_mode::symmetric:
             while (j < n_filter) {
                 std::size_t k = 0;
                 for (; k < n_input && j < n_filter; ++j, ++k) {
-                    sum += filter[j] * input[k];
+                    sum += filter[j] * input[k * offset];
                 }
                 for (k = 0; k < n_input && j < n_filter; ++k, ++j) {
-                    sum += filter[j] * input[n_input - 1 - k];
+                    sum += filter[j] * input[(n_input - 1 - k) * offset];
                 }
             }
             break;
@@ -54,16 +56,16 @@ void downsampling_convolution(const T* restrict input,
     }
 
     // center (if input equal or wider than filter: N >= F)
-    for (; i < n_input; i += step, ++out_idx) {
+    for (; i < n_input; i += step, out_idx += offset) {
         T sum = 0;
         for (std::size_t j = 0; j < n_filter; ++j) {
-            sum += input[i - j] * filter[j];
+            sum += input[(i - j) * offset] * filter[j];
         }
         output[out_idx] = sum;
     }
 
     // center (if filter is wider than input: F > N)
-    for (; i < n_filter; i += step, ++out_idx) {
+    for (; i < n_filter; i += step, out_idx += offset) {
         T sum = 0;
         std::size_t j = 0;
         switch (mode) {
@@ -74,10 +76,11 @@ void downsampling_convolution(const T* restrict input,
             while (i - j >= n_input) {
                 std::size_t k = 0;
                 for (; k < n_input && i - j >= n_input; ++j, ++k) {
-                    sum += filter[i - n_input - j] * input[n_input - 1 - k];
+                    sum += filter[i - n_input - j] *
+                           input[(n_input - 1 - k) * offset];
                 }
                 for (k = 0; k < n_input && i - j >= n_input; ++j, ++k) {
-                    sum += filter[i - n_input - j] * input[k];
+                    sum += filter[i - n_input - j] * input[k * offset];
                 }
             }
             break;
@@ -88,7 +91,7 @@ void downsampling_convolution(const T* restrict input,
         }
 
         for (; j <= i; ++j) {
-            sum += filter[j] * input[i - j];
+            sum += filter[j] * input[(i - j) * offset];
         }
 
         switch (mode) {
@@ -96,10 +99,10 @@ void downsampling_convolution(const T* restrict input,
             while (j < n_filter) {
                 std::size_t k = 0;
                 for (; k < n_input && j < n_filter; ++j, ++k) {
-                    sum += filter[j] * input[k];
+                    sum += filter[j] * input[k * offset];
                 }
                 for (k = 0; k < n_input && j < n_filter; ++k, ++j) {
-                    sum += filter[j] * input[n_input - 1 - k];
+                    sum += filter[j] * input[(n_input - 1 - k) * offset];
                 }
             }
             break;
@@ -111,7 +114,7 @@ void downsampling_convolution(const T* restrict input,
     }
 
     // right boundary overhang
-    for (; i < n_input + n_filter - 1; i += step, ++out_idx) {
+    for (; i < n_input + n_filter - 1; i += step, out_idx += offset) {
         T sum = 0;
         size_t j = 0;
         switch (mode) {
@@ -119,10 +122,11 @@ void downsampling_convolution(const T* restrict input,
             while (i - j >= n_input) {
                 size_t k;
                 for (k = 0; k < n_input && i - j >= n_input; ++j, ++k) {
-                    sum += filter[i - n_input - j] * input[n_input - 1 - k];
+                    sum += filter[i - n_input - j] *
+                           input[(n_input - 1 - k) * offset];
                 }
                 for (k = 0; k < n_input && i - j >= n_input; ++j, ++k) {
-                    sum += filter[i - n_input - j] * input[k];
+                    sum += filter[i - n_input - j] * input[k * offset];
                 }
             }
             break;
@@ -132,7 +136,7 @@ void downsampling_convolution(const T* restrict input,
             break;
         }
         for (; j < n_filter; ++j) {
-            sum += filter[j] * input[i - j];
+            sum += filter[j] * input[(i - j) * offset];
         }
         output[out_idx] = sum;
     }

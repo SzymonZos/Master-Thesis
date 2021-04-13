@@ -23,7 +23,8 @@ void downsampling_convolution(const T* restrict input,
                               const U* restrict filter,
                               size_t n_filter,
                               T* restrict output,
-                              padding_mode mode);
+                              padding_mode mode,
+                              std::size_t offset = 1);
 } // namespace mgr
 
 #endif // JPEG2000_DWT_HPP

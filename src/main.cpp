@@ -109,14 +109,56 @@ int main() {
                                       out.data() + i * (test_mat.n_rows() + 1),
                                       mgr::padding_mode::symmetric);
     }
-    std::cout << "\n";
+    std::cout << "\n\n";
     for (std::size_t i{}; i < 15; i++) {
         if (i && i % 3 == 0) {
             std::cout << "\n";
         }
         std::cout << out[i] << " ";
     }
+    std::cout << "\n\n";
+
+    for (std::size_t i{}; i < test_mat.n_cols(); i++) {
+        mgr::downsampling_convolution(test_mat.data() + i,
+                                      test_mat.n_rows(),
+                                      mgr::lut_bior2_2_f.data(),
+                                      mgr::lut_bior2_2_f.size(),
+                                      out.data() + i,
+                                      mgr::padding_mode::symmetric,
+                                      test_mat.n_cols());
+    }
+    for (std::size_t i{}; i < 15; i++) {
+        if (i && i % 5 == 0) {
+            std::cout << "\n";
+        }
+        std::cout << out[i] << " ";
+    }
     std::cout << "\n";
 
+    std::vector<float> out_2(128);
+    for (std::size_t i{}; i < test_mat.n_rows(); i++) {
+        mgr::downsampling_convolution(test_mat.get_row(i),
+                                      test_mat.n_cols(),
+                                      mgr::lut_bior2_2_f.data(),
+                                      mgr::lut_bior2_2_f.size(),
+                                      out_2.data() + i * test_mat.n_cols(),
+                                      mgr::padding_mode::symmetric);
+    }
+    for (std::size_t i{}; i < test_mat.n_cols(); i++) {
+        mgr::downsampling_convolution(out_2.data() + i,
+                                      test_mat.n_rows(),
+                                      mgr::lut_bior2_2_f.data(),
+                                      mgr::lut_bior2_2_f.size(),
+                                      out.data() + i,
+                                      mgr::padding_mode::symmetric,
+                                      test_mat.n_cols());
+    }
+    for (std::size_t i{}; i < 15; i++) {
+        if (i && i % 5 == 0) {
+            std::cout << "\n";
+        }
+        std::cout << out[i] << " ";
+    }
+    std::cout << "\n";
     return 0;
 }
