@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, "../cmake-build-debug-gcc/test")
-
 import jpeg2000_test as m
 
 

@@ -320,6 +320,9 @@ TSWLatexianTemp*
 # Makeindex log files
 *.lpz
 
+# Python library files
+*.pyd
+
 # Virtual environment
 venv*
 
