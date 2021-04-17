@@ -4,12 +4,15 @@ set(CMAKE_CXX_STANDARD 20)
 option(BUILD_EXTERNALS OFF)
 
 set(TOOLCHAIN_BUILD "${CMAKE_CXX_COMPILER_ID}${CMAKE_BUILD_TYPE}")
-set(OPENCV_PATH external/opencv)
+set(OPENCV_PATH ${CMAKE_SOURCE_DIR}/external/opencv)
+set(PYBIND11_PATH ${CMAKE_SOURCE_DIR}/external/pybind11)
 
 # OpenCV junk
 set(OPENCV_ENABLE_ALLOCATOR_STATS OFF CACHE BOOL "")
 set(BUILD_opencv_gapi OFF CACHE BOOL "")
 set(CPU_DISPATCH "" CACHE STRING "")
+
+project(jpeg2000)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(
@@ -23,7 +26,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     )
 endif()
 
-project(jpeg2000)
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+add_subdirectory(${PYBIND11_PATH})
+add_subdirectory(test)
 
 if(BUILD_EXTERNALS)
     add_subdirectory(${OPENCV_PATH})

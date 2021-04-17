@@ -120,8 +120,8 @@ void downsampling_convolution(const T* restrict input,
         switch (mode) {
         case padding_mode::symmetric:
             while (i - j >= n_input) {
-                size_t k;
-                for (k = 0; k < n_input && i - j >= n_input; ++j, ++k) {
+                std::size_t k = 0;
+                for (; k < n_input && i - j >= n_input; ++j, ++k) {
                     sum += filter[i - n_input - j] *
                            input[(n_input - 1 - k) * offset];
                 }
