@@ -1,13 +1,15 @@
 import jpeg2000_test as m
+import numpy as np
+from pywt import dwt
 
 
 def test():
-    assert m.__version__ == "dev"
-    assert m.add(1, 2) == 3
-    assert m.subtract(1, 2) == -1
-    a, b, c = 1.0, 1.0, 1.0
-    m.downsampling_convolution_f(a, 1, b, 1, c, m.padding_mode.zeropad, 1)
-    print(f"Finished: {a}, {b}, {c}")
+    dummy = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    out = m.downsampling_convolution_f(dummy, m.lut_bior2_2_f,
+                                       m.padding_mode.symmetric, 1)
+    out_2 = dwt(dummy, 'bior2.2')[0]
+    print(f"Finished\n{out}\n{out_2}")
+    assert np.allclose(out, out_2)
 
 
 if __name__ == "__main__":

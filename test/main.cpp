@@ -1,35 +1,24 @@
 #include "dwt.hpp"
-#include <pybind11/pybind11.h>
+#include "luts.hpp"
 
-int add(int i, int j) {
-    return i + j;
-}
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
+template<typename T>
+using dense_array = py::array_t<T, py::array::c_style | py::array::forcecast>;
+
 PYBIND11_MODULE(jpeg2000_test, m) {
     m.doc() = R"pbdoc(
-        Pybind11 example plugin
+        Pybind11 jpeg2000 test plugin
         -----------------------
-        .. currentmodule:: cmake_example
+        .. currentmodule:: jpeg2000_test
         .. autosummary::
            :toctree: _generate
-           add
-           subtract
+           downsampling_convolution_f
+           downsampling_convolution_d
     )pbdoc";
-
-    m.def("add", &add, R"pbdoc(
-        Add two numbers
-        Some other explanation about the add function.
-    )pbdoc");
-
-    m.def(
-        "subtract",
-        [](int i, int j) { return i - j; },
-        R"pbdoc(
-        Subtract two numbers
-        Some other explanation about the subtract function.
-    )pbdoc");
 
     py::enum_<mgr::padding_mode>(m, "padding_mode")
         .value("invalid", mgr::padding_mode::invalid)
@@ -37,13 +26,33 @@ PYBIND11_MODULE(jpeg2000_test, m) {
         .value("symmetric", mgr::padding_mode::symmetric)
         .export_values();
 
-    m.def("downsampling_convolution_f",
-          &mgr::downsampling_convolution<float, float>,
-          R"pbdoc(Something float)pbdoc");
+    m.attr("lut_bior2_2_f") = dense_array<float>(mgr::lut_bior2_2_f.size(),
+                                                 mgr::lut_bior2_2_f.data());
+
+    m.def(
+        "downsampling_convolution_f",
+        [](dense_array<float> input,
+           dense_array<float> filter,
+           mgr::padding_mode mode,
+           std::size_t offset) {
+            dense_array<float> output(
+                mgr::get_n_dwt_output(input.size(), filter.size()));
+            mgr::downsampling_convolution(input.data(),
+                                          input.size(),
+                                          filter.data(),
+                                          filter.size(),
+                                          output.mutable_data(),
+                                          mode,
+                                          offset);
+            return output;
+        },
+        R"pbdoc(dwt for floats)pbdoc",
+        py::arg("input"),
+        py::arg("filter"),
+        py::arg("mode"),
+        py::arg("offset") = 1);
 
     m.def("downsampling_convolution_d",
           &mgr::downsampling_convolution<double, double>,
-          R"pbdoc(Something double)pbdoc");
-
-    m.attr("__version__") = "dev";
+          R"pbdoc(dwt for doubles)pbdoc");
 }
