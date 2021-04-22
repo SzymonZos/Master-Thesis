@@ -9,6 +9,14 @@ namespace py = pybind11;
 template<typename T>
 using dense_array = py::array_t<T, py::array::c_style | py::array::forcecast>;
 
+template<typename T>
+dense_array<T> make_array(py::ssize_t rows, py::ssize_t cols) {
+    if (cols == 1) {
+        return dense_array<T>{rows};
+    }
+    return dense_array<T>{{rows, cols}};
+}
+
 PYBIND11_MODULE(jpeg2000_test, m) {
     m.doc() = R"pbdoc(
         Pybind11 jpeg2000 test plugin
@@ -35,8 +43,9 @@ PYBIND11_MODULE(jpeg2000_test, m) {
            dense_array<float> filter,
            mgr::padding_mode mode,
            std::size_t offset) {
-            dense_array<float> output(
-                mgr::get_n_dwt_output(input.size(), filter.size()));
+            auto output = make_array<float>(
+                mgr::get_n_dwt_output(input.shape(0), filter.size()),
+                offset);
             mgr::downsampling_convolution(input.data(),
                                           input.size(),
                                           filter.data(),

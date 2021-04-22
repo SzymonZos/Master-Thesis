@@ -323,6 +323,9 @@ TSWLatexianTemp*
 # Python library files
 *.pyd
 
+# Python cache
+__pycache__/
+
 # Virtual environment
 venv*
 

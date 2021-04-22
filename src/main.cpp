@@ -2,6 +2,7 @@
 #include <array>
 #include <iostream>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 #include "dwt.hpp"
