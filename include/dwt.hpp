@@ -4,16 +4,6 @@
 #include "config.hpp"
 
 namespace mgr {
-enum class padding_mode {
-    invalid = -1,
-    zeropad = 0, // default, signal extended with zeros
-    symmetric, /* signal extended symmetrically (mirror)
-                * also known as half-sample symmetric
-                * For extensions greater than signal length,
-                * mirror back and forth:
-                * 2 3 3 2 1 | 1 2 3 | 3 2 1 1 2
-                */
-};
 
 std::size_t get_n_dwt_output(std::size_t n_input, std::size_t n_filter);
 

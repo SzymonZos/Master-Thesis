@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "dwt.hpp"
+#include "dwt_2d.hpp"
 #include "luts.hpp"
 #include "matrix.hpp"
 
@@ -161,5 +162,58 @@ int main() {
         std::cout << out[i] << " ";
     }
     std::cout << "\n";
+
+    std::vector<float> out_3(128);
+    mgr::dwt_2d(test_mat.data(),
+                test_mat.n_rows(),
+                test_mat.n_cols(),
+                mgr::lut_bior2_2_f.data(),
+                mgr::lut_bior2_2_f.size(),
+                out_3.data(),
+                mgr::padding_mode::symmetric);
+
+    std::cout << "\n";
+    for (std::size_t i{}; i < 15; i++) {
+        if (i && i % 5 == 0) {
+            std::cout << "\n";
+        }
+        std::cout << out_3[i] << " ";
+    }
+    std::cout << "\n";
+
+    mgr::dwt_2d_rows(test_mat.data(),
+                     test_mat.n_rows(),
+                     test_mat.n_cols(),
+                     mgr::lut_bior2_2_f.data(),
+                     mgr::lut_bior2_2_f.size(),
+                     out_3.data(),
+                     mgr::padding_mode::symmetric);
+
+    std::cout << "\n";
+    for (std::size_t i{}; i < 10; i++) {
+        if (i && i % 5 == 0) {
+            std::cout << "\n";
+        }
+        std::cout << out_3[i] << " ";
+    }
+    std::cout << "\n";
+
+    mgr::dwt_2d_cols(test_mat.data(),
+                     test_mat.n_rows(),
+                     test_mat.n_cols(),
+                     mgr::lut_bior2_2_f.data(),
+                     mgr::lut_bior2_2_f.size(),
+                     out_3.data(),
+                     mgr::padding_mode::symmetric);
+
+    std::cout << "\n";
+    for (std::size_t i{}; i < 15; i++) {
+        if (i && i % 5 == 0) {
+            std::cout << "\n";
+        }
+        std::cout << out_3[i] << " ";
+    }
+    std::cout << "\n";
+
     return 0;
 }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(jpeg2000_test)
 
-pybind11_add_module(jpeg2000_test main.cpp ../src/dwt.cpp)
+pybind11_add_module(jpeg2000_test main.cpp ../src/dwt.cpp ../src/dwt_2d.cpp)
 target_include_directories(jpeg2000_test PRIVATE ../include)
 install(TARGETS jpeg2000_test
     LIBRARY
