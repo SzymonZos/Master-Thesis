@@ -60,160 +60,60 @@ int main() {
     for (auto x : mgr::detail::lut_db2<float>) {
         std::cout << x << " ";
     }
-    std::cout << "\n";
+    std::cout << "\n\n";
     for (auto x : mgr::lut_db2_f) {
         std::cout << x << " ";
     }
-    std::array<float, 4> in{1, 2, 3, 4};
-    std::vector<float> out(128);
+    std::cout << "\n\n";
 
+    std::array<float, 4> in{1, 2, 3, 4};
+    std::vector<float> out(
+        mgr::get_n_dwt_output(in.size(), mgr::lut_db2_f.size()));
     mgr::downsampling_convolution(in.data(),
                                   in.size(),
                                   mgr::lut_db2_f.data(),
                                   mgr::lut_db2_f.size(),
                                   out.data(),
                                   mgr::padding_mode::symmetric);
-    std::cout << "\n";
-    for (std::size_t i{}; i < 3; i++) {
-        std::cout << out[i] << " ";
+    for (auto i : out) {
+        std::cout << i << " ";
     }
-    std::cout << "\n";
-    std::array<float, 10> in_2d{1, 2, 3, 4, 5, 5, 6, 7, 8, 9};
-    for (std::size_t i{}; i < 2; i++) {
-        mgr::downsampling_convolution(in_2d.data() + i * 5,
-                                      5,
-                                      mgr::lut_bior2_2_f.data(),
-                                      mgr::lut_bior2_2_f.size(),
-                                      out.data() + i * 5,
-                                      mgr::padding_mode::symmetric);
-    }
-    for (std::size_t i{}; i < 10; i++) {
-        std::cout << out[i] << " ";
-    }
-    std::cout << "\n";
+    std::cout << "\n\n";
+
     mgr::matrix<float> test_mat{{1, 2, 3, 4, 5, 5, 6, 7, 8, 9}, 2, 5};
-    for (std::size_t i{}; i < test_mat.n_rows(); i++) {
-        mgr::downsampling_convolution(test_mat.get_row(i),
-                                      test_mat.n_cols(),
-                                      mgr::lut_bior2_2_f.data(),
-                                      mgr::lut_bior2_2_f.size(),
-                                      out.data() + i * test_mat.n_cols(),
-                                      mgr::padding_mode::symmetric);
-    }
-    for (std::size_t i{}; i < 10; i++) {
-        std::cout << out[i] << " ";
-    }
-    for (std::size_t i{}; i < test_mat.n_cols(); i++) {
-        mgr::downsampling_convolution(test_mat.get_col(i),
-                                      test_mat.n_rows(),
-                                      mgr::lut_bior2_2_f.data(),
-                                      mgr::lut_bior2_2_f.size(),
-                                      out.data() + i * (test_mat.n_rows() + 1),
-                                      mgr::padding_mode::symmetric);
-    }
-    std::cout << "\n\n";
-    for (std::size_t i{}; i < 15; i++) {
-        if (i && i % 3 == 0) {
-            std::cout << "\n";
-        }
-        std::cout << out[i] << " ";
-    }
-    std::cout << "\n\n";
+    mgr::matrix<float> out_rows{
+        test_mat.rows(),
+        mgr::get_n_dwt_output(test_mat.cols(), mgr::lut_bior2_2_f.size())};
+    mgr::matrix<float> out_cols{
+        mgr::get_n_dwt_output(test_mat.rows(), mgr::lut_bior2_2_f.size()),
+        test_mat.cols()};
+    mgr::matrix<float> out_2d{out_cols.rows(), out_rows.cols()};
 
-    for (std::size_t i{}; i < test_mat.n_cols(); i++) {
-        mgr::downsampling_convolution(test_mat.data() + i,
-                                      test_mat.n_rows(),
-                                      mgr::lut_bior2_2_f.data(),
-                                      mgr::lut_bior2_2_f.size(),
-                                      out.data() + i,
-                                      mgr::padding_mode::symmetric,
-                                      test_mat.n_cols());
-    }
-    for (std::size_t i{}; i < 15; i++) {
-        if (i && i % 5 == 0) {
-            std::cout << "\n";
-        }
-        std::cout << out[i] << " ";
-    }
-    std::cout << "\n";
-
-    std::vector<float> out_2(128);
-    for (std::size_t i{}; i < test_mat.n_rows(); i++) {
-        mgr::downsampling_convolution(test_mat.get_row(i),
-                                      test_mat.n_cols(),
-                                      mgr::lut_bior2_2_f.data(),
-                                      mgr::lut_bior2_2_f.size(),
-                                      out_2.data() + i * test_mat.n_cols(),
-                                      mgr::padding_mode::symmetric);
-    }
-    for (std::size_t i{}; i < test_mat.n_cols(); i++) {
-        mgr::downsampling_convolution(out_2.data() + i,
-                                      test_mat.n_rows(),
-                                      mgr::lut_bior2_2_f.data(),
-                                      mgr::lut_bior2_2_f.size(),
-                                      out.data() + i,
-                                      mgr::padding_mode::symmetric,
-                                      test_mat.n_cols());
-    }
-    for (std::size_t i{}; i < 15; i++) {
-        if (i && i % 5 == 0) {
-            std::cout << "\n";
-        }
-        std::cout << out[i] << " ";
-    }
-    std::cout << "\n";
-
-    std::vector<float> out_3(128);
     mgr::dwt_2d(test_mat.data(),
-                test_mat.n_rows(),
-                test_mat.n_cols(),
+                test_mat.rows(),
+                test_mat.cols(),
                 mgr::lut_bior2_2_f.data(),
                 mgr::lut_bior2_2_f.size(),
-                out_3.data(),
+                out_2d.data(),
                 mgr::padding_mode::symmetric);
-
-    std::cout << "\n";
-    for (std::size_t i{}; i < 15; i++) {
-        if (i && i % 5 == 0) {
-            std::cout << "\n";
-        }
-        std::cout << out_3[i] << " ";
-    }
-    std::cout << "\n";
+    std::cout << out_2d << "\n\n";
 
     mgr::dwt_2d_rows(test_mat.data(),
-                     test_mat.n_rows(),
-                     test_mat.n_cols(),
+                     test_mat.rows(),
+                     test_mat.cols(),
                      mgr::lut_bior2_2_f.data(),
                      mgr::lut_bior2_2_f.size(),
-                     out_3.data(),
+                     out_rows.data(),
                      mgr::padding_mode::symmetric);
-
-    std::cout << "\n";
-    for (std::size_t i{}; i < 10; i++) {
-        if (i && i % 5 == 0) {
-            std::cout << "\n";
-        }
-        std::cout << out_3[i] << " ";
-    }
-    std::cout << "\n";
+    std::cout << out_rows << "\n\n";
 
     mgr::dwt_2d_cols(test_mat.data(),
-                     test_mat.n_rows(),
-                     test_mat.n_cols(),
+                     test_mat.rows(),
+                     test_mat.cols(),
                      mgr::lut_bior2_2_f.data(),
                      mgr::lut_bior2_2_f.size(),
-                     out_3.data(),
+                     out_cols.data(),
                      mgr::padding_mode::symmetric);
-
-    std::cout << "\n";
-    for (std::size_t i{}; i < 15; i++) {
-        if (i && i % 5 == 0) {
-            std::cout << "\n";
-        }
-        std::cout << out_3[i] << " ";
-    }
-    std::cout << "\n";
-
+    std::cout << out_cols << "\n\n";
     return 0;
 }
