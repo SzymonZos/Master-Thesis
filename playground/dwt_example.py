@@ -41,7 +41,8 @@ def _no_dwt(image):
 
 def my_dwt(image, depth):
     cbs = [_dwt2, _dwt_cols, _dwt_rows, _no_dwt]
-    comps = {tuple(takewhile(lambda x: x != _no_dwt, comp)) for comp in product(cbs, repeat=depth)}
+    comps = {tuple(takewhile(lambda x: x != _no_dwt, comp))
+             for comp in product(cbs, repeat=depth)}
     results = []
     for comp in comps:
         ll = image

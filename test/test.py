@@ -12,13 +12,6 @@ ONE_DIMENSIONAL_DATA = [
     np.array([1, -2, 3, -4, 5, -6, 7, -8, 9, -10])
 ]
 
-TWO_DIMENSIONAL_DATA = [
-    np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]),
-    np.array([[1, 2], [3, 4]]),
-    np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]),
-    np.array([[1, -2], [3, -4], [5, -6], [7, -8], [9, -10]])
-]
-
 
 @pytest.fixture
 def dwt_rows(request):
@@ -31,6 +24,14 @@ def dwt_rows(request):
 @pytest.mark.parametrize("dwt_rows", ONE_DIMENSIONAL_DATA, indirect=True)
 def test_dwt_rows(dwt_rows):
     assert starmap(np.allclose, dwt_rows)
+
+
+TWO_DIMENSIONAL_DATA = [
+    np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]),
+    np.array([[1, 2], [3, 4]]),
+    np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]),
+    np.array([[1, -2], [3, -4], [5, -6], [7, -8], [9, -10]])
+]
 
 
 @pytest.fixture
