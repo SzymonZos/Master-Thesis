@@ -1,10 +1,5 @@
 language: cpp
 
-matrix:
-  include:
-    - os: linux
-      dist: focal
-
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
   - sudo apt update -qq
@@ -18,14 +13,16 @@ install:
 before_script:
   - cmake -B build
 
-jobs:
+matrix:
   include:
-    - stage: build
+    - os: linux
+      dist: focal
       name: "App main"
       script:
         - cmake --build build -- -j $(nproc)
         - ./build/jpeg2000
-    - stage: test
+    - os: linux
+      dist: focal
       name: "Test 1D dwt"
       script:
         - cmake -DBUILD_TESTS=ON --build build --target install -- -j $(nproc)
