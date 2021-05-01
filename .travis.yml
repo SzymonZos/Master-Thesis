@@ -10,8 +10,8 @@ before_install:
   - sudo apt update -qq
 
 install:
-  - sudo apt install -qq cmake g++-11
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 90
+  - sudo apt install -qq cmake g++-10
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90
 
 before_script:
   - cmake -B build
