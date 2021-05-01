@@ -10,8 +10,10 @@ before_install:
   - sudo apt update -qq
 
 install:
-  - sudo apt install -qq cmake g++-10
+  - sudo apt install -qq g++-10
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90
+  - sudo apt remove cmake
+  - pip install cmake --upgrade
 
 before_script:
   - cmake -B build
