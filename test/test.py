@@ -40,10 +40,10 @@ def dwt_cols(request):
     return request.param, ref.T
 
 
-@pytest.mark.parametrize("dwt_cols", TWO_DIMENSIONAL_DATA, indirect=True)
-def test_dwt_cols(dwt_cols):
-    out = m.downsampling_convolution_f(dwt_cols[0], m.lut_bior2_2_f,
-                                       m.padding_mode.symmetric,
-                                       dwt_cols[0].shape[1])
-    print(out)
-    assert np.allclose(out, dwt_cols[1])
+# @pytest.mark.parametrize("dwt_cols", TWO_DIMENSIONAL_DATA, indirect=True)
+# def test_dwt_cols(dwt_cols):
+#     out = m.downsampling_convolution_f(dwt_cols[0], m.lut_bior2_2_f,
+#                                        m.padding_mode.symmetric,
+#                                        dwt_cols[0].shape[1])
+#     print(out)
+#     assert np.allclose(out, dwt_cols[1])
