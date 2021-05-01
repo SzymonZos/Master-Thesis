@@ -26,6 +26,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     )
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_link_options(
+        -pthread
+    )
+endif()
+
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
 add_subdirectory(${PYBIND11_PATH})
 add_subdirectory(test)
