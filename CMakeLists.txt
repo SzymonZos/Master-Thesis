@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 
 set(CMAKE_CXX_STANDARD 20)
 option(BUILD_EXTERNALS OFF)
+option(BUILD_TESTS OFF)
 
 set(TOOLCHAIN_BUILD "${CMAKE_CXX_COMPILER_ID}${CMAKE_BUILD_TYPE}")
 set(OPENCV_PATH ${CMAKE_SOURCE_DIR}/external/opencv)
@@ -32,9 +33,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
-add_subdirectory(${PYBIND11_PATH})
-add_subdirectory(test)
+if(BUILD_TESTS)
+    find_package(Python COMPONENTS Interpreter Development REQUIRED)
+    add_subdirectory(${PYBIND11_PATH})
+    add_subdirectory(test)
+endif()
 
 if(BUILD_EXTERNALS)
     add_subdirectory(${OPENCV_PATH})

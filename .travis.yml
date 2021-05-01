@@ -18,6 +18,14 @@ install:
 before_script:
   - cmake -B build
 
-script:
-  - cmake --build build -- -j $(nproc)
-  - ./build/jpeg2000
+jobs:
+  include:
+    - stage: build
+      name: "App main"
+      script:
+        - cmake --build build -- -j $(nproc)
+        - ./build/jpeg2000
+    - stage: test
+      name: "Test 1D dwt"
+      script:
+        - cmake -DBUILD_TESTS=ON --build build --target install -- -j $(nproc)
