@@ -51,6 +51,7 @@ matrix:
             - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main"
               key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
           packages:
+            - python3-pip
             - llvm-dev
             - libclang-dev
             - clang-tools
@@ -70,9 +71,10 @@ matrix:
         apt:
           update: true
           sources:
-            - sourceline: "deb http://apt.llvm.org/focal/ llvm-toolchain-bionic main"
+            - sourceline: "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main"
               key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
           packages:
+            - python3-pip
             - llvm-dev
             - libclang-dev
             - clang-tools
