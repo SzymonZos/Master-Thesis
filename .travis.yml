@@ -15,22 +15,44 @@ install:
   - pip3 install cmake --upgrade
 
 before_script:
+  - if [ "$COMPILER" = "clang" ]; then wget https://apt.llvm.org/llvm.sh; chmod +x llvm.sh; sudo ./llvm.sh 12; fi
   - if [ "$BUILD_TESTS" = "ON" ]; then python3 -m venv venv; . ./venv/bin/activate; pip install -r requirements.txt; fi
-  - cmake -DBUILD_TESTS="$BUILD_TESTS" -B build
+  - if [ "$COMPILER" = "gcc" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -B build; fi
+  - if [ "$COMPILER" = "clang" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 -B build; fi
 
 matrix:
   include:
     - os: linux
       dist: focal
       name: "App main"
+      env:
+        - COMPILER="gcc"
       script:
         - cmake --build build -- -j $(nproc)
         - ./build/jpeg2000
     - os: linux
       dist: focal
-      name: "Test 1D dwt"
+      name: "Tests dwt"
       env:
         - BUILD_TESTS="ON"
+        - COMPILER="gcc"
+      script:
+        - cmake --build build --target install -- -j $(nproc)
+        - pytest ./test/test.py
+    - os: linux
+      dist: focal
+      name: "App main"
+      env:
+        - COMPILER="clang"
+      script:
+        - cmake --build build -- -j $(nproc)
+        - ./build/jpeg2000
+    - os: linux
+      dist: focal
+      name: "Tests dwt"
+      env:
+        - BUILD_TESTS="ON"
+        - COMPILER="clang"
       script:
         - cmake --build build --target install -- -j $(nproc)
         - pytest ./test/test.py

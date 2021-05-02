@@ -18,7 +18,6 @@ project(jpeg2000)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(
         -stdlib=libc++
-        -fno-exceptions
     )
     add_link_options(
         -stdlib=libc++
