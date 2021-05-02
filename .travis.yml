@@ -3,15 +3,7 @@ language: cpp
 os:
   - linux
 
-before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
-  - sudo apt update -qq
-  - sudo apt clean -qq
-  - sudo apt autoremove -qq
-
 install:
-  - sudo apt install -qq python3-venv
-  - if [ "$COMPILER" = "gcc" ]; then sudo apt install -qq g++-10; fi
   - if [ "$COMPILER" = "gcc" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90; fi
   - sudo apt remove cmake
   - if [ "$COMPILER" = "clang" ]; then wget https://bootstrap.pypa.io/get-pip.py; sudo python3.8 get-pip.py; fi
@@ -27,7 +19,14 @@ matrix:
   include:
     - os: linux
       dist: focal
-      name: "App main"
+      name: "gcc main app"
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-ppa
+          packages:
+            - g++-10
       env:
         - COMPILER="gcc"
       script:
@@ -35,7 +34,15 @@ matrix:
         - ./build/jpeg2000
     - os: linux
       dist: focal
-      name: "Tests dwt"
+      name: "gcc dwt tests"
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-ppa
+          packages:
+            - g++-10
+            - python3-venv
       env:
         - BUILD_TESTS="ON"
         - COMPILER="gcc"
@@ -44,7 +51,7 @@ matrix:
         - pytest ./test/test.py
     - os: linux
       dist: bionic
-      name: "App main"
+      name: "clang main app"
       addons:
         apt:
           update: true
@@ -55,7 +62,6 @@ matrix:
             - python3.8
             - python3.8-dev
             - python3.8-distutils
-            - python3.8-venv
             - llvm-12-dev
             - libclang-12-dev
             - clang-tools-12
@@ -70,7 +76,7 @@ matrix:
         - ./build/jpeg2000
     - os: linux
       dist: bionic
-      name: "Tests dwt"
+      name: "clang dwt tests"
       addons:
         apt:
           update: true
