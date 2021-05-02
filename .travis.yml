@@ -8,7 +8,7 @@ install:
 
 before_script:
   - eval "$MATRIX_EVAL"
-  - if [ "$BUILD_TESTS" = "ON" ]; then ./ci/activate_venv.sh fi
+  - if [ "$BUILD_TESTS" = "ON" ]; then ./ci/activate_venv.sh; fi
   - cmake -DBUILD_TESTS="$BUILD_TESTS" -B build
 
 matrix:
