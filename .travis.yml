@@ -64,13 +64,13 @@ matrix:
         - cmake --build build -- -j $(nproc)
         - ./build/jpeg2000
     - os: linux
-      dist: bionic
+      dist: focal
       name: "Tests dwt"
       addons:
         apt:
           update: true
           sources:
-            - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main"
+            - sourceline: "deb http://apt.llvm.org/focal/ llvm-toolchain-bionic main"
               key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
           packages:
             - llvm-dev
