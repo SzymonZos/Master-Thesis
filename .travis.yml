@@ -8,7 +8,7 @@ install:
 
 before_script:
   - eval "$MATRIX_EVAL"
-  - if [ "$BUILD_TESTS" = "ON" ]; then python3.8 -m venv venv; . ./venv/bin/activate; pip install -r requirements.txt; fi
+  - if [ "$BUILD_TESTS" = "ON" ]; then ./ci/activate_venv.sh fi
   - cmake -DBUILD_TESTS="$BUILD_TESTS" -B build
 
 matrix:
@@ -26,8 +26,7 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-10 && CXX=g++-10"
       script:
-        - cmake --build build -- -j $(nproc)
-        - ./build/jpeg2000
+        - ./ci/run_main_app.sh
     - os: linux
       dist: focal
       name: "gcc dwt tests"
@@ -43,8 +42,7 @@ matrix:
         - BUILD_TESTS="ON"
         - MATRIX_EVAL="CC=gcc-10 && CXX=g++-10"
       script:
-        - cmake --build build --target install -- -j $(nproc)
-        - pytest ./test/test.py
+        - ./ci/run_tests.sh
     - os: linux
       dist: bionic
       name: "clang main app"
@@ -68,8 +66,7 @@ matrix:
       env:
         - MATRIX_EVAL="CC=clang-12 && CXX=clang++-12"
       script:
-        - cmake --build build -- -j $(nproc)
-        - ./build/jpeg2000
+        - ./ci/run_main_app.sh
     - os: linux
       dist: bionic
       name: "clang dwt tests"
@@ -95,5 +92,4 @@ matrix:
         - BUILD_TESTS="ON"
         - MATRIX_EVAL="CC=clang-12 && CXX=clang++-12"
       script:
-        - cmake --build build --target install -- -j $(nproc)
-        - pytest ./test/test.py
+        - ./ci/run_tests.sh
