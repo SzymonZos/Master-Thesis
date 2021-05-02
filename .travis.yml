@@ -19,7 +19,7 @@ install:
   - pip3.8 install cmake --upgrade
 
 before_script:
-  - if [ "$BUILD_TESTS" = "ON" ]; then python3 -m venv venv; . ./venv/bin/activate; pip install -r requirements.txt; fi
+  - if [ "$BUILD_TESTS" = "ON" ]; then python3.8 -m venv venv; . ./venv/bin/activate; pip install -r requirements.txt; fi
   - if [ "$COMPILER" = "gcc" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -B build; fi
   - if [ "$COMPILER" = "clang" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 -B build; fi
 
