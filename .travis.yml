@@ -6,9 +6,9 @@ os:
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
   - sudo apt update -qq
-  - sudo apt-get upgrade
-  - sudo apt-get clean
-  - sudo apt-get autoremove
+  - sudo apt upgrade -qq
+  - sudo apt clean -qq
+  - sudo apt autoremove -qq
 
 install:
   - sudo apt install -qq g++-10 python3-venv
@@ -18,7 +18,7 @@ install:
   - pip3 install cmake --upgrade
 
 before_script:
-  - if [ "$COMPILER" = "clang" ]; then wget https://apt.llvm.org/llvm.sh; chmod +x llvm.sh; sudo ./llvm.sh 11; fi
+  - if [ "$COMPILER" = "clang" ]; then wget https://apt.llvm.org/llvm.sh; chmod +x llvm.sh; sudo apt-get install -f libclang-common-11-dev; sudo ./llvm.sh 11; fi
   - if [ "$BUILD_TESTS" = "ON" ]; then python3 -m venv venv; . ./venv/bin/activate; pip install -r requirements.txt; fi
   - if [ "$COMPILER" = "gcc" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -B build; fi
   - if [ "$COMPILER" = "clang" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -DCMAKE_C_COMPILER=clang-11 -DCMAKE_CXX_COMPILER=clang++-11 -B build; fi
