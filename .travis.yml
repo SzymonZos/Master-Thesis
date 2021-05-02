@@ -11,6 +11,7 @@ before_install:
   - sudo apt autoremove -qq
 
 install:
+  - bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
   - sudo apt install -qq python3-venv
   - if [ "$COMPILER" = "gcc" ]; then sudo apt install -qq g++-10; fi
   - if [ "$COMPILER" = "gcc" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90; fi
