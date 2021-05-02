@@ -26,6 +26,8 @@ matrix:
             - g++-10
       env:
         - MATRIX_EVAL="CC=gcc-10 && CXX=g++-10"
+      install:
+        - python3 -m pip install -U --user pip
       script:
         - cmake --build build -- -j $(nproc)
         - ./build/jpeg2000
@@ -42,6 +44,9 @@ matrix:
             - python3-venv
       env:
         - BUILD_TESTS="ON"
+        - MATRIX_EVAL="CC=gcc-10 && CXX=g++-10"
+      install:
+        - python3 -m pip install -U --user pip
       script:
         - cmake --build build --target install -- -j $(nproc)
         - pytest ./test/test.py
@@ -96,6 +101,7 @@ matrix:
             - libc++abi-12-dev
       env:
         - BUILD_TESTS="ON"
+        - MATRIX_EVAL="CC=clang-12 && CXX=clang++-12"
       install:
         - wget https://bootstrap.pypa.io/get-pip.py
         - sudo python3.8 get-pip.py
