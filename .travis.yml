@@ -14,13 +14,13 @@ install:
   - if [ "$COMPILER" = "gcc" ]; then sudo apt install -qq g++-10; fi
   - if [ "$COMPILER" = "gcc" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90; fi
   - sudo apt remove cmake
-  - python3 -m pip install --user --upgrade pip
-  - pip3 install cmake --upgrade
+  - python3.8 -m pip install --user --upgrade pip
+  - pip3.8 install cmake --upgrade
 
 before_script:
   - if [ "$BUILD_TESTS" = "ON" ]; then python3 -m venv venv; . ./venv/bin/activate; pip install -r requirements.txt; fi
   - if [ "$COMPILER" = "gcc" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -B build; fi
-  - if [ "$COMPILER" = "clang" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -B build; fi
+  - if [ "$COMPILER" = "clang" ]; then cmake -DBUILD_TESTS="$BUILD_TESTS" -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 -B build; fi
 
 matrix:
   include:
@@ -48,17 +48,21 @@ matrix:
         apt:
           update: true
           sources:
-            - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main"
+            - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-12 main"
               key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
           packages:
-            - python3-pip
-            - llvm-dev
-            - libclang-dev
-            - clang-tools
-            - clang
-            - lld
-            - libc++-dev
-            - libc++abi-dev
+            - python3.8
+            - python3.8-dev
+            - python3.8-distutils
+            - python3.8-venv
+            - python3.8-pip
+            - llvm-12-dev
+            - libclang-12-dev
+            - clang-tools-12
+            - clang-12
+            - lld-12
+            - libc++-12-dev
+            - libc++abi-12-dev
       env:
         - COMPILER="clang"
       script:
@@ -71,17 +75,21 @@ matrix:
         apt:
           update: true
           sources:
-            - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main"
+            - sourceline: "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-12 main"
               key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
           packages:
-            - python3-pip
-            - llvm-dev
-            - libclang-dev
-            - clang-tools
-            - clang
-            - lld
-            - libc++-dev
-            - libc++abi-dev
+            - python3.8
+            - python3.8-dev
+            - python3.8-distutils
+            - python3.8-venv
+            - python3.8-pip
+            - llvm-12-dev
+            - libclang-12-dev
+            - clang-tools-12
+            - clang-12
+            - lld-12
+            - libc++-12-dev
+            - libc++abi-12-dev
       env:
         - BUILD_TESTS="ON"
         - COMPILER="clang"
