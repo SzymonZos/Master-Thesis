@@ -11,8 +11,9 @@ before_install:
   - sudo apt autoremove -qq
 
 install:
-  - sudo apt install -qq g++-10 python3-venv
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90
+  - sudo apt install -qq python3-venv
+  - if [ "$COMPILER" = "gcc" ]; then sudo apt install -qq g++-10; fi
+  - if [ "$COMPILER" = "gcc" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90; fi
   - sudo apt remove cmake
   - python3 -m pip install --user --upgrade pip
   - pip3 install cmake --upgrade
