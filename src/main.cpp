@@ -69,12 +69,12 @@ int main() {
     std::array<float, 4> in{1, 2, 3, 4};
     std::vector<float> out(
         mgr::get_n_dwt_output(in.size(), mgr::lut_db2_f.size()));
-    mgr::downsampling_convolution(in.data(),
-                                  in.size(),
-                                  mgr::lut_db2_f.data(),
-                                  mgr::lut_db2_f.size(),
-                                  out.data(),
-                                  mgr::padding_mode::symmetric);
+    mgr::dwt_1d(in.data(),
+                in.size(),
+                mgr::lut_db2_f.data(),
+                mgr::lut_db2_f.size(),
+                out.data(),
+                mgr::padding_mode::symmetric);
     for (auto i : out) {
         std::cout << i << " ";
     }

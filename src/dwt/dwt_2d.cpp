@@ -16,12 +16,12 @@ namespace mgr {
 
 REGISTER_DWT_2D(dwt_2d_rows) {
     for (std::size_t i{}; i < rows; i++) {
-        downsampling_convolution(input + i * cols,
-                                 cols,
-                                 filter,
-                                 n_filter,
-                                 output + i * cols,
-                                 mode);
+        dwt_1d(input + i * cols,
+               cols,
+               filter,
+               n_filter,
+               output + i * cols,
+               mode);
     }
 }
 INSTANTIATE_DWT_2D(dwt_2d_rows, float, float);
@@ -29,13 +29,7 @@ INSTANTIATE_DWT_2D(dwt_2d_rows, double, double);
 
 REGISTER_DWT_2D(dwt_2d_cols) {
     for (std::size_t i{}; i < cols; i++) {
-        mgr::downsampling_convolution(input + i,
-                                      rows,
-                                      filter,
-                                      n_filter,
-                                      output + i,
-                                      mode,
-                                      cols);
+        dwt_1d(input + i, rows, filter, n_filter, output + i, mode, cols);
     }
 }
 INSTANTIATE_DWT_2D(dwt_2d_cols, float, float);

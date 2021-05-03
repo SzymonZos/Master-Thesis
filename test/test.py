@@ -15,8 +15,8 @@ ONE_DIMENSIONAL_DATA = [
 
 @pytest.fixture
 def dwt_rows(request):
-    out = m.downsampling_convolution_f(request.param, m.lut_bior2_2_f,
-                                       m.padding_mode.symmetric, 1)
+    out = m.dwt_1d_f(request.param, m.lut_bior2_2_f,
+                     m.padding_mode.symmetric, 1)
     ref = dwt(request.param, 'bior2.2')[0]
     return out, ref
 
@@ -42,7 +42,7 @@ def dwt_cols(request):
 
 # @pytest.mark.parametrize("dwt_cols", TWO_DIMENSIONAL_DATA, indirect=True)
 # def test_dwt_cols(dwt_cols):
-#     out = m.downsampling_convolution_f(dwt_cols[0], m.lut_bior2_2_f,
+#     out = m.dwt_1d_f(dwt_cols[0], m.lut_bior2_2_f,
 #                                        m.padding_mode.symmetric,
 #                                        dwt_cols[0].shape[1])
 #     print(out)

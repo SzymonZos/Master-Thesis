@@ -9,6 +9,7 @@ namespace py = pybind11;
 template<typename T>
 using dense_array = py::array_t<T, py::array::c_style | py::array::forcecast>;
 
+namespace {
 template<typename T>
 dense_array<T> make_array(std::size_t rows, std::size_t cols) {
     if (cols == 1) {
@@ -16,6 +17,25 @@ dense_array<T> make_array(std::size_t rows, std::size_t cols) {
     }
     return dense_array<T>{{rows, cols}};
 }
+
+template<typename T>
+dense_array<T> dwt_1d_py(const dense_array<T>& input,
+                         const dense_array<T>& filter,
+                         mgr::padding_mode mode,
+                         std::size_t offset) {
+    auto rows = mgr::get_n_dwt_output(static_cast<std::size_t>(input.shape(0)),
+                                      static_cast<std::size_t>(filter.size()));
+    auto output = make_array<T>(rows, offset);
+    mgr::dwt_1d(input.data(),
+                static_cast<std::size_t>(input.size()),
+                filter.data(),
+                static_cast<std::size_t>(filter.size()),
+                output.mutable_data(),
+                mode,
+                offset);
+    return output;
+}
+} // namespace
 
 PYBIND11_MODULE(jpeg2000_test, m) {
     m.doc() = R"pbdoc(
@@ -37,33 +57,22 @@ PYBIND11_MODULE(jpeg2000_test, m) {
     m.attr("lut_bior2_2_f") = dense_array<float>(mgr::lut_bior2_2_f.size(),
                                                  mgr::lut_bior2_2_f.data());
 
-    m.def(
-        "downsampling_convolution_f",
-        [](const dense_array<float>& input,
-           const dense_array<float>& filter,
-           mgr::padding_mode mode,
-           std::size_t offset) {
-            auto rows = mgr::get_n_dwt_output(
-                static_cast<std::size_t>(input.shape(0)),
-                static_cast<std::size_t>(filter.size()));
-            auto output = make_array<float>(rows, offset);
-            mgr::downsampling_convolution(
-                input.data(),
-                static_cast<std::size_t>(input.size()),
-                filter.data(),
-                static_cast<std::size_t>(filter.size()),
-                output.mutable_data(),
-                mode,
-                offset);
-            return output;
-        },
-        R"pbdoc(dwt for floats)pbdoc",
-        py::arg("input"),
-        py::arg("filter"),
-        py::arg("mode"),
-        py::arg("offset") = 1);
+    m.attr("lut_bior2_2_d") = dense_array<double>(mgr::lut_bior2_2_d.size(),
+                                                  mgr::lut_bior2_2_d.data());
 
-    m.def("downsampling_convolution_d",
-          &mgr::downsampling_convolution<double, double>,
-          R"pbdoc(dwt for doubles)pbdoc");
+    m.def("dwt_1d_f",
+          dwt_1d_py<float>,
+          R"pbdoc(dwt for float)pbdoc",
+          py::arg("input"),
+          py::arg("filter"),
+          py::arg("mode"),
+          py::arg("offset") = 1);
+
+    m.def("dwt_1d_d",
+          dwt_1d_py<double>,
+          R"pbdoc(dwt for double)pbdoc",
+          py::arg("input"),
+          py::arg("filter"),
+          py::arg("mode"),
+          py::arg("offset") = 1);
 }
