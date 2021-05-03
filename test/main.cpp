@@ -10,9 +10,9 @@ template<typename T>
 using dense_array = py::array_t<T, py::array::c_style | py::array::forcecast>;
 
 template<typename T>
-dense_array<T> make_array(py::ssize_t rows, py::ssize_t cols) {
+dense_array<T> make_array(std::size_t rows, std::size_t cols) {
     if (cols == 1) {
-        return dense_array<T>{rows};
+        return dense_array<T>{static_cast<py::ssize_t>(rows)};
     }
     return dense_array<T>{{rows, cols}};
 }
@@ -39,20 +39,22 @@ PYBIND11_MODULE(jpeg2000_test, m) {
 
     m.def(
         "downsampling_convolution_f",
-        [](dense_array<float> input,
-           dense_array<float> filter,
+        [](const dense_array<float>& input,
+           const dense_array<float>& filter,
            mgr::padding_mode mode,
            std::size_t offset) {
-            auto output = make_array<float>(
-                mgr::get_n_dwt_output(input.shape(0), filter.size()),
+            auto rows = mgr::get_n_dwt_output(
+                static_cast<std::size_t>(input.shape(0)),
+                static_cast<std::size_t>(filter.size()));
+            auto output = make_array<float>(rows, offset);
+            mgr::downsampling_convolution(
+                input.data(),
+                static_cast<std::size_t>(input.size()),
+                filter.data(),
+                static_cast<std::size_t>(filter.size()),
+                output.mutable_data(),
+                mode,
                 offset);
-            mgr::downsampling_convolution(input.data(),
-                                          input.size(),
-                                          filter.data(),
-                                          filter.size(),
-                                          output.mutable_data(),
-                                          mode,
-                                          offset);
             return output;
         },
         R"pbdoc(dwt for floats)pbdoc",
