@@ -21,6 +21,12 @@ target_compile_options(dwt PUBLIC
     -fconstexpr-depth=1024
 )
 
+if((NOT CMAKE_SYSTEM_NAME STREQUAL "Windows") AND BUILD_TESTS)
+    target_compile_options(dwt PRIVATE
+        -fPIC
+    )
+endif()
+
 target_include_directories(dwt PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/include
