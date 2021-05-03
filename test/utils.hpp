@@ -10,7 +10,7 @@ template<typename T>
 using dense_array = py::array_t<T, py::array::c_style | py::array::forcecast>;
 
 template<typename T>
-dense_array<T> make_array(std::size_t rows, std::size_t cols) {
+dense_array<T> make_array(std::size_t rows, std::size_t cols = 1) {
     if (cols == 1) {
         return dense_array<T>{static_cast<py::ssize_t>(rows)};
     }

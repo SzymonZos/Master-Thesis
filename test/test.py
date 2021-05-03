@@ -1,7 +1,7 @@
 import jpeg2000_test as m
 import numpy as np
 import pytest
-from pywt import dwt
+from pywt import dwt, dwt2
 from itertools import starmap
 
 
@@ -15,8 +15,7 @@ ONE_DIMENSIONAL_DATA = [
 
 @pytest.fixture
 def dwt_rows(request):
-    out = m.dwt_1d_f(request.param, m.lut_bior2_2_f,
-                     m.padding_mode.symmetric, 1)
+    out = m.dwt_1d_f(request.param, m.lut_bior2_2_f, m.padding_mode.symmetric)
     ref = dwt(request.param, 'bior2.2')[0]
     return out, ref
 
@@ -35,15 +34,12 @@ TWO_DIMENSIONAL_DATA = [
 
 
 @pytest.fixture
-def dwt_cols(request):
-    ref = dwt(request.param.T, 'bior2.2')[0]
-    return request.param, ref.T
+def dwt_2d(request):
+    out = m.dwt_2d_f(request.param, m.lut_bior2_2_f, m.padding_mode.symmetric)
+    ref = dwt2(request.param, 'bior2.2')[0]
+    return out, ref
 
 
-# @pytest.mark.parametrize("dwt_cols", TWO_DIMENSIONAL_DATA, indirect=True)
-# def test_dwt_cols(dwt_cols):
-#     out = m.dwt_1d_f(dwt_cols[0], m.lut_bior2_2_f,
-#                                        m.padding_mode.symmetric,
-#                                        dwt_cols[0].shape[1])
-#     print(out)
-#     assert np.allclose(out, dwt_cols[1])
+@pytest.mark.parametrize("dwt_2d", TWO_DIMENSIONAL_DATA, indirect=True)
+def test_dwt_cols(dwt_2d):
+    assert starmap(np.allclose, dwt_2d)
