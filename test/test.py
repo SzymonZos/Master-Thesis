@@ -1,11 +1,26 @@
 from typing import List
-from itertools import starmap, product, chain
+from itertools import product, chain
 
 import numpy as np
 import pytest
 
 from pywt import dwt, dwt2
 import jpeg2000_test as m
+
+
+def _dwt2(data, wavelet, mode):
+    ll, (_, _, _) = dwt2(data, wavelet, mode)
+    return ll
+
+
+def _dwt_rows(data, wavelet, mode):
+    ll, _ = dwt(data, wavelet, mode)
+    return ll
+
+
+def _dwt_cols(data, wavelet, mode):
+    ll, _ = dwt(data.T, wavelet, mode)
+    return ll.T
 
 
 WAVELETS = {
@@ -18,8 +33,10 @@ PADDING_MODES = {
 }
 
 DWT_FUNCS = {
-    "dwt 1d": (dwt, m.dwt_1d_f),
-    "dwt 2d": (dwt2, m.dwt_2d_f)
+    "dwt 1d": (_dwt_rows, m.dwt_1d_f),
+    "dwt 2d": (_dwt2, m.dwt_2d_f),
+    "dwt 2d rows": (_dwt_rows, m.dwt_2d_rows_f),
+    "dwt 2d cols": (_dwt_cols, m.dwt_2d_cols_f)
 }
 
 DATA_1D = [
@@ -44,7 +61,9 @@ def get_test_suit(data: List[np.array], dwt_func: str):
 def get_all_test_suits():
     return chain(
         get_test_suit(DATA_1D, "dwt 1d"),
-        get_test_suit(DATA_2D, "dwt 2d")
+        get_test_suit(DATA_2D, "dwt 2d"),
+        get_test_suit(DATA_2D, "dwt 2d rows"),
+        get_test_suit(DATA_2D, "dwt 2d cols")
     )
 
 
@@ -52,11 +71,12 @@ def get_all_test_suits():
 def dwt_fixture(request):
     data, wavelet, padding_mode, dwt_func = request.param
     dwt_ref, dwt_impl = DWT_FUNCS[dwt_func]
-    ref = dwt_ref(data, wavelet, padding_mode)[0]
+    ref = dwt_ref(data, wavelet, padding_mode)
     out = dwt_impl(data, WAVELETS[wavelet], PADDING_MODES[padding_mode])
+    print(f"{ref}\n{out}")
     return ref, out
 
 
 @pytest.mark.parametrize("dwt_fixture", get_all_test_suits(), indirect=True)
 def test_dwt(dwt_fixture):
-    assert starmap(np.allclose, dwt_fixture)
+    assert np.allclose(*dwt_fixture)
