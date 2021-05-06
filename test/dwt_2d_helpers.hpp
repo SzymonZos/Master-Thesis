@@ -1,14 +1,20 @@
-#include "dwt_2d.hpp"
+#ifndef JPEG2000_TEST_DWT_2D_HELPERS_HPP
+#define JPEG2000_TEST_DWT_2D_HELPERS_HPP
+
 #include "dwt.hpp"
+#include "dwt_2d.hpp"
 #include "utils.hpp"
+
+#include <string_view>
 
 namespace mgr {
 enum class dwt_mode { _2d = 0, _rows = 1, _cols = 2 };
 
-std::pair<std::size_t, std::size_t> get_out_rows_cols(std::size_t rows_in,
-                                                      std::size_t cols_in,
-                                                      std::size_t filter_size,
-                                                      dwt_mode mode) {
+inline std::pair<std::size_t, std::size_t>
+get_out_rows_cols(std::size_t rows_in,
+                  std::size_t cols_in,
+                  std::size_t filter_size,
+                  dwt_mode mode) {
     auto rows_out = get_n_dwt_output(rows_in, filter_size);
     auto cols_out = get_n_dwt_output(cols_in, filter_size);
     switch (mode) {
@@ -46,17 +52,21 @@ dense_array<T> dwt_2d_py(const dense_array<T>& input,
     return output;
 }
 
-void init_dwt_2d(py::module_& module) {
-    module.def("dwt_2d_f",
-               dwt_2d_py<float, dwt_2d, dwt_mode::_2d>,
-               R"pbdoc(dwt 2d for floats)pbdoc");
+template<typename T>
+void init_dwt_2d_generic(py::module_& module, std::string_view name) {
+    using namespace std::string_literals;
+    module.def(("dwt_2d_"s += name.front()).c_str(),
+               dwt_2d_py<T, dwt_2d, dwt_mode::_2d>,
+               ("dwt 2d for"s += name).c_str());
 
-    module.def("dwt_2d_rows_f",
-               dwt_2d_py<float, dwt_2d_rows, dwt_mode::_rows>,
-               R"pbdoc(dwt 2d rows for floats)pbdoc");
+    module.def(("dwt_2d_rows_"s += name.front()).c_str(),
+               dwt_2d_py<T, dwt_2d_rows, dwt_mode::_rows>,
+               ("dwt 2d rows for "s += name).c_str());
 
-    module.def("dwt_2d_cols_f",
-               dwt_2d_py<float, dwt_2d_cols, dwt_mode::_cols>,
-               R"pbdoc(dwt 2d cols for floats)pbdoc");
+    module.def(("dwt_2d_cols_"s += name.front()).c_str(),
+               dwt_2d_py<T, dwt_2d_cols, dwt_mode::_cols>,
+               ("dwt 2d cols for floats"s += name).c_str());
 }
 } // namespace mgr
+
+#endif // JPEG2000_TEST_DWT_2D_HELPERS_HPP

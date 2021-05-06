@@ -3,7 +3,8 @@ project(jpeg2000_test)
 
 pybind11_add_module(jpeg2000_test
     dwt.cpp
-    dwt_2d.cpp
+    dwt_2d_f.cpp
+    dwt_2d_d.cpp
     utils.cpp
 )
 

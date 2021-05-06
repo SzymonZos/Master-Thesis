@@ -18,7 +18,8 @@ dense_array<T> make_array(std::size_t rows, std::size_t cols = 1) {
 }
 
 void init_dwt_1d(py::module_& module);
-void init_dwt_2d(py::module_& module);
+void init_dwt_2d_f(py::module_& module);
+void init_dwt_2d_d(py::module_& module);
 } // namespace mgr
 
 #endif // JPEG2000_TEST_UTILS_HPP

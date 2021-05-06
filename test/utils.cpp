@@ -30,5 +30,6 @@ PYBIND11_MODULE(jpeg2000_test, m) {
         mgr::lut_bior2_2_d.data());
 
     mgr::init_dwt_1d(m);
-    mgr::init_dwt_2d(m);
+    mgr::init_dwt_2d_f(m);
+    mgr::init_dwt_2d_d(m);
 }

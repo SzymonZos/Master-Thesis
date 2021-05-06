@@ -1,4 +1,3 @@
-from typing import List
 from itertools import product, chain
 
 import numpy as np
