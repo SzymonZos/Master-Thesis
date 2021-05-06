@@ -15,12 +15,13 @@
 namespace mgr {
 
 REGISTER_DWT_2D(dwt_2d_rows) {
+    std::size_t out_cols = get_n_dwt_output(cols, n_filter);
     for (std::size_t i{}; i < rows; i++) {
         dwt_1d(input + i * cols,
                cols,
                filter,
                n_filter,
-               output + i * cols,
+               output + i * out_cols,
                mode);
     }
 }

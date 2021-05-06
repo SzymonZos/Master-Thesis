@@ -39,31 +39,35 @@ DWT_FUNCS = {
     "dwt 2d cols": (_dwt_cols, m.dwt_2d_cols_f)
 }
 
-DATA_1D = [
-    np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
-    np.array([1, 2, 3, 4]),
-    np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
-    np.array([1, -2, 3, -4, 5, -6, 7, -8, 9, -10])
-]
 
-DATA_2D = [
-    np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]),
-    np.array([[1, 2], [3, 4]]),
-    np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]),
-    np.array([[1, -2], [3, -4], [5, -6], [7, -8], [9, -10]])
-]
+def get_1d_data(dtype):
+    return [
+        np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=dtype),
+        np.array([1, 2, 3, 4], dtype=dtype),
+        np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], dtype=dtype),
+        np.array([1, -2, 3, -4, 5, -6, 7, -8, 9, -10], dtype=dtype)
+    ]
 
 
-def get_test_suit(data: List[np.array], dwt_func: str):
+def get_2d_data(dtype):
+    return [
+        np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=dtype),
+        np.array([[1, 2], [3, 4]], dtype=dtype),
+        np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]], dtype=dtype),
+        np.array([[1, -2], [3, -4], [5, -6], [7, -8], [9, -10]], dtype=dtype)
+    ]
+
+
+def get_test_suit(data, dwt_func: str):
     return product(data, WAVELETS, PADDING_MODES, [dwt_func])
 
 
 def get_all_test_suits():
     return chain(
-        get_test_suit(DATA_1D, "dwt 1d"),
-        get_test_suit(DATA_2D, "dwt 2d"),
-        get_test_suit(DATA_2D, "dwt 2d rows"),
-        get_test_suit(DATA_2D, "dwt 2d cols")
+        get_test_suit(get_1d_data(np.float32), "dwt 1d"),
+        get_test_suit(get_2d_data(np.float32), "dwt 2d"),
+        get_test_suit(get_2d_data(np.float32), "dwt 2d rows"),
+        get_test_suit(get_2d_data(np.float32), "dwt 2d cols")
     )
 
 

@@ -80,7 +80,7 @@ int main() {
     }
     std::cout << "\n\n";
 
-    mgr::matrix<float> test_mat{{1, 2, 3, 4, 5, 5, 6, 7, 8, 9}, 2, 5};
+    mgr::matrix<float> test_mat{{1, 2, 3, 4, 5, 5, 6, 7, 8, 9}, 5, 2};
     mgr::matrix<float> out_rows{
         test_mat.rows(),
         mgr::get_n_dwt_output(test_mat.cols(), mgr::lut_bior2_2_f.size())};
