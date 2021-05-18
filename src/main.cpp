@@ -52,7 +52,7 @@ void threadTesting() {
         std::cout << id << ": " << count << "\n";
     }
 }
-
+void show_queue();
 } // namespace mgr
 
 int main() {
@@ -115,5 +115,7 @@ int main() {
                      out_cols.data(),
                      mgr::padding_mode::symmetric);
     std::cout << out_cols << "\n\n";
+
+    mgr::show_queue();
     return 0;
 }

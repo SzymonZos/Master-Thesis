@@ -2,7 +2,7 @@ project(jpeg2000_src)
 
 add_subdirectory(dwt)
 
-add_executable(jpeg2000 matrix.cpp main.cpp)
+add_executable(jpeg2000 matrix.cpp queue.cpp main.cpp)
 
 if(BUILD_EXTERNALS)
     target_include_directories(jpeg2000 SYSTEM PRIVATE
