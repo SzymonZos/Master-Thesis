@@ -14,6 +14,10 @@
 
 namespace mgr {
 
+REGISTER_DWT_2D(no_dwt_2d) {}
+INSTANTIATE_DWT_2D(no_dwt_2d, float, float);
+INSTANTIATE_DWT_2D(no_dwt_2d, double, double);
+
 REGISTER_DWT_2D(dwt_2d_rows) {
     std::size_t out_cols = get_n_dwt_output(cols, n_filter);
     for (std::size_t i{}; i < rows; i++) {

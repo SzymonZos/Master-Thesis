@@ -15,14 +15,15 @@
 
 namespace mgr {
 template<typename T, typename U>
-using dwt_2d_cb = void(const T* restrict input,
-                       std::size_t rows,
-                       std::size_t cols,
-                       const U* restrict filter,
-                       std::size_t n_filter,
-                       T* restrict output,
-                       padding_mode mode);
+using dwt_2d_cb = void (*)(const T* restrict input,
+                           std::size_t rows,
+                           std::size_t cols,
+                           const U* restrict filter,
+                           std::size_t n_filter,
+                           T* restrict output,
+                           padding_mode mode);
 
+REGISTER_DWT_2D(no_dwt_2d);
 REGISTER_DWT_2D(dwt_2d_rows);
 REGISTER_DWT_2D(dwt_2d_cols);
 REGISTER_DWT_2D(dwt_2d);
