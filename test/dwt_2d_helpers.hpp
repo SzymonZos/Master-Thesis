@@ -46,7 +46,7 @@ dense_array<T> dwt_2d_py(const dense_array<T>& input,
            rows_in,
            cols_in,
            filter.data(),
-           static_cast<std::size_t>(filter.size()),
+           filter_size,
            output.mutable_data(),
            mode);
     return output;
@@ -65,7 +65,7 @@ void init_dwt_2d_generic(py::module_& module, std::string_view name) {
 
     module.def(("dwt_2d_cols_"s += name.front()).c_str(),
                dwt_2d_py<T, dwt_2d_cols, dwt_mode::_cols>,
-               ("dwt 2d cols for floats"s += name).c_str());
+               ("dwt 2d cols for "s += name).c_str());
 }
 } // namespace mgr
 

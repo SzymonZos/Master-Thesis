@@ -91,8 +91,13 @@ private:
 
 constexpr auto queue = cartesian_prod<int, 0>{}.calculate(lut_dwt);
 constexpr auto queue_2 = cartesian_prod<cb, foo>{}.calculate(lut_dwt_2);
-constexpr auto queue_3 = cartesian_prod<dwt_2d_cb_f, no_dwt_2d<float, float>>{}
-                             .calculate(lut_dwt_3);
+inline constexpr auto
+    queue_3 = cartesian_prod<dwt_2d_cb_f, no_dwt_2d<float, float>>{}.calculate(
+        lut_dwt_3);
+
+std::array<dwt_2d_cb_f, depth> get_queue() {
+    return queue_3[get_queue_size()];
+}
 
 void show_queue() {
     std::cout << get_queue_size() << "\n";

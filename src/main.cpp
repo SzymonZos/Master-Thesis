@@ -53,7 +53,55 @@ void threadTesting() {
     }
 }
 void show_queue();
+
+using dwt_2d_cb_f = dwt_2d_cb<float, float>;
+constexpr int depth = 3;
+std::array<dwt_2d_cb_f, depth> get_queue();
 } // namespace mgr
+
+//#if 0
+enum class dwt_mode { _2d = 0, _rows = 1, _cols = 2 };
+
+std::pair<std::size_t, std::size_t> get_out_rows_cols(std::size_t rows_in,
+                                                      std::size_t cols_in,
+                                                      std::size_t filter_size,
+                                                      dwt_mode mode) {
+    auto rows_out = mgr::get_n_dwt_output(rows_in, filter_size);
+    auto cols_out = mgr::get_n_dwt_output(cols_in, filter_size);
+    switch (mode) {
+    case dwt_mode::_2d:
+        return {rows_out, cols_out};
+    case dwt_mode::_rows:
+        return {rows_in, cols_out};
+    case dwt_mode::_cols:
+        return {rows_out, cols_in};
+    default:
+        return {};
+    }
+}
+
+template<typename T,
+         mgr::dwt_2d_cb<T, T> dwt_cb,
+         dwt_mode dwt_mode,
+         std::size_t N>
+mgr::matrix<T> dwt_2d_wrapper(const mgr::matrix<T>& input,
+                              const std::array<T, N>& filter,
+                              mgr::padding_mode mode) {
+    auto [rows_out, cols_out] = get_out_rows_cols(input.rows(),
+                                                  input.cols(),
+                                                  filter.size(),
+                                                  dwt_mode);
+    mgr::matrix<T> output(rows_out, cols_out);
+    dwt_cb(input.data(),
+           input.rows(),
+           input.cols(),
+           filter.data(),
+           filter.size(),
+           output.data(),
+           mode);
+    return output;
+}
+//#endif
 
 int main() {
     //    mgr::threadTesting();
@@ -116,6 +164,14 @@ int main() {
                      mgr::padding_mode::symmetric);
     std::cout << out_cols << "\n\n";
 
-    mgr::show_queue();
+    auto dupa = mgr::get_queue();
+    for (auto d : dupa) {
+        auto out_mat = dwt_2d_wrapper<float, mgr::dwt_2d, dwt_mode::_2d>(
+            out_2d,
+            mgr::lut_bior2_2_f,
+            mgr::padding_mode::symmetric);
+        std::cout << out_mat << "\n\n";
+    }
+    //    mgr::show_queue();
     return 0;
 }
