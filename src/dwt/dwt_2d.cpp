@@ -14,7 +14,9 @@
 
 namespace mgr {
 
-REGISTER_DWT_2D(no_dwt_2d) {}
+REGISTER_DWT_2D(no_dwt_2d) {
+    std::copy_n(input, rows * cols, output);
+}
 INSTANTIATE_DWT_2D(no_dwt_2d, float, float);
 INSTANTIATE_DWT_2D(no_dwt_2d, double, double);
 

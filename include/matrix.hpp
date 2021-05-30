@@ -71,7 +71,7 @@ public:
     }
 
     friend std::ostream& operator<<(std::ostream& os, const matrix<T>& mat) {
-        os << "[";
+        os << "[ ";
         for (std::size_t i{}; i < mat.rows_ * mat.cols_; i++) {
             if (i && i % mat.cols_ == 0) {
                 os << "\n";

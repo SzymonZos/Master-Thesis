@@ -96,7 +96,12 @@ inline constexpr auto
         lut_dwt_3);
 
 std::array<dwt_2d_cb_f, depth> get_queue() {
-    return queue_3[get_queue_size()];
+    return queue_3[get_queue_size() - 1];
+}
+
+const std::array<std::array<dwt_2d_cb_f, depth>, get_queue_size()>&
+get_queue_all() {
+    return queue_3;
 }
 
 void show_queue() {
