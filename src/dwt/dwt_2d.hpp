@@ -28,7 +28,6 @@ REGISTER_DWT_2D(dwt_2d_rows);
 REGISTER_DWT_2D(dwt_2d_cols);
 REGISTER_DWT_2D(dwt_2d);
 
-//#undef REGISTER_DWT_2D
 } // namespace mgr
 
 #endif // JPEG2000_DWT_2D_HPP

@@ -1,4 +1,5 @@
 #include "dwt.hpp"
+#include "dwt_helpers.hpp"
 #include "utils.hpp"
 
 namespace mgr {

@@ -3,31 +3,12 @@
 
 #include "dwt.hpp"
 #include "dwt_2d.hpp"
+#include "dwt_helpers.hpp"
 #include "utils.hpp"
 
 #include <string_view>
 
 namespace mgr {
-enum class dwt_mode { _2d = 0, _rows = 1, _cols = 2 };
-
-inline std::pair<std::size_t, std::size_t>
-get_out_rows_cols(std::size_t rows_in,
-                  std::size_t cols_in,
-                  std::size_t filter_size,
-                  dwt_mode mode) {
-    auto rows_out = get_n_dwt_output(rows_in, filter_size);
-    auto cols_out = get_n_dwt_output(cols_in, filter_size);
-    switch (mode) {
-    case dwt_mode::_2d:
-        return {rows_out, cols_out};
-    case dwt_mode::_rows:
-        return {rows_in, cols_out};
-    case dwt_mode::_cols:
-        return {rows_out, cols_in};
-    default:
-        return {};
-    }
-}
 
 template<typename T, dwt_2d_cb<T, T> dwt_cb, dwt_mode dwt_mode>
 dense_array<T> dwt_2d_py(const dense_array<T>& input,

@@ -1,57 +1,16 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
-#include <thread>
-#include <unordered_map>
 #include <vector>
 
 #include "dwt.hpp"
 #include "dwt_2d.hpp"
+#include "dwt_helpers.hpp"
 #include "luts.hpp"
 #include "matrix.hpp"
 
 namespace mgr {
 
-alignas(64) std::atomic<std::size_t> index;
-constexpr std::size_t queueSize = 100;
-
-struct atrocity {
-    // data
-};
-
-constexpr void fillAtrocities() {
-    // generate queue array by filling members with right values
-}
-
-std::array<std::thread::id, queueSize> queue{};
-
-void threadTesting() {
-    //    std::iota(queue.begin(), queue.end(), -100);
-    std::vector<std::thread> threads;
-    const auto noThreads = std::thread::hardware_concurrency();
-    threads.reserve(noThreads);
-
-    for (std::size_t i{}; i < noThreads; i++) {
-        threads.emplace_back([]() {
-            while (index < queueSize) {
-                using namespace std::chrono_literals;
-                queue[++index] = std::this_thread::get_id();
-                std::this_thread::sleep_for(1ms);
-            }
-        });
-    }
-    for (auto& thread : threads) {
-        thread.join();
-    }
-    std::unordered_map<std::thread::id, std::size_t> counter;
-    for (std::size_t i{}; i < queue.size(); i++) {
-        std::cout << "[" << i << "]: " << queue[i] << "\n";
-        counter[queue[i]]++;
-    }
-    for (const auto& [id, count] : counter) {
-        std::cout << id << ": " << count << "\n";
-    }
-}
 void show_queue();
 
 using dwt_2d_cb_f = dwt_2d_cb<float, float>;
@@ -73,47 +32,15 @@ const std::array<std::array<dwt_2d_cb_f, depth>, get_queue_size()>&
 get_queue_all();
 } // namespace mgr
 
-enum class dwt_mode { _2d = 0, _rows = 1, _cols = 2, _no = 3 };
-
-template<typename T>
-std::unordered_map<mgr::dwt_2d_cb<T, T>, dwt_mode> dwt_cb_map = {
-    {mgr::dwt_2d<T, T>, dwt_mode::_2d},
-    {mgr::dwt_2d_rows<T, T>, dwt_mode::_rows},
-    {mgr::dwt_2d_cols<T, T>, dwt_mode::_cols},
-    {mgr::no_dwt_2d<T, T>, dwt_mode::_no}};
-
-template<typename T>
-std::pair<std::size_t, std::size_t>
-get_out_rows_cols(std::size_t rows_in,
-                  std::size_t cols_in,
-                  std::size_t filter_size,
-                  mgr::dwt_2d_cb<T, T> cb) {
-    auto rows_out = mgr::get_n_dwt_output(rows_in, filter_size);
-    auto cols_out = mgr::get_n_dwt_output(cols_in, filter_size);
-    auto mode = dwt_cb_map<T>[cb];
-    switch (mode) {
-    case dwt_mode::_2d:
-        return {rows_out, cols_out};
-    case dwt_mode::_rows:
-        return {rows_in, cols_out};
-    case dwt_mode::_cols:
-        return {rows_out, cols_in};
-    case dwt_mode::_no:
-        return {rows_in, cols_in};
-    default:
-        return {};
-    }
-}
-
 template<typename T, std::size_t N>
 mgr::matrix<T> dwt_2d_wrapper(const mgr::matrix<T>& input,
                               const std::array<T, N>& filter,
                               mgr::dwt_2d_cb<T, T> dwt_cb,
                               mgr::padding_mode mode) {
-    auto [rows_out, cols_out] = get_out_rows_cols(input.rows(),
-                                                  input.cols(),
-                                                  filter.size(),
-                                                  dwt_cb);
+    auto [rows_out, cols_out] = mgr::get_out_rows_cols(input.rows(),
+                                                       input.cols(),
+                                                       filter.size(),
+                                                       dwt_cb);
     mgr::matrix<T> output(rows_out, cols_out);
     dwt_cb(input.data(),
            input.rows(),
@@ -126,7 +53,6 @@ mgr::matrix<T> dwt_2d_wrapper(const mgr::matrix<T>& input,
 }
 
 int main() {
-    //    mgr::threadTesting();
     for (auto x : mgr::detail::lut_db2<float>) {
         std::cout << x << " ";
     }

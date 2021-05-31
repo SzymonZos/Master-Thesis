@@ -1,5 +1,7 @@
 #include "dwt_2d.hpp"
+
 #include "dwt.hpp"
+#include "dwt_helpers.hpp"
 
 #include <vector>
 
