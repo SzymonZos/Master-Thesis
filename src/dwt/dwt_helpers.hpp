@@ -3,8 +3,6 @@
 
 #include "dwt_2d.hpp"
 
-#include <unordered_map>
-
 namespace mgr {
 inline std::size_t get_n_dwt_output(std::size_t n_input,
                                     std::size_t n_filter) {
@@ -13,15 +11,6 @@ inline std::size_t get_n_dwt_output(std::size_t n_input,
     }
     return (n_input + n_filter - 1) / 2;
 }
-
-enum class dwt_mode { _2d = 0, _rows = 1, _cols = 2, _no = 3 };
-
-template<typename T>
-inline std::unordered_map<dwt_2d_cb<T, T>, dwt_mode> dwt_cb_map = {
-    {dwt_2d<T, T>, dwt_mode::_2d},
-    {dwt_2d_rows<T, T>, dwt_mode::_rows},
-    {dwt_2d_cols<T, T>, dwt_mode::_cols},
-    {no_dwt_2d<T, T>, dwt_mode::_no}};
 
 using dimensions = std::pair<std::size_t, std::size_t>;
 

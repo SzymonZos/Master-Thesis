@@ -2,6 +2,9 @@
 #define JPEG2000_MATRIX_HPP
 
 #include "config.hpp"
+#include "dwt_helpers.hpp"
+
+#include <array>
 #include <initializer_list>
 #include <ostream>
 #include <vector>
@@ -26,13 +29,11 @@ public:
     matrix(std::size_t rows, std::size_t cols) :
         rows_{rows},
         cols_{cols},
-        col_buf_(rows_),
         buf_(rows_ * cols_) {}
 
     matrix(std::initializer_list<T> list, std::size_t rows, std::size_t cols) :
         rows_{rows},
         cols_{cols},
-        col_buf_(rows_),
         buf_(list) {}
 
     [[nodiscard]] std::size_t rows() const noexcept {
@@ -53,13 +54,6 @@ public:
 
     const_pointer get_row(std::size_t row) const noexcept {
         return buf_.data() + row * cols_;
-    }
-
-    const_pointer get_col(std::size_t col) noexcept {
-        for (std::size_t i{}; i < col_buf_.size(); i++) {
-            col_buf_[i] = buf_[col + i * cols_];
-        }
-        return col_buf_.data();
     }
 
     reference operator[](std::size_t index) noexcept {
@@ -85,9 +79,28 @@ public:
 private:
     std::size_t rows_{};
     std::size_t cols_{};
-    std::vector<T> col_buf_;
     std::vector<T> buf_;
 };
+
+template<typename T, std::size_t N>
+matrix<T> dwt_2d_wrapper(const matrix<T>& input,
+                         const std::array<T, N>& filter,
+                         dwt_2d_cb<T, T> dwt_cb,
+                         padding_mode mode) {
+    auto [rows_out, cols_out] = get_out_rows_cols(input.rows(),
+                                                  input.cols(),
+                                                  filter.size(),
+                                                  dwt_cb);
+    matrix<T> output(rows_out, cols_out);
+    dwt_cb(input.data(),
+           input.rows(),
+           input.cols(),
+           filter.data(),
+           filter.size(),
+           output.data(),
+           mode);
+    return output;
+}
 
 } // namespace mgr
 

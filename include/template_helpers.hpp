@@ -1,6 +1,8 @@
 #ifndef JPEG2000_TEMPLATE_HELPERS_HPP
 #define JPEG2000_TEMPLATE_HELPERS_HPP
 
+#include <type_traits>
+
 namespace mgr {
 
 template<typename T, T... Seq>

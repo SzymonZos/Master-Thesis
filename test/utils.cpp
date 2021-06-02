@@ -1,6 +1,6 @@
 #include "utils.hpp"
 #include "config.hpp"
-#include "luts.hpp"
+#include "filter_luts.hpp"
 
 #include <pybind11/pybind11.h>
 
