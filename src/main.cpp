@@ -100,6 +100,7 @@ auto demo_sequential() {
     return vec;
 }
 
+#ifndef __clang__
 auto demo_parallel() {
     std::vector<mgr::matrix<float>> vec(mgr::detail::get_queue_size());
     std::atomic<std::size_t> i{0};
@@ -120,6 +121,7 @@ auto demo_parallel() {
                   });
     return vec;
 }
+#endif
 } // namespace
 
 int main() {
