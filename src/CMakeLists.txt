@@ -4,6 +4,8 @@ add_subdirectory(dwt)
 
 add_executable(jpeg2000 main.cpp)
 
+set_target_properties(jpeg2000 PROPERTIES COMPILE_FLAGS "-save-temps")
+
 if(BUILD_EXTERNALS)
     target_include_directories(jpeg2000 SYSTEM PRIVATE
         ${OPENCV_PATH}/modules/core/include
@@ -14,6 +16,7 @@ endif()
 
 target_include_directories(jpeg2000 SYSTEM PRIVATE
     ${CMAKE_SOURCE_DIR}
+    ${TIMER_PATH}
 )
 
 target_link_libraries(jpeg2000 PRIVATE

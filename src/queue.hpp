@@ -10,7 +10,7 @@
 namespace mgr {
 namespace detail {
 
-constexpr std::size_t depth = 3;
+constexpr std::size_t depth = 5;
 constexpr std::size_t n_dwt_cbs = lut_dwt_2d_cbs<float, float>.size() - 1;
 
 consteval std::size_t get_queue_size() {

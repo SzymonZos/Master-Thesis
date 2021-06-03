@@ -1,6 +1,11 @@
 #include <array>
+#include <atomic>
 #include <iostream>
 #include <vector>
+
+#ifndef __clang__
+#include <execution>
+#endif
 
 #include "dwt.hpp"
 #include "dwt_2d.hpp"
@@ -9,7 +14,12 @@
 #include "matrix.hpp"
 #include "queue.hpp"
 
-int main() {
+#include "Timer.hpp"
+
+namespace {
+const mgr::matrix<float> test_mat{{1, 2, 3, 4, 5, 5, 6, 7, 8, 9}, 5, 2};
+
+void demo_filter_luts() {
     for (auto x : mgr::detail::lut_db2<float>) {
         std::cout << x << " ";
     }
@@ -18,7 +28,9 @@ int main() {
         std::cout << x << " ";
     }
     std::cout << "\n\n";
+}
 
+void demo_dwt_1d() {
     std::array<float, 4> in{1, 2, 3, 4};
     std::vector<float> out(
         mgr::get_n_dwt_output(in.size(), mgr::lut_db2_f.size()));
@@ -32,8 +44,9 @@ int main() {
         std::cout << i << " ";
     }
     std::cout << "\n\n";
+}
 
-    mgr::matrix<float> test_mat{{1, 2, 3, 4, 5, 5, 6, 7, 8, 9}, 5, 2};
+void demo_dwt_2d() {
     mgr::matrix<float> out_rows{
         test_mat.rows(),
         mgr::get_n_dwt_output(test_mat.cols(), mgr::lut_bior2_2_f.size())};
@@ -68,16 +81,60 @@ int main() {
                      out_cols.data(),
                      mgr::padding_mode::symmetric);
     std::cout << out_cols << "\n\n";
+}
 
+auto demo_sequential() {
+    std::vector<mgr::matrix<float>> vec;
+    vec.reserve(mgr::detail::get_queue_size());
+    Timer<std::chrono::nanoseconds> t{};
     for (const auto& cbs : mgr::dwt_queue<float>) {
-        auto out_mat_2 = test_mat;
+        auto out_mat = test_mat;
         for (auto cb : cbs) {
-            out_mat_2 = mgr::dwt_2d_wrapper(out_mat_2,
-                                            mgr::lut_bior2_2_f,
-                                            cb,
-                                            mgr::padding_mode::symmetric);
+            out_mat = mgr::dwt_2d_wrapper(out_mat,
+                                          mgr::lut_bior2_2_f,
+                                          cb,
+                                          mgr::padding_mode::symmetric);
         }
-        std::cout << out_mat_2 << "\n\n";
+        vec.emplace_back(std::move(out_mat));
     }
+    return vec;
+}
+
+auto demo_parallel() {
+    std::vector<mgr::matrix<float>> vec(mgr::detail::get_queue_size());
+    std::atomic<std::size_t> i{0};
+    Timer<std::chrono::nanoseconds> t{};
+    std::for_each(std::execution::par_unseq,
+                  mgr::dwt_queue<float>.begin(),
+                  mgr::dwt_queue<float>.end(),
+                  [&vec, &i](const auto& cbs) {
+                      auto out_mat = test_mat;
+                      for (auto cb : cbs) {
+                          out_mat = mgr::dwt_2d_wrapper(
+                              out_mat,
+                              mgr::lut_bior2_2_f,
+                              cb,
+                              mgr::padding_mode::symmetric);
+                      }
+                      vec[i++] = std::move(out_mat);
+                  });
+    return vec;
+}
+} // namespace
+
+int main() {
+    std::cout << "SEQUENTIAL VERSION\n";
+    auto vec_seq = demo_sequential();
+    for (auto&& mat : vec_seq) {
+        std::cout << mat << "\n\n";
+    }
+
+#ifndef __clang__
+    std::cout << "\n\nPARALLEL VERSION\n";
+    auto vec_par = demo_parallel();
+    for (auto&& mat : vec_par) {
+        std::cout << mat << "\n\n";
+    }
+#endif
     return 0;
 }
