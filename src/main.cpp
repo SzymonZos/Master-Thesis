@@ -1,6 +1,6 @@
 #include <array>
-#include <atomic>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 #ifndef __clang__
@@ -103,7 +103,7 @@ auto demo_sequential() {
 #ifndef __clang__
 auto demo_parallel() {
     std::vector<mgr::matrix<float>> vec(mgr::detail::get_queue_size());
-    std::atomic<std::size_t> i{0};
+    alignas(64) std::atomic<std::size_t> i{0};
     Timer<std::chrono::nanoseconds> t{};
     std::for_each(std::execution::par_unseq,
                   mgr::dwt_queue<float>.begin(),
@@ -122,6 +122,36 @@ auto demo_parallel() {
     return vec;
 }
 #endif
+
+auto demo_my_parallel() {
+    constexpr auto n_queue = mgr::detail::get_queue_size();
+    const auto n_threads = std::thread::hardware_concurrency();
+
+    std::vector<mgr::matrix<float>> vec(n_queue);
+    std::vector<std::thread> threads;
+    threads.reserve(n_threads);
+    Timer<std::chrono::nanoseconds> t{};
+
+    for (std::size_t thread_idx{}; thread_idx < n_threads; thread_idx++) {
+        threads.emplace_back([&vec, thread_idx, n_threads]() {
+            for (std::size_t i{thread_idx}; i < n_queue; i += n_threads) {
+                auto out_mat = test_mat;
+                for (auto cb : mgr::dwt_queue<float>[i]) {
+                    out_mat = mgr::dwt_2d_wrapper(
+                        out_mat,
+                        mgr::lut_bior2_2_f,
+                        cb,
+                        mgr::padding_mode::symmetric);
+                }
+                vec[i] = std::move(out_mat);
+            }
+        });
+    }
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    return vec;
+}
 } // namespace
 
 int main() {
@@ -138,5 +168,13 @@ int main() {
         std::cout << mat << "\n\n";
     }
 #endif
+
+    std::cout << "\n\nMY PARALLEL VERSION\n";
+    auto vec_my_par = demo_my_parallel();
+    for (auto&& mat : vec_my_par) {
+        std::cout << mat << "\n\n";
+    }
+
+    std::cout << std::boolalpha << (vec_seq == vec_my_par) << "\n";
     return 0;
 }

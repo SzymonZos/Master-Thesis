@@ -5,6 +5,7 @@
 #include "dwt_helpers.hpp"
 
 #include <array>
+#include <compare>
 #include <initializer_list>
 #include <ostream>
 #include <vector>
@@ -75,6 +76,8 @@ public:
         os << "\b]";
         return os;
     }
+
+    auto operator<=>(const matrix&) const = default;
 
 private:
     std::size_t rows_{};
