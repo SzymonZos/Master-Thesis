@@ -8,6 +8,7 @@ set(TOOLCHAIN_BUILD "${CMAKE_CXX_COMPILER_ID}${CMAKE_BUILD_TYPE}")
 set(OPENCV_PATH ${CMAKE_SOURCE_DIR}/external/opencv)
 set(PYBIND11_PATH ${CMAKE_SOURCE_DIR}/external/pybind11)
 set(TIMER_PATH ${CMAKE_SOURCE_DIR}/external/Timer)
+set(CXXOPTS_PATH ${CMAKE_SOURCE_DIR}/external/cxxopts)
 
 # OpenCV junk
 set(OPENCV_ENABLE_ALLOCATOR_STATS OFF CACHE BOOL "")
@@ -45,3 +46,5 @@ if(BUILD_EXTERNALS)
     add_subdirectory(${OPENCV_PATH})
     add_subdirectory(src/jp3d)
 endif()
+
+add_subdirectory(${CXXOPTS_PATH})

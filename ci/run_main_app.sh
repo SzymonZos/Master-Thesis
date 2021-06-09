@@ -2,4 +2,4 @@
 set -Eeuo pipefail
 
 cmake --build build -- -j "$(nproc)"
-./build/src/jpeg2000
+./build/src/jpeg2000 -dq
