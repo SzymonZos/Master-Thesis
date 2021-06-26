@@ -5,6 +5,7 @@ add_subdirectory(dwt)
 set(SOURCES
     demo_dwt.cpp
     demo_queue.cpp
+    demo_opencv.cpp
     arg_parser.cpp
     main.cpp
 )
@@ -17,8 +18,10 @@ if(BUILD_EXTERNALS)
     target_include_directories(jpeg2000 SYSTEM PRIVATE
         ${OPENCV_PATH}/modules/core/include
         ${OPENCV_PATH}/modules/imgcodecs/include
-        ${CMAKE_CURRENT_BINARY_DIR} # OpenCV is looking for opencv2/opencv_modules.hpp
+        ${OPENCV_PATH}/modules/imgproc/include
+        ${CMAKE_BINARY_DIR} # OpenCV is looking for opencv2/opencv_modules.hpp
     )
+    target_compile_definitions(jpeg2000 PRIVATE BUILD_OPENCV)
 endif()
 
 target_include_directories(jpeg2000 SYSTEM PRIVATE
@@ -32,9 +35,10 @@ target_link_libraries(jpeg2000 PRIVATE
 )
 
 if (BUILD_EXTERNALS)
-    target_link_libraries(jpeg2000
+    target_link_libraries(jpeg2000 PRIVATE
         opencv_core
         opencv_imgcodecs
+        opencv_imgproc
         jp3d
     )
 endif()

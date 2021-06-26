@@ -3,7 +3,9 @@ import shutil
 from itertools import product, takewhile
 
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import numpy as np
+import cv2
 from pywt import dwt, dwt2, Wavelet
 from pywt.data import camera
 
@@ -141,17 +143,27 @@ def main():
 
 
 if __name__ == "__main__":
-    dummy = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    print(dwt_re(dummy, 'haar'))
-    print(dwt(dummy, 'haar')[0])
-    print(dwt_re(dummy, 'db2'))
-    print(dwt(dummy, 'db2')[0])
-    print(_dwt_rows(dummy))
-    print(dwt_re(dummy, 'bior2.2'))
-
-    dummy_2d = np.array([[1, 2, 3, 4, 5], [5, 6, 7, 8, 9]])
-    print(_dwt2(dummy_2d))
-    print(_dwt_rows(dummy_2d))
-    print(_dwt_cols(dummy_2d))
-    print(dwt_re(np.array([1, 5]), 'bior2.2'))
-    print(dwt(np.array([1, 5]), 'bior2.2')[0])
+    # dummy = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    # print(dwt_re(dummy, 'haar'))
+    # print(dwt(dummy, 'haar')[0])
+    # print(dwt_re(dummy, 'db2'))
+    # print(dwt(dummy, 'db2')[0])
+    # print(_dwt_rows(dummy))
+    # print(dwt_re(dummy, 'bior2.2'))
+    #
+    # dummy_2d = np.array([[1, 2, 3, 4, 5], [5, 6, 7, 8, 9]])
+    # print(_dwt2(dummy_2d))
+    # print(_dwt_rows(dummy_2d))
+    # print(_dwt_cols(dummy_2d))
+    # print(dwt_re(np.array([1, 5]), 'bior2.2'))
+    # print(dwt(np.array([1, 5]), 'bior2.2')[0])
+    original = cv2.imread('../img/lena.png', cv2.IMREAD_GRAYSCALE)
+    cv2.imshow('DUPA', original)
+    titles = ['Approximation', ' Horizontal detail',
+              'Vertical detail', 'Diagonal detail']
+    LL, (LH, HL, HH) = dwt2(original, 'bior1.3')
+    dupa = lambda x: 255 * (x - np.min(LL)) // (np.max(LL) - np.min(LL))
+    kupa = np.array([*map(dupa, LL), ]).astype(np.uint8)
+    cv2.imshow('kupa', kupa)
+    cv2.imshow('DUPA 2', LL)
+    plot_subbands(LL, LH, HL, HH, titles)
