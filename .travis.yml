@@ -9,7 +9,7 @@ install:
 before_script:
   - eval "$MATRIX_EVAL"
   - if [ "$BUILD_TESTS" = "ON" ]; then . ./ci/activate_venv.sh; fi
-  - cmake -DBUILD_TESTS="$BUILD_TESTS" -B build
+  - cmake -DBUILD_TESTS="$BUILD_TESTS" -DBUILD_EXTERNALS="$BUILD_EXTERNALS" -B build
 
 matrix:
   include:
@@ -24,6 +24,7 @@ matrix:
           packages:
             - g++-10
       env:
+        - BUILD_EXTERNALS="ON"
         - MATRIX_EVAL="CC=gcc-10 && CXX=g++-10"
       script:
         - ./ci/run_main_app.sh
@@ -64,6 +65,7 @@ matrix:
             - libc++-12-dev
             - libc++abi-12-dev
       env:
+        - BUILD_EXTERNALS="ON"
         - MATRIX_EVAL="CC=clang-12 && CXX=clang++-12"
       script:
         - ./ci/run_main_app.sh
