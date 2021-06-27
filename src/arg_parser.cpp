@@ -1,8 +1,8 @@
 #include "arg_parser.hpp"
 
 #include "demo_dwt.hpp"
-#include "demo_queue.hpp"
 #include "demo_opencv.hpp"
+#include "demo_queue.hpp"
 
 #include <cxxopts.hpp>
 
@@ -24,7 +24,7 @@ void parse_args(int argc, char** argv) {
                 ("sequential", "Demo of sequential queue")
                 ("parallel", "Demo of parallel queue")
                 ("my-parallel", "Demo of my parallel queue")
-                ("opencv", "Demo of using opencv loading image")
+                ("opencv", "Demo of using opencv loading image", cxxopts::value<std::string>())
                 ("h,help", "Print help");
 
         // clang-format on
@@ -63,7 +63,7 @@ void parse_args(int argc, char** argv) {
             demo_my_parallel();
         }
         if (result.count("opencv")) {
-            demo_opencv();
+            demo_opencv(result["opencv"].as<std::string>());
         }
 
     } catch (const cxxopts::OptionException& e) {

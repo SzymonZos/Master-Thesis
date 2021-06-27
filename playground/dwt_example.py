@@ -3,7 +3,6 @@ import shutil
 from itertools import product, takewhile
 
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import numpy as np
 import cv2
 from pywt import dwt, dwt2, Wavelet
@@ -142,28 +141,39 @@ def main():
     save_results(results)
 
 
-if __name__ == "__main__":
-    # dummy = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    # print(dwt_re(dummy, 'haar'))
-    # print(dwt(dummy, 'haar')[0])
-    # print(dwt_re(dummy, 'db2'))
-    # print(dwt(dummy, 'db2')[0])
-    # print(_dwt_rows(dummy))
-    # print(dwt_re(dummy, 'bior2.2'))
-    #
-    # dummy_2d = np.array([[1, 2, 3, 4, 5], [5, 6, 7, 8, 9]])
-    # print(_dwt2(dummy_2d))
-    # print(_dwt_rows(dummy_2d))
-    # print(_dwt_cols(dummy_2d))
-    # print(dwt_re(np.array([1, 5]), 'bior2.2'))
-    # print(dwt(np.array([1, 5]), 'bior2.2')[0])
+def dwt_testing():
+    dummy = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    print(dwt_re(dummy, 'haar'))
+    print(dwt(dummy, 'haar')[0])
+    print(dwt_re(dummy, 'db2'))
+    print(dwt(dummy, 'db2')[0])
+    print(_dwt_rows(dummy))
+    print(dwt_re(dummy, 'bior2.2'))
+
+    dummy_2d = np.array([[1, 2, 3, 4, 5], [5, 6, 7, 8, 9]])
+    print(_dwt2(dummy_2d))
+    print(_dwt_rows(dummy_2d))
+    print(_dwt_cols(dummy_2d))
+    print(dwt_re(np.array([1, 5]), 'bior2.2'))
+    print(dwt(np.array([1, 5]), 'bior2.2')[0])
+
+
+def opencv_dwt():
     original = cv2.imread('../img/lena.png', cv2.IMREAD_GRAYSCALE)
-    cv2.imshow('DUPA', original)
+    cv2.imshow('Original lena.png', original)
+    LL, (LH, HL, HH) = dwt2(original, 'bior1.3')
+
+    def normalize_img(pixel):
+        return 255 * (pixel - np.min(LL)) // (np.max(LL) - np.min(LL))
+
+    norm_ll = np.array([*map(normalize_img, LL), ]).astype(np.uint8)
+    cv2.imshow('opencv normalized ll from dwt', norm_ll)
     titles = ['Approximation', ' Horizontal detail',
               'Vertical detail', 'Diagonal detail']
-    LL, (LH, HL, HH) = dwt2(original, 'bior1.3')
-    dupa = lambda x: 255 * (x - np.min(LL)) // (np.max(LL) - np.min(LL))
-    kupa = np.array([*map(dupa, LL), ]).astype(np.uint8)
-    cv2.imshow('kupa', kupa)
-    cv2.imshow('DUPA 2', LL)
     plot_subbands(LL, LH, HL, HH, titles)
+
+
+if __name__ == "__main__":
+    main()
+    dwt_testing()
+    opencv_dwt()

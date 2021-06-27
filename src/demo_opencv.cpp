@@ -30,7 +30,7 @@ void paintAlphaMat(cv::Mat& mat) {
     }
 }
 
-bool imWrite(auto&&... params) {
+bool imwrite(auto&&... params) {
     try {
         return cv::imwrite(std::forward<decltype(params)>(params)...);
     } catch (const cv::Exception& ex) {
@@ -47,48 +47,60 @@ void opencvTesting() {
     std::vector<int> compression_params(2);
     compression_params[0] = cv::IMWRITE_PNG_COMPRESSION;
     compression_params[1] = 9;
-    imWrite("alpha.png", mat, compression_params);
-    imWrite("beta.jp2", mat);
+    imwrite("alpha.png", mat, compression_params);
+    imwrite("beta.jp2", mat);
+}
+
+cv::Mat read_img(const std::string& path) {
+    cv::Mat img = cv::imread(path, cv::IMREAD_GRAYSCALE);
+    if (img.empty()) {
+        throw std::runtime_error("cv::imread() failed: image not found");
+    }
+    img.convertTo(img, CV_32F);
+    return img;
+}
+
+void save_img(const std::string& path, cv::Mat& img) {
+    cv::normalize(img, img, 0., 1., cv::NORM_MINMAX, CV_32F);
+    img.convertTo(img, CV_8U, 255);
+    imwrite(path, img);
+}
+
+template<typename T, std::size_t N>
+cv::Mat dwt_2d_img_wrapper(const cv::Mat& input,
+                           const std::array<T, N>& filter,
+                           dwt_2d_cb<T, T> dwt_cb,
+                           padding_mode mode) {
+    auto [rows_out,
+          cols_out] = get_out_rows_cols(static_cast<std::size_t>(input.rows),
+                                        static_cast<std::size_t>(input.cols),
+                                        filter.size(),
+                                        dwt_cb);
+    cv::Mat output(static_cast<int>(rows_out),
+                   static_cast<int>(cols_out),
+                   input.type());
+    dwt_cb(input.ptr<T>(0),
+           static_cast<std::size_t>(input.rows),
+           static_cast<std::size_t>(input.cols),
+           filter.data(),
+           filter.size(),
+           output.ptr<T>(0),
+           mode);
+    return output;
 }
 } // namespace
 } // namespace mgr
 #endif
 
 namespace mgr {
-void demo_opencv() {
+void demo_opencv(const std::string& path) {
 #ifdef BUILD_OPENCV
-    cv::Mat img = cv::imread("../../img/lena.png", cv::IMREAD_GRAYSCALE);
-    if (img.empty()) {
-        std::cout << "!!! Failed imread(): image not found\n";
-    }
-    //    cv::cvtColor(img, img, cv::COLOR_RGB2GRAY);
-    std::cout << img.size << "\n";
-    cv::Mat img_f;
-    //    img.convertTo(img_f, CV_32F, 1. / 255.);
-    img.convertTo(img_f, CV_32F);
-    cv::Mat1f dupa(img);
-    auto [rows_out,
-          cols_out] = get_out_rows_cols(static_cast<std::size_t>(img_f.rows),
-                                        static_cast<std::size_t>(img_f.cols),
-                                        lut_bior2_2_f.size(),
-                                        dwt_mode::_2d);
-    cv::Mat out(static_cast<int>(rows_out),
-                static_cast<int>(cols_out),
-                img_f.type());
-    std::cout << img.type() << "\n";
-    dwt_2d(img_f.ptr<float>(0),
-           static_cast<std::size_t>(img_f.rows),
-           static_cast<std::size_t>(img_f.cols),
-           lut_bior2_2_f.data(),
-           lut_bior2_2_f.size(),
-           out.ptr<float>(0),
-           padding_mode::symmetric);
-    cv::normalize(out, out, 0., 1., cv::NORM_MINMAX, CV_32F);
-    cv::Mat out_u8;
-    out.convertTo(out_u8, CV_8U, 255);
-    imWrite("../../img/lena_dwt.bmp", out_u8);
-    []() {
-    }();
+    cv::Mat img = read_img(path);
+    cv::Mat out = dwt_2d_img_wrapper(img,
+                                     lut_bior2_2_f,
+                                     dwt_2d<float, float>,
+                                     padding_mode::symmetric);
+    save_img(std::string{path}.insert(path.find_last_of('.'), "_dwt"), out);
 #endif
 }
 } // namespace mgr
