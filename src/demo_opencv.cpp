@@ -1,5 +1,7 @@
 #ifdef BUILD_OPENCV
 
+#include "demo_opencv.hpp"
+
 #include "dwt_2d.hpp"
 #include "dwt_helpers.hpp"
 #include "filter_luts.hpp"
@@ -7,7 +9,6 @@
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgcodecs.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 
 namespace mgr {
 namespace {
