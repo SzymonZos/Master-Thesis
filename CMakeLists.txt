@@ -52,9 +52,6 @@ endif()
 
 if(BUILD_EXTERNALS)
     add_subdirectory(${OPENCV_PATH})
-    if(EXISTS ${JP3D_PATH})
-        add_subdirectory(${JP3D_PATH})
-    endif()
 endif()
 
 add_subdirectory(${CXXOPTS_PATH})

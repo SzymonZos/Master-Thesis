@@ -2,6 +2,10 @@ project(jpeg2000_src)
 
 add_subdirectory(dwt)
 
+if(BUILD_EXTERNALS AND EXISTS ${JP3D_PATH})
+    add_subdirectory(${JP3D_PATH})
+endif()
+
 set(SOURCES
     demo_dwt.cpp
     demo_queue.cpp
@@ -20,6 +24,7 @@ if(BUILD_EXTERNALS)
         ${OPENCV_PATH}/modules/imgcodecs/include
         ${OPENCV_PATH}/modules/imgproc/include
         ${CMAKE_BINARY_DIR} # OpenCV is looking for opencv2/opencv_modules.hpp
+        ${CXXOPTS_PATH}/include
     )
     target_compile_definitions(jpeg2000 PRIVATE BUILD_OPENCV)
 endif()
@@ -34,11 +39,13 @@ target_link_libraries(jpeg2000 PRIVATE
     cxxopts
 )
 
-if (BUILD_EXTERNALS)
+if(BUILD_EXTERNALS)
     target_link_libraries(jpeg2000 PRIVATE
         opencv_core
         opencv_imgcodecs
         opencv_imgproc
-        jp3d
     )
+    if(EXISTS ${JP3D_PATH})
+        target_link_libraries(jpeg2000 PRIVATE jp3d)
+    endif()
 endif()
