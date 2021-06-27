@@ -1,5 +1,3 @@
-#ifdef BUILD_OPENCV
-
 #include "demo_opencv.hpp"
 
 #include "dwt_2d.hpp"
@@ -7,6 +5,8 @@
 #include "filter_luts.hpp"
 
 #include <iostream>
+
+#ifdef BUILD_OPENCV
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 
