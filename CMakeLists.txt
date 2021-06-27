@@ -6,6 +6,7 @@ option(BUILD_TESTS OFF)
 
 set(TOOLCHAIN_BUILD "${CMAKE_CXX_COMPILER_ID}${CMAKE_BUILD_TYPE}")
 set(OPENCV_PATH ${CMAKE_SOURCE_DIR}/external/opencv)
+set(JP3D_PATH ${CMAKE_SOURCE_DIR}/src/jp3d)
 set(PYBIND11_PATH ${CMAKE_SOURCE_DIR}/external/pybind11)
 set(TIMER_PATH ${CMAKE_SOURCE_DIR}/external/Timer)
 set(CXXOPTS_PATH ${CMAKE_SOURCE_DIR}/external/cxxopts)
@@ -51,7 +52,6 @@ endif()
 
 if(BUILD_EXTERNALS)
     add_subdirectory(${OPENCV_PATH})
-    add_subdirectory(src/jp3d)
 endif()
 
 add_subdirectory(${CXXOPTS_PATH})
