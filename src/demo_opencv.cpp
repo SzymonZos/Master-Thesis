@@ -3,12 +3,16 @@
 #include "dwt_2d.hpp"
 #include "dwt_helpers.hpp"
 #include "filter_luts.hpp"
+#include "queue.hpp"
 
+#include <filesystem>
 #include <iostream>
 
 #ifdef BUILD_OPENCV
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgcodecs.hpp>
+
+namespace fs = std::filesystem;
 
 namespace mgr {
 namespace {
@@ -42,7 +46,7 @@ bool imwrite(auto&&... params) {
     return false;
 }
 
-void opencvTesting() {
+[[maybe_unused]] void opencvTesting() {
     cv::Mat mat(480, 640, CV_8UC4); // Create a matrix with alpha channel
     paintAlphaMat(mat);
     std::vector<int> compression_params(2);
@@ -101,7 +105,35 @@ void demo_opencv(const std::string& path) {
                                      lut_bior2_2_f,
                                      dwt_2d<float, float>,
                                      padding_mode::symmetric);
-    save_img(std::string{path}.insert(path.find_last_of('.'), "_dwt"), out);
+    fs::path input_path{path};
+    fs::path tmp_path{input_path.parent_path() / "tmp"};
+    fs::create_directory(tmp_path);
+    tmp_path /= ((input_path.stem() += "_dwt") += input_path.extension());
+    save_img(tmp_path.string(), out);
+#endif
+}
+
+void demo_opencv_queue(const std::string& path) {
+#ifdef BUILD_OPENCV
+    using namespace std::string_literals;
+    cv::Mat img = read_img(path);
+    fs::path input_path{path};
+    fs::path tmp_path{input_path.parent_path() / "tmp"};
+    fs::create_directory(tmp_path);
+
+    for (std::size_t i{}; const auto& cbs : mgr::dwt_queue<float>) {
+        auto out = img;
+        for (auto cb : cbs) {
+            out = dwt_2d_img_wrapper(out,
+                                     lut_bior2_2_f,
+                                     cb,
+                                     mgr::padding_mode::symmetric);
+        }
+        std::string ext = "_dwt_"s + std::to_string(i++);
+        tmp_path /= ((input_path.stem() += ext) += input_path.extension());
+        save_img(tmp_path.string(), out);
+        tmp_path.remove_filename();
+    }
 #endif
 }
 } // namespace mgr
