@@ -333,5 +333,5 @@ venv*
 src/jp3d/
 
 # Temporary directiores
-**/tmp/
-**/temp/
+**/tmp*/
+**/temp*/

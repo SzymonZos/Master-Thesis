@@ -5,8 +5,12 @@
 #include "filter_luts.hpp"
 #include "queue.hpp"
 
+#include "Timer.hpp"
+
 #include <filesystem>
 #include <iostream>
+#include <thread>
+#include <vector>
 
 #ifdef BUILD_OPENCV
 #include <opencv2/core/core.hpp>
@@ -121,6 +125,7 @@ void demo_opencv_queue(const std::string& path) {
     fs::path tmp_path{input_path.parent_path() / "tmp"};
     fs::create_directory(tmp_path);
 
+    Timer<std::chrono::milliseconds> t{};
     for (std::size_t i{}; const auto& cbs : mgr::dwt_queue<float>) {
         auto out = img;
         for (auto cb : cbs) {
@@ -136,4 +141,47 @@ void demo_opencv_queue(const std::string& path) {
     }
 #endif
 }
+
+void demo_opencv_parallel_queue(const std::string& path) {
+#ifdef BUILD_OPENCV
+    constexpr auto n_queue = mgr::detail::get_queue_size();
+    const auto n_threads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
+    threads.reserve(n_threads);
+
+    using namespace std::string_literals;
+    cv::Mat img = read_img(path);
+    fs::path input_path{path};
+    fs::path tmp_path{input_path.parent_path() / "tmp_2"};
+    fs::create_directory(tmp_path);
+
+    Timer<std::chrono::milliseconds> t{};
+    for (std::size_t thread_idx{}; thread_idx < n_threads; thread_idx++) {
+        threads.emplace_back([&img,
+                              &input_path,
+                              tmp_path,
+                              thread_idx,
+                              n_threads]() mutable {
+            for (std::size_t i{thread_idx}; i < n_queue; i += n_threads) {
+                auto out = img;
+                for (auto cb : dwt_queue<float>[i]) {
+                    out = dwt_2d_img_wrapper(out,
+                                             lut_bior2_2_f,
+                                             cb,
+                                             padding_mode::symmetric);
+                }
+                std::string ext = "_dwt_"s + std::to_string(i);
+                tmp_path /= ((input_path.stem() += ext) += input_path
+                                                               .extension());
+                save_img(tmp_path.string(), out);
+                tmp_path.remove_filename();
+            }
+        });
+    }
+    for (auto& thread : threads) {
+        thread.join();
+    }
+#endif
+}
+
 } // namespace mgr
