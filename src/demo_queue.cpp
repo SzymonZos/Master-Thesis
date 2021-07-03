@@ -3,6 +3,7 @@
 #include "dwt_helpers.hpp"
 #include "filter_luts.hpp"
 #include "matrix.hpp"
+#include "parallel_for.hpp"
 #include "queue.hpp"
 
 #include "Timer.hpp"
