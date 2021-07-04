@@ -13,8 +13,9 @@ namespace detail {
 
 // clang-format off
 template<typename Func, typename... Args>
-concept no_returnable = std::invocable<Func, Args...> &&
-                        std::same_as<std::invoke_result_t<Func, Args...>, void>;
+// std::invocable<Func, Args...> should really be used in conjunction
+// enable it with the release of libc++13 (support of <concepts> header)
+concept no_returnable = std::same_as<std::invoke_result_t<Func, Args...>, void>;
 
 template<typename Func, typename... Args>
 concept returnable = !no_returnable<Func, Args...>;
