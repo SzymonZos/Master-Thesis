@@ -2,15 +2,13 @@
 
 #include "dwt_2d.hpp"
 #include "dwt_helpers.hpp"
+#include "filesystem.hpp"
 #include "filter_luts.hpp"
 #include "parallel_for.hpp"
 #include "queue.hpp"
-#include "filesystem.hpp"
 
 #include "Timer.hpp"
 #include <iostream>
-#include <thread>
-#include <vector>
 
 #ifdef BUILD_OPENCV
 #include <opencv2/core/core.hpp>
@@ -106,46 +104,45 @@ void demo_opencv(const std::string& path) {
                                      dwt_2d<float, float>,
                                      padding_mode::symmetric);
     fs::path input_path{path};
-    fs::path tmp_path{input_path.parent_path() / "tmp"};
+    fs::path tmp_path = get_path_in_same_dir(input_path, "tmp");
     fs::create_directory(tmp_path);
-    tmp_path /= ((input_path.stem() += "_dwt") += input_path.extension());
+    tmp_path /= append_to_filename(input_path, "_dwt");
     save_img(tmp_path.string(), out);
 }
 
 void demo_opencv_queue(const std::string& path) {
-    using namespace std::string_literals;
     cv::Mat img = read_img(path);
     fs::path input_path{path};
-    fs::path tmp_path{input_path.parent_path() / "tmp"};
+    fs::path tmp_path = get_path_in_same_dir(input_path, "tmp");
     fs::create_directory(tmp_path);
 
     Timer<std::chrono::milliseconds> t{};
-    for (std::size_t i{}; const auto& cbs : mgr::dwt_queue<float>) {
+    for (std::size_t i{}; const auto& cbs : dwt_queue<float>) {
+        using namespace std::string_literals;
         auto out = img;
         for (auto cb : cbs) {
             out = dwt_2d_img_wrapper(out,
                                      lut_bior2_2_f,
                                      cb,
-                                     mgr::padding_mode::symmetric);
+                                     padding_mode::symmetric);
         }
-        std::string ext = "_dwt_"s + std::to_string(i++);
-        tmp_path /= ((input_path.stem() += ext) += input_path.extension());
+        tmp_path /= append_to_filename(input_path,
+                                       append_iter_to_name("_dwt_", i++));
         save_img(tmp_path.string(), out);
         tmp_path.remove_filename();
     }
 }
 
 void demo_opencv_parallel_queue(const std::string& path) {
-    constexpr auto n_queue = mgr::detail::get_queue_size();
+    constexpr auto n_queue = detail::get_queue_size();
     const auto n_threads = std::thread::hardware_concurrency();
 
-    using namespace std::string_literals;
     cv::Mat img = read_img(path);
     fs::path input_path{path};
-    fs::create_directory(input_path.parent_path() / "tmp_2");
+    fs::path tmp_path = get_path_in_same_dir(input_path, "tmp_2");
+    fs::create_directory(tmp_path);
 
-    Timer<std::chrono::milliseconds> t{};
-    auto par_queue = [&img, &input_path](std::size_t i) mutable {
+    auto par_queue = [&img, &input_path, tmp_path](std::size_t i) mutable {
         auto out = img;
         for (auto cb : dwt_queue<float>[i]) {
             out = dwt_2d_img_wrapper(out,
@@ -153,11 +150,12 @@ void demo_opencv_parallel_queue(const std::string& path) {
                                      cb,
                                      padding_mode::symmetric);
         }
-        std::string ext = "_dwt_"s + std::to_string(i);
-        fs::path tmp_path{input_path.parent_path() / "tmp_2"};
-        tmp_path /= (input_path.stem() + ext + input_path.extension());
+        tmp_path /= append_to_filename(input_path,
+                                       append_iter_to_name("_dwt_", i));
         save_img(tmp_path.string(), out);
+        tmp_path.remove_filename();
     };
+    Timer<std::chrono::milliseconds> t{};
     parallel_for(n_threads, n_queue, std::move(par_queue));
 }
 

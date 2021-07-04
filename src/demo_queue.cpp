@@ -19,19 +19,19 @@
 
 namespace mgr {
 namespace {
-const mgr::matrix<float> test_mat{{1, 2, 3, 4, 5, 5, 6, 7, 8, 9}, 5, 2};
+const matrix<float> test_mat{{1, 2, 3, 4, 5, 5, 6, 7, 8, 9}, 5, 2};
 
 auto demo_sequential_() {
-    std::vector<mgr::matrix<float>> vec;
-    vec.reserve(mgr::detail::get_queue_size());
+    std::vector<matrix<float>> vec;
+    vec.reserve(detail::get_queue_size());
     Timer<std::chrono::nanoseconds> t{};
-    for (const auto& cbs : mgr::dwt_queue<float>) {
+    for (const auto& cbs : dwt_queue<float>) {
         auto out_mat = test_mat;
         for (auto cb : cbs) {
-            out_mat = mgr::dwt_2d_wrapper(out_mat,
-                                          mgr::lut_bior2_2_f,
-                                          cb,
-                                          mgr::padding_mode::symmetric);
+            out_mat = dwt_2d_wrapper(out_mat,
+                                     lut_bior2_2_f,
+                                     cb,
+                                     padding_mode::symmetric);
         }
         vec.emplace_back(std::move(out_mat));
     }
@@ -40,20 +40,19 @@ auto demo_sequential_() {
 
 #ifndef __clang__
 auto demo_parallel_() {
-    std::vector<mgr::matrix<float>> vec(mgr::detail::get_queue_size());
+    std::vector<matrix<float>> vec(detail::get_queue_size());
     alignas(64) std::atomic<std::size_t> i{0};
     Timer<std::chrono::nanoseconds> t{};
     std::for_each(std::execution::par_unseq,
-                  mgr::dwt_queue<float>.begin(),
-                  mgr::dwt_queue<float>.end(),
+                  dwt_queue<float>.begin(),
+                  dwt_queue<float>.end(),
                   [&vec, &i](const auto& cbs) {
                       auto out_mat = test_mat;
                       for (auto cb : cbs) {
-                          out_mat = mgr::dwt_2d_wrapper(
-                              out_mat,
-                              mgr::lut_bior2_2_f,
-                              cb,
-                              mgr::padding_mode::symmetric);
+                          out_mat = dwt_2d_wrapper(out_mat,
+                                                   lut_bior2_2_f,
+                                                   cb,
+                                                   padding_mode::symmetric);
                       }
                       vec[i++] = std::move(out_mat);
                   });
@@ -62,32 +61,21 @@ auto demo_parallel_() {
 #endif
 
 auto demo_my_parallel_() {
-    constexpr auto n_queue = mgr::detail::get_queue_size();
+    constexpr auto n_queue = detail::get_queue_size();
     const auto n_threads = std::thread::hardware_concurrency();
+    auto par_queue = [](std::size_t i) -> matrix<float> {
+        auto out_mat = test_mat;
+        for (auto cb : dwt_queue<float>[i]) {
+            out_mat = dwt_2d_wrapper(out_mat,
+                                     lut_bior2_2_f,
+                                     cb,
+                                     padding_mode::symmetric);
+        }
+        return out_mat;
+    };
 
-    std::vector<mgr::matrix<float>> vec(n_queue);
-    std::vector<std::thread> threads;
-    threads.reserve(n_threads);
     Timer<std::chrono::nanoseconds> t{};
-
-    for (std::size_t thread_idx{}; thread_idx < n_threads; thread_idx++) {
-        threads.emplace_back([&vec, thread_idx, n_threads]() {
-            for (std::size_t i{thread_idx}; i < n_queue; i += n_threads) {
-                auto out_mat = test_mat;
-                for (auto cb : mgr::dwt_queue<float>[i]) {
-                    out_mat = mgr::dwt_2d_wrapper(
-                        out_mat,
-                        mgr::lut_bior2_2_f,
-                        cb,
-                        mgr::padding_mode::symmetric);
-                }
-                vec[i] = std::move(out_mat);
-            }
-        });
-    }
-    for (auto& thread : threads) {
-        thread.join();
-    }
+    auto vec = parallel_for(n_threads, n_queue, std::move(par_queue));
     return vec;
 }
 } // namespace

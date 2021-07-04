@@ -3,22 +3,29 @@
 
 #include "config.hpp"
 
+#include <concepts>
 #include <functional>
 #include <thread>
 #include <vector>
 
-#include <iostream>
-
 namespace mgr {
 namespace detail {
 
+// clang-format off
+template<typename Func, typename... Args>
+concept no_returnable = std::invocable<Func, Args...> &&
+                        std::same_as<std::invoke_result_t<Func, Args...>, void>;
+
+template<typename Func, typename... Args>
+concept returnable = !no_returnable<Func, Args...>;
+// clang-format on
+
 template<typename Func>
-void parallel_for(std::size_t n_threads, Func&& func) {
+void parallel_for(std::size_t n_threads, const Func& func) {
     std::vector<std::thread> threads;
     threads.reserve(n_threads);
-
     for (std::size_t thread_idx{}; thread_idx < n_threads; thread_idx++) {
-        threads.emplace_back(std::forward<Func>(func), thread_idx);
+        threads.emplace_back(func, thread_idx);
     }
     for (auto& thread : threads) {
         thread.join();
@@ -26,28 +33,32 @@ void parallel_for(std::size_t n_threads, Func&& func) {
 }
 } // namespace detail
 
-/*
- * template <typename T>
-auto capture_example(T&& value) {
-  struct { T value; } cap{std::forward<T>(value)};
-  return [cap = std::move(cap)]() {  use cap.value ; };
-};
- */
+template<typename Func>
+requires detail::no_returnable<Func, std::size_t>
+void parallel_for(std::size_t n_threads, std::size_t n_elements, Func&& func) {
+    detail::parallel_for(
+        n_threads,
+        [n_threads, n_elements, func = std::forward<Func>(func)](
+            std::size_t thread_idx) mutable {
+            for (std::size_t i{thread_idx}; i < n_elements; i += n_threads) {
+                func(i);
+            }
+        });
+}
 
 template<typename Func>
-void parallel_for(std::size_t n_threads, std::size_t n_elements, Func&& func) {
-    struct {
-        Func func;
-    } cap{std::forward<Func>(func)};
-    detail::parallel_for(n_threads,
-                         [n_threads, n_elements, cap = std::move(cap)](
-                             std::size_t thread_idx) mutable {
-                             for (std::size_t i{thread_idx}; i < n_elements;
-                                  i += n_threads) {
-                                 //                std::cout << i << "\n";
-                                 std::invoke(std::forward<Func>(cap.func), i);
-                             }
-                         });
+requires detail::returnable<Func, std::size_t>
+auto parallel_for(std::size_t n_threads, std::size_t n_elements, Func&& func) {
+    std::vector<std::invoke_result_t<Func, std::size_t>> result(n_elements);
+    detail::parallel_for(
+        n_threads,
+        [n_threads, n_elements, func = std::forward<Func>(func), &result](
+            std::size_t thread_idx) mutable {
+            for (std::size_t i{thread_idx}; i < n_elements; i += n_threads) {
+                result[i] = func(i);
+            }
+        });
+    return result;
 }
 } // namespace mgr
 
