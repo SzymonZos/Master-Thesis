@@ -335,3 +335,6 @@ src/jp3d/
 # Temporary directiores
 **/tmp*/
 **/temp*/
+
+# Matlab autosave
+*.asv

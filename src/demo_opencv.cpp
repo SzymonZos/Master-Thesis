@@ -2,6 +2,7 @@
 
 #include "dwt_2d.hpp"
 #include "dwt_helpers.hpp"
+#include "entropy.hpp"
 #include "filesystem.hpp"
 #include "filter_luts.hpp"
 #include "parallel_for.hpp"
@@ -61,6 +62,11 @@ cv::Mat read_img(const std::string& path) {
     if (img.empty()) {
         throw std::runtime_error("cv::imread() failed: image not found");
     }
+    std::cout << memoryless_entropy<double>(
+                     img.ptr<std::uint8_t>(),
+                     static_cast<std::size_t>(img.rows) *
+                         static_cast<std::size_t>(img.cols))
+              << "\n";
     img.convertTo(img, CV_32F);
     return img;
 }
