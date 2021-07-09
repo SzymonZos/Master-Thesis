@@ -165,6 +165,34 @@ void demo_opencv_parallel_queue(const std::string& path) {
     parallel_for(n_threads, n_queue, std::move(par_queue));
 }
 
+void demo_opencv_entropy(const std::string& path) {
+    constexpr auto n_queue = detail::get_queue_size();
+    const auto n_threads = std::thread::hardware_concurrency();
+    cv::Mat img = read_img(path);
+
+    auto par_queue = [&img](std::size_t i) mutable {
+        auto out = img;
+        for (auto cb : dwt_queue<float>[i]) {
+            out = dwt_2d_img_wrapper(out,
+                                     lut_bior2_2_f,
+                                     cb,
+                                     padding_mode::symmetric);
+        }
+        cv::normalize(out, out, 0., 1., cv::NORM_MINMAX, CV_32F);
+        out.convertTo(out, CV_8U, 255);
+        return memoryless_entropy<float>(
+            out.data,
+            static_cast<std::size_t>(out.rows) *
+                static_cast<std::size_t>(out.cols));
+    };
+    Timer<std::chrono::milliseconds> t{};
+    auto entropies = parallel_for(n_threads, n_queue, std::move(par_queue));
+    auto max = std::distance(
+        entropies.begin(),
+        std::max_element(entropies.begin(), entropies.end()));
+    std::cout << max << "\n";
+}
+
 } // namespace mgr
 #else
 namespace mgr {
