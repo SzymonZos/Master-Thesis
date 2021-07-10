@@ -29,6 +29,8 @@ void parse_args(int argc, char** argv) {
                 ("opencv-queue-parallel", "Demo of parallel dwt queue with opencv loading image",
                     cxxopts::value<std::string>())
                 ("opencv-queue-entropy", "Demo of dwt queue with opencv and entropy", cxxopts::value<std::string>())
+                ("opencv-queue-parallel-rgb", "Demo of parallel dwt queue with opencv for rgb images",
+                    cxxopts::value<std::string>())
                 ("h,help", "Print help");
 
         // clang-format on
@@ -79,6 +81,10 @@ void parse_args(int argc, char** argv) {
         if (result.count("opencv-queue-entropy")) {
             demo_opencv_entropy(
                 result["opencv-queue-entropy"].as<std::string>());
+        }
+        if (result.count("opencv-queue-parallel-rgb")) {
+            demo_opencv_parallel_queue_rgb(
+                result["opencv-queue-parallel-rgb"].as<std::string>());
         }
 
     } catch (const cxxopts::OptionException& e) {

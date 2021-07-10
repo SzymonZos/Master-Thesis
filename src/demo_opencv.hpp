@@ -9,6 +9,7 @@ void demo_opencv(const std::string& path);
 void demo_opencv_queue(const std::string& path);
 void demo_opencv_parallel_queue(const std::string& path);
 void demo_opencv_entropy(const std::string& path);
+void demo_opencv_parallel_queue_rgb(const std::string& path);
 
 } // namespace mgr
 

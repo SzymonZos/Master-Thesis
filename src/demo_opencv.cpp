@@ -12,8 +12,7 @@
 #include <iostream>
 
 #ifdef BUILD_OPENCV
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgcodecs.hpp>
+#include "opencv.hpp"
 
 namespace mgr {
 namespace {
@@ -36,17 +35,6 @@ void paintAlphaMat(cv::Mat& mat) {
     }
 }
 
-bool imwrite(auto&&... params) {
-    try {
-        return cv::imwrite(std::forward<decltype(params)>(params)...);
-    } catch (const cv::Exception& ex) {
-        std::cerr << "Exception converting image ("
-                  << std::get<0>(std::forward_as_tuple(params...))
-                  << "): " << ex.what() << "\n";
-    } catch (...) { std::cerr << "Unknown exception\n"; }
-    return false;
-}
-
 [[maybe_unused]] void opencvTesting() {
     cv::Mat mat(480, 640, CV_8UC4); // Create a matrix with alpha channel
     paintAlphaMat(mat);
@@ -57,54 +45,14 @@ bool imwrite(auto&&... params) {
     imwrite("beta.jp2", mat);
 }
 
-cv::Mat read_img(const std::string& path) {
-    cv::Mat img = cv::imread(path, cv::IMREAD_GRAYSCALE);
-    if (img.empty()) {
-        throw std::runtime_error("cv::imread() failed: image not found");
-    }
-    std::cout << memoryless_entropy<double>(
-                     img.ptr<std::uint8_t>(),
-                     static_cast<std::size_t>(img.rows) *
-                         static_cast<std::size_t>(img.cols))
-              << "\n";
-    img.convertTo(img, CV_32F);
-    return img;
-}
-
-void save_img(const std::string& path, cv::Mat& img) {
-    cv::normalize(img, img, 0., 1., cv::NORM_MINMAX, CV_32F);
-    img.convertTo(img, CV_8U, 255);
-    imwrite(path, img);
-}
-
-template<typename T, std::size_t N>
-cv::Mat dwt_2d_img_wrapper(const cv::Mat& input,
-                           const std::array<T, N>& filter,
-                           dwt_2d_cb<T, T> dwt_cb,
-                           padding_mode mode) {
-    auto [rows_out,
-          cols_out] = get_out_rows_cols(static_cast<std::size_t>(input.rows),
-                                        static_cast<std::size_t>(input.cols),
-                                        filter.size(),
-                                        dwt_cb);
-    cv::Mat output(static_cast<int>(rows_out),
-                   static_cast<int>(cols_out),
-                   input.type());
-    dwt_cb(input.ptr<T>(0),
-           static_cast<std::size_t>(input.rows),
-           static_cast<std::size_t>(input.cols),
-           filter.data(),
-           filter.size(),
-           output.ptr<T>(0),
-           mode);
-    return output;
-}
+constexpr auto n_queue = detail::get_queue_size();
+const auto n_threads = std::thread::hardware_concurrency();
 } // namespace
 } // namespace mgr
 
 namespace mgr {
 void demo_opencv(const std::string& path) {
-    cv::Mat img = read_img(path);
+    cv::Mat img = read_img(path, cv::IMREAD_GRAYSCALE);
     cv::Mat out = dwt_2d_img_wrapper(img,
                                      lut_bior2_2_f,
                                      dwt_2d<float, float>,
@@ -117,7 +65,7 @@ void demo_opencv(const std::string& path) {
 }
 
 void demo_opencv_queue(const std::string& path) {
-    cv::Mat img = read_img(path);
+    cv::Mat img = read_img(path, cv::IMREAD_GRAYSCALE);
     fs::path input_path{path};
     fs::path tmp_path = get_path_in_same_dir(input_path, "tmp");
     fs::create_directory(tmp_path);
@@ -140,10 +88,7 @@ void demo_opencv_queue(const std::string& path) {
 }
 
 void demo_opencv_parallel_queue(const std::string& path) {
-    constexpr auto n_queue = detail::get_queue_size();
-    const auto n_threads = std::thread::hardware_concurrency();
-
-    cv::Mat img = read_img(path);
+    cv::Mat img = read_img(path, cv::IMREAD_GRAYSCALE);
     fs::path input_path{path};
     fs::path tmp_path = get_path_in_same_dir(input_path, "tmp_2");
     fs::create_directory(tmp_path);
@@ -166,9 +111,7 @@ void demo_opencv_parallel_queue(const std::string& path) {
 }
 
 void demo_opencv_entropy(const std::string& path) {
-    constexpr auto n_queue = detail::get_queue_size();
-    const auto n_threads = std::thread::hardware_concurrency();
-    cv::Mat img = read_img(path);
+    cv::Mat img = read_img(path, cv::IMREAD_GRAYSCALE);
 
     auto par_queue = [&img](std::size_t i) mutable {
         auto out = img;
@@ -193,6 +136,35 @@ void demo_opencv_entropy(const std::string& path) {
     std::cout << max << "\n";
 }
 
+void demo_opencv_parallel_queue_rgb(const std::string& path) {
+    cv::Mat img = read_img(path, cv::IMREAD_COLOR);
+    std::vector<cv::Mat> channels(3);
+    cv::split(img, channels);
+    fs::path input_path{path};
+    fs::path tmp_path = get_path_in_same_dir(input_path, "tmp_3");
+    fs::create_directory(tmp_path);
+
+    auto par_queue =
+        [&channels, &input_path, tmp_path](std::size_t i) mutable {
+            auto out_channels = channels;
+            for (auto cb : dwt_queue<float>[i]) {
+                for (auto& channel : out_channels) {
+                    channel = dwt_2d_img_wrapper(channel,
+                                                 lut_bior2_2_f,
+                                                 cb,
+                                                 padding_mode::symmetric);
+                }
+            }
+            tmp_path /= append_to_filename(input_path,
+                                           append_iter_to_name("_dwt_", i));
+            cv::Mat out_img;
+            cv::merge(out_channels, out_img);
+            save_img(tmp_path.string(), out_img);
+            tmp_path.remove_filename();
+        };
+    Timer<std::chrono::milliseconds> t{};
+    parallel_for(n_threads, n_queue, std::move(par_queue));
+}
 } // namespace mgr
 #else
 namespace mgr {
