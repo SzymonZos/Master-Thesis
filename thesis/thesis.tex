@@ -78,7 +78,9 @@
 % Introductory pages
 
 \begin{abstract}
-    Abstract
+    Lorem ipsum\dots
+
+    \textbf{Keywords:} image compression, image processing, jpeg2000, multithreading, modern c++ 
 \end{abstract}
 
 \tableofcontents
@@ -87,23 +89,54 @@
 \pagenumbering{arabic}
 
 % Chapters
-\chapter{Introduction}
+\chapter{Introduction} \label{ch:intro}
 \input{chapters/introduction}
 
-\chapter{Idea} \label{ch:idea}
-\input{chapters/idea}
+\chapter{Problem analysis} \label{ch:problem}
+\input{chapters/problem}
 
-\chapter{Assumptions}
-\input{chapters/assumptions}
+\chapter{Subject of the thesis} \label{ch:subject}
+\input{chapters/subject}
 
-\chapter{Implementation}
-\input{chapters/implementation}
-
-\chapter{Results}
-\input{chapters/results}
+\chapter{Experiments} \label{ch:experiments}
+\input{chapters/experiments}
 
 \chapter{Summary} \label{ch:summary}
 \input{chapters/summary}
+
+\begin{appendices}
+    \chapter*{Technical documentation}
+    \addcontentsline{toc}{chapter}{Technical documentation}
+
+    \chapter*{List of abbreviations and symbols}
+    \addcontentsline{toc}{chapter}{List of abbreviations and symbols}
+
+    \begin{itemize}
+    \item[DNA] deoxyribonucleic acid
+    \item[MVC] model--view--controller 
+    \item[$N$] cardinality of data set
+    \item[$\mu$] membership function of a fuzzy set
+    \item[$\mathbb{E}$] set of edges of a graph
+    \item[$\mathcal{L}$] Laplace transformation
+    \end{itemize}
+
+    \chapter*{Contents of attached CD}
+    \addcontentsline{toc}{chapter}{Contents of attached CD}
+
+    The thesis is accompanied by a CD containing:
+    \begin{itemize}
+    \item thesis (\texttt{pdf} file),
+    \item source code of applications,
+    \item data sets used in experiments.
+    \end{itemize}   
+\end{appendices}
+
+\newpage
+
+% Lists of objects
+\listoffigures
+\listoftables
+% \listoflistings
 
 % Bibliography
 \nocite{*}
