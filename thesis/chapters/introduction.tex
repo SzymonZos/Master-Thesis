@@ -1,10 +1,42 @@
 \section{Preface}
 
-\begin{itemize}
-    \item introduction into the problem domain
-    \item settling of the problem in the domain
-\end{itemize}
-    
+The usage of digital images is constantly growing across whole world. There are multiple types
+of application where memory usage matters to the users. Image compression is a possible solution
+to this problem in some of these fields. For example it is mission critical component in medical
+and picture archiving and communication systems (PACSs). \cite{entropy} There are two major types
+of such compression. The one is lossy variant and the other one is lossless. Applying lossy methods
+to the image can result in the occurrence of compression artifacts. However, there are applications
+where such disadvantage is negligible, e.g. natural images and photographs processing in Internet day-to-day usage.
+\cite{img_compress} On the other hand lossless image compression does not produce such artefacts,
+sacrificing some performance and bitrates optimizations. It is employed in mentioned before medical systems.
+Images used for the sake of diagnostics can be taken as an example. In some countries there are
+regulations that forbid applying lossy compression to such images. \cite{entropy} Moreover, the
+usage of lossless variant is more desired when there exists some uncertainty whether information
+contained in the image can be discarded. In these scenarios not using any variant of compression
+can be the only subsitute of lossless one. \cite{entropy}
+
+Taking into account mentioned before reasons, some compression algorithms have been introduced as ISO
+standards. \cite{entropy} Some notable examples of such papers are PNG, JPEG and JPEG 2000 (often written as JP2).
+The latter was orginally developed from 1997 to 2000 with the desire of expanding JPEG capabilities.
+The main feature of this standard is usage of discrete wavelet transform (DWT) instead of discrete
+cosine transform (DCT) which was introduced in the predecessor. \cite{jpeg2000} The other feature
+of JPEG 2000 are support for lossy and lossless compression. As can be described before, such compression
+is needed to be perfomed in mission critical systems such as medicine. Therefore, the JPEG 2000 standard
+is utilized in PACSs and Digital Imaging and Communications in Medicine DICOM standard. \cite{entropy}
+This standard consist of 16 ISO parts which contain wide set of features. Some notable ones are core system
+coding and its extensions, motion images, testing and reference software. \cite{jpeg2000}
+
+The successor of JPEG standard improved several aspects over its predecessor. With the usage of its algorithms,
+e.g. DWT, it was possible to improve compression performance over JPEG. Moreover, there are other improved areas
+with even greater importance. The few examples of such features are scalability and editability. \cite{jpeg2000}
+The JPEG 2000 standard supports both very low and very high rates of the compression. It comes crucial
+in applications that require such flexibility. Another main advantage of this standard is the ability of
+effective handling large range of bit rates. It allows to reduce number of steps taken in processing
+certain images in comparison to JPEG. As an example, reducing the number of bits in some image below certain
+amount using JPEG standard compliant solution requires reducing the resolution of the input at first.
+Only after this procedure encoding of the image can be applied. The JPEG 2000 standard supplies adequate feature
+named multiresolution decomposition structure which makes such transformation transparent and one step only. \cite{jpeg2000}
+
 
 \section{Objective of the project}
 
