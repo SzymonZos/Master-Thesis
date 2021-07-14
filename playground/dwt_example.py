@@ -112,6 +112,14 @@ lut_bior2_2 = [
     0.0
 ]
 
+lut_leg_l = [
+    -0.125, 0.25, 0.75, 0.25, -0.125, 0
+]
+
+lut_leg_h = [
+    0, -0.5, 1., -0.5, 0, 0
+]
+
 
 def get_lut(wavelet: str):
     luts = {
@@ -119,7 +127,9 @@ def get_lut(wavelet: str):
         "haar": lut_db1,
         "db2": lut_db2,
         "db3": lut_db3,
-        "bior2.2": lut_bior2_2
+        "bior2.2": lut_bior2_2,
+        "leg_l": lut_leg_l,
+        "leg_h": lut_leg_h
     }
     return luts.get(wavelet, 0)
 
@@ -131,6 +141,7 @@ def dwt_re(arr_input: np.array, wavelet: str):
         arr_input = np.concatenate(
             (arr_input[symmetric_len - 1::-1], arr_input,
              arr_input[:arr_input.shape[0] - symmetric_len - 1:-1]), axis=None)
+    print(f"Dupa: {arr_input}")
     output = np.convolve(arr_input, lut, mode='valid')
     return output[::2]
 
@@ -174,6 +185,13 @@ def opencv_dwt():
 
 
 if __name__ == "__main__":
-    main()
-    dwt_testing()
-    opencv_dwt()
+    # main()
+    # dwt_testing()
+    # opencv_dwt()
+    img = np.array([55, 234, 70, 21, 88, 37])
+    print(dwt_re(img, 'leg_l'))
+    print(dwt_re(img, 'leg_h'))
+    l, h = dwt(img, 'bior2.2')
+    print(f"{l / np.sqrt(2)}\n{h / np.sqrt(2)}")
+    debug_img = np.array([21, 70, 234, 55, 55, 234, 70, 21, 88, 37, 37, 88, 21, 70])
+    print(np.convolve(debug_img, [*reversed(lut_leg_h), ], mode='full'))
