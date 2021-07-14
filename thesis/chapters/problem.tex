@@ -132,24 +132,27 @@ complex dwt calculating process only the coefficients $\mathbf{X}_{\phi}$ are ta
 
 \subsection{Introduction}
 
-As JPEG 2000 developed, many ideas for value-added capabilities emerged. It was not
-feasible to include them in the Part 1 Core (ISO/IEC, 2004a) – originally published
-in 2000 – so additional parts were created. The Part 2 standard, published as ISO/IEC
-15444-2 or ITU Recommendation T.801 (ISO/IEC, 2004b), contains multiple extensions
-of JPEG 2000 that were not large enough to merit entire documents of their own.
-Unlike the JPEG 2000 Part 1 Core, where decoders are expected to handle all the
-code-stream functionality, Part 2 is a collection of options that may be implemented `a la
-carte to meet specific market requirements. Moreover, sections within an extension annex
-can be implemented separately (e.g. subsets of the extended file format JPX). Hence,
-some extension features may appear across a wide spectrum of JPEG 2000 applications,
-while others will be less common in decoders.
-The extensions in Part 2 cover a disparate set of topics that modify or add to the Part 1
-JPEG 2000 processing chain. Some tools improve the compression efficiency and/or visual
-appearance of compressed images, while others modify or extend the functionality in other
-ways. To set the stage for the remainder of this chapter, we list the major topics with a
-pointer to their location within the Part 2 standard:
+Many ideas have been emerging as the JPEG 2000 was developed. These concept were full of
+value-added capabilities. However, they were not that important to be gone through the time-consuming
+ISO standardization process. The Part 1 (ISO/IEC, 2004a) of the standard, i.e. Core coding system, 
+was originally published in 2000. There was a need to created additional parts to include
+missing features. The Part 2 of the standard, published as ISO/IEC 15444-2 or ITU Recommendation
+T.801 (ISO/IEC, 2004b), contains multiple such extensions. There is present group of rather small
+additions that could not merit entire documents of their own. In the Part 1 Core of JPEG 2000
+standard decoders are supposed to handle all of the code-stream functionality. The Part 2
+is different from first one in this aspect. It is a collection of options that can be
+implemented on demand to meet very specific requirements of the given market. Moreover,
+sections within an extension annex can be implemented separately. For example, subsets
+of extended file format JPX can be used on their own. Therefore, some features of the Part 2
+may be present in the wide spectrum of JPEG 2000 applications while the other ones can be
+less common in the decoders. \cite{jpeg_suite}
 
-Compression efficiency
+As it was shown in the previous paragraph, the extensions present in the Part 2 consist of 
+very different set of topics that can modify or add some features to the Part 1 JPEG 2000 compliant 
+processing chain. Some tools can result in the compression efficiency improvement. Others can
+ameliorate the visual appearance of compressed images. Another group of extensions can modify
+or extend some functionalities in the other ways. The list of the major topics is presented below. \cite{jpeg_suite}
+\newline \newline Compression efficiency:
 \begin{itemize}
     \item Variable DC offset (VDCO) - Annex B
     \item Variable scalar quantization (VSQ) - Annex C
@@ -158,50 +161,68 @@ Compression efficiency
     \item Arbitrary wavelet decomposition - Annex F
     \item Arbitrary wavelet transform kernel - Annexes G and H
     \item Multiple component transform - Annex J
-    \item Nonlinear point transform - Annex K
+    \item Nonlinear point transform - Annex K \cite{jpeg_suite}
 \end{itemize}
-
-Functionality
+\hfill \break Functionalities:
 \begin{itemize} 
     \item Geometric manipulation - Annex I
     \item Single-sample overlap (SSO/TSSO) - Annex I
     \item Precinct-dependent quantization - Amendment 1
     \item Extended region of interest - Annex L
     \item Extended file format/metadata (JPX) - Annexes M and N
-    \item Extended capabilities signaling - Amendment 2
+    \item Extended capabilities signaling - Amendment 2 \cite{jpeg_suite}
 \end{itemize}
 
 \subsection{Arbitrary Decomposition}
 
-JPEG 2000 Part 1 allows only one wavelet decomposition structure: the well-known
-Mallat dyadic decomposition. Although this decomposition represents a good first choice
-across a broad spectrum of imagery, other decomposition styles can improve the image
-quality over specialized image classes and allow unequal size reductions in the horizontal
-and vertical dimensions of reduced resolution extracts.
-Other decomposition styles described with some regularity in the wavelet literature
-include the full packet tree and its derivatives. The packet decomposition derivatives can
-outperform the dyadic decomposition at maintaining regular fine-grain texture and work
-well on synthetic aperture radar imagery. The US Federal Bureau of Investigation uses
-a 500 ppi fingerprint compression standard, WSQ (CJIS, 1997), with a decomposition
-specialized for the characteristics of fingerprint imagery at 500 dpi. Figure 2.7 shows
-some of these decompositions.
-In addition to prespecified decomposition structures, wavelet packet analysis can be
-used to design custom decompositions for specific images or image types (Coifman and
-Wickerhauser, 1992; Ramchandan anad Vetterli, 1993; Meyer, Averbuch, and Stromberg,
-2000). Such approaches start with a large decomposition tree and locate a good decomposition
-based upon a chosen optimization metric.
+In the Part 1 of the JPEG 2000 standard there is only one wavelet decomposition structure allowed.
+This wavelet is called Mallat dyadic decomposition. Such decomposition is a good first choice
+to be applied across a wide spectrum of images. However, other ones can improve the quality of the image
+over specialized classes of the applications. The other effect of applying such decompositions are
+unequal reductions in the horizontal and vertical dimensional of reduced resolution extracts. \cite{jpeg_suite}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.45]{part_2_decomp_examples.png}
+    \caption{Some examples of decomposition compliant with the Part 2 \cite{jpeg_suite}}
+    \label{fig:part_2_decomp_examples}
+\end{figure}
+
+Other decomposition styles can be found in the wavelet literature. They include the full packet
+tree processing and some of its derivatives. The applied packet decomposition derivatives
+can outperform the solution from Part 1 of the JPEG 2000 standard in some applications.
+For instance, they come crucial at maintaining regular fine-grain texture. Moreover,
+the applications that require processing synthetic aperture radar images can benefit
+from using this extension. The US Federal Bureau of Investigation actively uses a 500 ppi
+fingerprint compression standard, i.e. WSQ (CJIS, 1997). The decomposition is specialized
+for the characteristics of fingerprint imagery at 500 dpi. \cite{jpeg_suite}
+
+Some of these decomposition can be seen of the Figure \ref{fig:part_2_decomp_examples}.
+Resolution decomposition is depicted as solid lines. Dashed lines represent extra sublevel
+decomposition. On the first example, i.e. image $(a)$, there is available full packet decomposition
+with such parameters: NL = 3: Ddfs = 111, Doads = 321, Dsads = all 1s. The next picture
+illustrates FBI decomposition wit specified parameters: NL = 5: Ddfs = 11111, Doads = 2321,
+Dsads = 11101111111111111. The last image is juts an arbitrary example. \cite{jpeg_suite}
+
+The prespecified decomposition structures are not the only feature of this extension.
+Wavelet packet analysis can be also used to design custom decompositions for specific images
+or some types of images. It was implemented in Coifman and Wickerhauser, 1992; Ramchandan
+anad Vetterli, 1993; Meyer, Averbuch, and Stromberg, 2000. Such applications often start with
+a large decomposition tree. Then, they tend to locate a good decomposition based upon
+specified optimization metric. \cite{jpeg_suite}
 
 \subsection{Arbitrary Wavelet Transforms}
 
-JPEG 2000 Part 1 includes only two wavelet transforms: the irreversible 9-7I and the
-reversible 5-3R, both specified with periodic symmetric preextension of the signal at
-the boundaries. While these filters work well for compressing a wide range of image
-types, certain image classes compress better with other wavelets. To allow this flexibility,
-Part 2 broadens the range of wavelet transforms that can be used to include not only the
-wider range of whole-sample symmetric (WS) filters, but also half-sample symmetric (HS)
-filters and generic nonsymmetric filters. This ability to handle generic filters makes JPEG
-2000 powerful not only for niche compression applications but also as a research tool. \cite{jpeg_suite}
-
+The Part 1 of the JPEG 2000 standard specifies only two possible wavelet transforms.
+The reversible one (5-3R) and the irreversible one (9-7I). As it was stated before, both
+are required to perform periodic symmetric signal extension at the boundaries.
+It is similar case to the Mallat dyadic decomposition in terms of generic implementation.
+These filters can compress quite well a wide set of image types. However, certain image
+classes can be compressed more efficiently with other types of wavelets. Such a flexibility
+is allowed in the Part 2 compliant applications. The range of wavelet transforms is broadened
+to include not only the wider range of whole-sample symmetric ones but also half-sample and
+generic nonsymmetric ones. Such ability to handle generic filters makes JPEG 2000 standard
+a powerful research tool, together with supporting more than niche compression applications.  \cite{jpeg_suite}
 
 \section{Computer architecture}
 
