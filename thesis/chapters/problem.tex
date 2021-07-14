@@ -22,13 +22,6 @@ The pair of low and high-pass filters is known as analysis filter bank in the en
 In the signal decoding process it is featured as a synthesis filter bank. The decoding step requires
 using the inverse of discrete wavelet transform. 
 
-The idea of using lowpass filter is the preservation of low frequencies of a signal while trying
-to eliminate or at least attenuate the high frequencies. In a result the output signal is the blurred
-version of the original one. Therefore, the operating principle of the highpass filter is completely
-opposite. As a result of applying such filter, the high frequencies of the signal are preserved and
-the low ones are discarded or at least dimnished. The output is a signal consisting of edges, textures
-and other details. \cite{jpeg_suite} 
-
 Take into consideration a one dimensional signal $x(n) = \{55, 234, 70, 21, 88, 37\}$. It can be better
 understood as values of pixels in a part of the grayscale image row. It is followed with a pair of low
 and highpass filters designated by $h_{0}(n)$ and $h_{1}(n)$ respectively. An example of such pair is
@@ -71,16 +64,13 @@ The $X_{\phi}(0, 0)$ and $X_{\psi}(0, 0)$ are calculated accordingly at the end 
 
 \subsection{Two dimensional DWT}
 
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.45]{dwt_2d_1_level.png}
-    \caption{Computation of a 1-level 4 $\times$ 4 2-D Haar DWT using a two-stage filter bank \cite{dwt_impl}}
-    \label{fig:dwt_2d_1_level}
-\end{figure}
+The idea of using lowpass filter is the preservation of low frequencies of a signal while trying
+to eliminate or at least attenuate the high frequencies. In a result the output signal is the blurred
+version of the original one. Therefore, the operating principle of the highpass filter is completely
+opposite. As a result of applying such filter, the high frequencies of the signal are preserved and
+the low ones are discarded or at least dimnished. The output is a signal consisting of edges, textures
+and other details. \cite{jpeg_suite} 
 
-Something something\dots Figure \ref{fig:dwt_2d_1_level} \cite{dwt_impl}
-
-% Something about DWT -> some specific info, new section probably to each of them
 \begin{figure}
     \centering
     \includegraphics[scale=0.7]{dwt_2d_example_wiki.png}
@@ -88,33 +78,51 @@ Something something\dots Figure \ref{fig:dwt_2d_1_level} \cite{dwt_impl}
     \label{fig:dwt_2d_example_wiki}
 \end{figure}
 
-An example of the 2D discrete wavelet transform that is used in JPEG2000 \ref{fig:dwt_2d_example_wiki}.
-The original image is high-pass filtered, yielding the three large images, each describing local changes
-in brightness (details) in the original image. It is then low-pass filtered and downscaled, yielding
-an approximation image; this image is high-pass filtered to produce the three smaller detail images and low-pass
-filtered to produce the final approximation image in the upper-left. \cite{dwt_example_wiki}
+There is presented an example of the effects of the two dimensional discrete wavelet transform on the Figure \ref{fig:dwt_2d_example_wiki}.
+The DWT used here is compliant with the Part 1 of the JPEG2000 standard. The number of DWT stages presented in this  
+example is equal to two. Two dimensional discrete wavelet transform applied first time to the original image
+yields four same sized subimages. The LL layer (upper left subimage) is an approximation of the image and contains the low frequencies.
+This layer is once more transformed in the next stage. The LH layer (upper right subimage) preserves high frequencies from the rows of the image.
+As a result vertical lines and details (brightness) can be seen in the produced subimage. On the other hand, the HL layer (bottom left)
+contains high frequencies from the columns of the image. The horizontal details and lines can be noticed there.
+Lastly, the HH layer (bottom right) preserves the diagonal lines. \cite{dwt_example_wiki}
 
-\subsection{DWT main features}
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.45]{dwt_2d_1_level.png}
+    \caption{Computation of a 1-level 4 $\times$ 4 2-D Haar DWT using a two-stage filter bank \cite{dwt_impl}}
+    \label{fig:dwt_2d_1_level}
+\end{figure}
+
+The process of computing a 1 level two dimensional discrete wavelet transform with usage of
+two-stage analysis Haar filter bank is shown in Figure \ref{fig:dwt_2d_1_level}. Coefficients $\mathbf{X}_{\phi}$
+are calculated as a result of lowpass filtering and downsampling to each row of the two dimensional
+data. Next, similar process process, i.e. lowpass convolution and downsampling is applied to each column of
+resulting data. The rest of coefficients is obtained in very similar fashion to the previous ones.
+Coefficients $\mathbf{X}^{H}_{\psi}$ are calculated by applying high-pass filtering and downsampling to each row of the
+2-D data $\mathbf{x}$ and then followed by applying sequence of low-pass filtering and downsampling to each
+column of the resulting data. Coefficients $\mathbf{X}^{V}_{\psi}$ are obtained by applying low-pass filtering
+and then downsampling to each column of the resulting data. Lastly, coefficients $\mathbf{X}^{D}_{\psi}$ are
+obtained by applying hig-pass filtering and downsampling to each row of the 2-D data $\mathbf{x}$ followed by
+applying highpass filtering and downsampling to each column of the resulting data. In the next stage of more
+complex dwt calculating process only the coefficients $\mathbf{X}_{\phi}$ are taken into consideration. \cite{dwt_impl}
+
+\subsection{DWT features summary}
 
 \begin{itemize}
-    \item The DWT is essentially a set of bandpass filters. However, it is efficiently implemented
-    using a set of lowpass and highpass filters recursively.
-    \item The computational complexity of computing the DWT is O(N).
-    \item There are basically two approaches to implement the DWT efficiently. The first approach is
-    to evaluate the required convolutions using the polyphase filter structure. Transform methods
-    are not used to carry out the convolution, as the length of the impulse response of the
-    filters is short.
-    \item The other approach is to factorize the polyphase matrix into a product of a set of sparse
-    matrices.
-    \item The 2-D DWT, with separable filters, is usually computed by the row-column method. That
-    is, 1-D DWT of all the columns is computed, and then the 1-D DWT of all the resulting
-    rows is computed. The order of the computation can also be reversed.
-    \item In the implementation of the DWT, additional memory of about half the size of the data is
-    required. For an in-place computation, data reordering is required.
-    \item In implementing the asymmetric filters, data expansion problem occurs due to the finite
-    length of the data.
-    \item Symmetric filters provide linear phase response and an effective solution to the border
-    problem.
+    \item In a nutshell, the discrete wavelet transform is a set of bandpass filters. Usually it is implemented
+    with the usage of low and high-pass filters recursively.
+    \item The computational complexity of computing the DWT in the best case is linear, i.e. $O(N)$.
+    \item The first approach to implement the DWT efficiently is evaluation of the required convolutions
+    with the usage of the polyphase filter structure.
+    \item The second approach is factorization of the polyphase matrix into a product of a set of sparse matrices.
+    \item The two dimensional discrete wavelet transform (with separable filters) is usually computed by the row-column method.
+    One dimensional DWT of all the columns is computed at first. Then the 1-D DWT of all the resulting
+    rows is calculated. The order of the computation does not matter in terms of achieving the same result.
+    \item Additional memory of approximate half the size of the given data is required in the implementation of the DWT.
+    \item Data reordering is required for an in-place computation of the DWT.
+    \item Data expansion problem can occur due to the finite length of the data in the implementation of the asymmetric filters.
+    \item Symmetric filters provide linear phase response and an effective solution to the border problem. \cite{dwt_impl}
 \end{itemize}
 
 \section{Part 2 of the JPEG 2000}
