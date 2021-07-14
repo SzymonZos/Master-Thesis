@@ -9,7 +9,12 @@
     \label{fig:dwt_1d_anal_synth}
 \end{figure}
 
-The one dimensional discrete wavelet transform can be depicted as successive applications of
+The linear convolution (filtering) of sequences $x(n)$ and $h(n)$ is defined as in equation \ref{eq:convolution}:
+\begin{equation}
+    y(n)=\sum_{m=-\infty}^{\infty}x(m)h(n-m)
+\label{eq:convolution}
+\end{equation}
+The one dimensional discrete wavelet transform can be depicted as successive applications (convolutions) of
 one seleceted pair of high and low-pass filters. The output of such application is then followed
 by downsampling by the factor of two. For example, it can be achieved by discarding samples with
 odd indices after each of filtering operation. It is better visualized in the Figure \ref{fig:dwt_1d_anal_synth}. \cite{jpeg_suite} 
@@ -46,7 +51,23 @@ $x'_{1}(n) = \{44.75, -85.75, 29, 12.75, -29.5\}$.
     \label{fig:dwt_1d_2_level}
 \end{figure}
 
-Something something\dots Figure \ref{fig:dwt_1d_2_level} \cite{dwt_impl}
+The next example shows how to compute the two levels of discrete wavelet transform. To speed up the process
+no padding option is chosen this time which makes it non-compliant with the JPEG 2000 standard.
+The filter used here is the most basic one, i.e. Haar analysis filter bank. It is the first wavelet
+from the Daubechies wavelet family. The calculation process is visualized in the Figure \ref{fig:dwt_1d_2_level}. \cite{dwt_impl}
+
+The input is chosen as 4-point signal $X_{\phi}(2, k) = \{2, 1, 3, 4\}$. This notaion emphasizes the fact
+that it is approximation of the input at scale 2. The so called scalling coefficients (or in other term
+approximation at scale 1) $X_{\phi}(1, k)$ are computed by convolving the input $x(k)$ with the low-pass
+Haar filter impulse response $l(k) = \{1/\sqrt{2}, 1/\sqrt{2}\}$. In the next step there is downsampling
+by a factor of 2 applied. The output of convolution has five values. The middle three from these fives 
+correspond to cases where both the given input values overlap with the impuse response. As it was described
+earlier, the odd values are preserved in the downsampling process. In a result first and third value of these
+three middle ones are the approximation output $X_{\phi}(1, k)$. In the similar way, the detail coefficients
+at scale 1 $X_{\psi}(1, k)$ are computed. The input $x(k)$ is convoled with the high-pass filter impulse
+response $h(k) = \{-1/\sqrt{2}, 1/\sqrt{2}\}$. Then the downsampling by factor of 2 is perfomed.
+Note that only only approximation output $X_{\phi}(1, k)$ of the first stage goes to the second one.
+The $X_{\phi}(0, 0)$ and $X_{\psi}(0, 0)$ are calculated accordingly at the end of the second stage. \cite{dwt_impl}
 
 \subsection{Two dimensional DWT}
 
