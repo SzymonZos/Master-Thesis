@@ -213,8 +213,93 @@ specified optimization metric. \cite{jpeg_suite}
 
 \subsection{Arbitrary Wavelet Transforms}
 
+\begin{table}
+    \centering
+    \caption{Analysis and synthesis filter taps for the floating-point Daubechies (9, 7) filter bank}
+    \label{tab:anal_synth_97i}
+\begin{tabular}{ccc}
+    \toprule
+    n         & Lowpass, $h_{0}(n)$ & Lowpass, $g_{0}(n)$ \\
+    \midrule
+    $0$       & +0.602949018236360  & +1.115087052457000  \\
+    $\pm 1$   & +0.266864118442875  & +0.591271763114250  \\
+    $\pm 2$   & -0.078223266528990  & -0.057543526228500  \\
+    $\pm 3$   & -0.016864118442875  & -0.091271763114250  \\
+    $\pm 4$   & +0.026748757410810  &                     \\
+    \bottomrule
+\end{tabular}
+
+\bigskip
+\bigskip
+
+
+\begin{tabular}{cc}
+    \toprule
+    n         & Highpass, $h_{1}(n)$ \\
+    \midrule
+    $-1$      & +1.115087052457000   \\
+    $-2, 0$   & -0.591271763114250   \\
+    $-3, 1$   & -0.057543526228500   \\
+    $-4, 2$   & +0.091271763114250   \\
+              &                      \\
+    \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+    \toprule
+    n        & Highpass, $g_{1}(n)$ \\
+    \midrule
+    $1$      & +0.602949018236360   \\
+    $0, 2$   & -0.266864118442875   \\
+    $-1, 3$  & -0.078223266528990   \\
+    $-2, 4$  & +0.016864118442875   \\
+    $-3, 5$  & +0.026748757410810   \\
+    \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{Analysis and synthesis filter taps for the integer (5, 3) filter bank}
+    \label{tab:anal_synth_53r}
+\begin{tabular}{ccc}
+    \toprule
+    n         & Lowpass, $h_{0}(n)$ & Lowpass, $g_{0}(n)$ \\
+    \midrule
+    $0$       & +0.75  & +1    \\
+    $\pm 1$   & +0.25  & +0.5  \\
+    $\pm 2$   & -0.125 &       \\
+    \bottomrule
+\end{tabular}
+
+\bigskip
+\bigskip
+
+
+\begin{tabular}{cc}
+    \toprule
+    n         & Highpass, $h_{1}(n)$ \\
+    \midrule
+    $-1$      & +1   \\
+    $-2, 0$   & -0.5 \\
+              &      \\
+    \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+    \toprule
+    n        & Highpass, $g_{1}(n)$ \\
+    \midrule
+    $1$      & +0.75  \\
+    $0, 2$   & -0.25  \\
+    $-1, 3$  & -0.125 \\
+    \bottomrule
+\end{tabular}
+\end{table}
+
 The Part 1 of the JPEG 2000 standard specifies only two possible wavelet transforms.
-The reversible one (5-3R) and the irreversible one (9-7I). As it was stated before, both
+The reversible one (5-3R, Table \ref{tab:anal_synth_53r}) and the irreversible one
+(9-7I, Table \ref{tab:anal_synth_97i}). As it was stated before, both
 are required to perform periodic symmetric signal extension at the boundaries.
 It is similar case to the Mallat dyadic decomposition in terms of generic implementation.
 These filters can compress quite well a wide set of image types. However, certain image
