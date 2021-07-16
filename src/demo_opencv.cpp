@@ -132,11 +132,11 @@ void demo_opencv_entropy(const std::string& path) {
             if (cb == dwt_2d<float, float>) {
                 auto out_hl = dwt_2d_img_wrapper(out,
                                                  lut_bior2_2_h_f,
-                                                 cb,
+                                                 dwt_2d_rows<float, float>,
                                                  padding_mode::symmetric);
                 out_hl = dwt_2d_img_wrapper(out_hl,
                                             lut_bior2_2_f,
-                                            cb,
+                                            dwt_2d_cols<float, float>,
                                             padding_mode::symmetric);
                 normalize_img(out_hl);
                 entropy += memoryless_entropy<float>(out_hl.data,
@@ -144,11 +144,11 @@ void demo_opencv_entropy(const std::string& path) {
                                                      out_hl.cols);
                 auto out_lh = dwt_2d_img_wrapper(out,
                                                  lut_bior2_2_f,
-                                                 cb,
+                                                 dwt_2d_rows<float, float>,
                                                  padding_mode::symmetric);
                 out_lh = dwt_2d_img_wrapper(out_lh,
                                             lut_bior2_2_h_f,
-                                            cb,
+                                            dwt_2d_cols<float, float>,
                                             padding_mode::symmetric);
                 normalize_img(out_lh);
                 entropy += memoryless_entropy<float>(out_lh.data,
