@@ -45,6 +45,18 @@ void paintAlphaMat(cv::Mat& mat) {
     imwrite("beta.jp2", mat);
 }
 
+template<typename T, typename U>
+T memoryless_entropy(const U* restrict arr, int rows, int cols) {
+    return mgr::memoryless_entropy<T>(arr,
+                                      static_cast<std::size_t>(rows) *
+                                          static_cast<std::size_t>(cols));
+}
+
+void normalize_img(cv::Mat& img) {
+    cv::normalize(img, img, 0., 1., cv::NORM_MINMAX, CV_32F);
+    img.convertTo(img, CV_8U, 255);
+}
+
 constexpr auto n_queue = detail::get_queue_size();
 const auto n_threads = std::thread::hardware_concurrency();
 } // namespace
@@ -115,24 +127,56 @@ void demo_opencv_entropy(const std::string& path) {
 
     auto par_queue = [&img](std::size_t i) mutable {
         auto out = img;
+        float entropy = 0.F;
         for (auto cb : dwt_queue<float>[i]) {
+            if (cb == dwt_2d<float, float>) {
+                auto out_hl = dwt_2d_img_wrapper(out,
+                                                 lut_bior2_2_h_f,
+                                                 cb,
+                                                 padding_mode::symmetric);
+                out_hl = dwt_2d_img_wrapper(out_hl,
+                                            lut_bior2_2_f,
+                                            cb,
+                                            padding_mode::symmetric);
+                normalize_img(out_hl);
+                entropy += memoryless_entropy<float>(out_hl.data,
+                                                     out_hl.rows,
+                                                     out_hl.cols);
+                auto out_lh = dwt_2d_img_wrapper(out,
+                                                 lut_bior2_2_f,
+                                                 cb,
+                                                 padding_mode::symmetric);
+                out_lh = dwt_2d_img_wrapper(out_lh,
+                                            lut_bior2_2_h_f,
+                                            cb,
+                                            padding_mode::symmetric);
+                normalize_img(out_lh);
+                entropy += memoryless_entropy<float>(out_lh.data,
+                                                     out_lh.rows,
+                                                     out_lh.cols);
+            }
+            auto out_h = dwt_2d_img_wrapper(out,
+                                            lut_bior2_2_h_f,
+                                            cb,
+                                            padding_mode::symmetric);
+            normalize_img(out_h);
+            entropy += memoryless_entropy<float>(out_h.data,
+                                                 out_h.rows,
+                                                 out_h.cols);
             out = dwt_2d_img_wrapper(out,
                                      lut_bior2_2_f,
                                      cb,
                                      padding_mode::symmetric);
         }
-        cv::normalize(out, out, 0., 1., cv::NORM_MINMAX, CV_32F);
-        out.convertTo(out, CV_8U, 255);
-        return memoryless_entropy<float>(
-            out.data,
-            static_cast<std::size_t>(out.rows) *
-                static_cast<std::size_t>(out.cols));
+        normalize_img(out);
+        entropy += memoryless_entropy<float>(out.data, out.rows, out.cols);
+        return entropy;
     };
     Timer<std::chrono::milliseconds> t{};
     auto entropies = parallel_for(n_threads, n_queue, std::move(par_queue));
     auto max = std::distance(
         entropies.begin(),
-        std::max_element(entropies.begin(), entropies.end()));
+        std::min_element(entropies.begin(), entropies.end()));
     std::cout << max << "\n";
 }
 

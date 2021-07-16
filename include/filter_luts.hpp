@@ -49,12 +49,22 @@ inline constexpr auto
                                     -0.1767766952966368811002110905262,
                                     0.0});
 
+template<typename T>
+inline constexpr auto
+    lut_bior2_2_h = std::to_array<T>({0.,
+                                      0.3535533905932737622004221810524,
+                                      0.7071067811865475244008443621048,
+                                      0.3535533905932737622004221810524,
+                                      0.,
+                                      0.});
+
 } // namespace detail
 
 INSTANTIATE_LUT(lut_db1);
 INSTANTIATE_LUT(lut_db2);
 INSTANTIATE_LUT(lut_db3);
 INSTANTIATE_LUT(lut_bior2_2);
+INSTANTIATE_LUT(lut_bior2_2_h);
 } // namespace mgr
 
 #endif // JPEG2000_FILTER_LUTS_HPP
