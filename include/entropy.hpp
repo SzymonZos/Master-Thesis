@@ -35,7 +35,7 @@ T memoryless_entropy(const U* restrict arr, std::size_t len) {
             T tmp = static_cast<T>(curr.second) / static_cast<T>(len);
             return prev + tmp * detail::log2(T{1} / tmp);
         });
-    return entropy;
+    return entropy / static_cast<T>(len);
 }
 } // namespace mgr
 

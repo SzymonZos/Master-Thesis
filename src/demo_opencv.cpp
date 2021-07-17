@@ -13,6 +13,11 @@
 
 #ifdef BUILD_OPENCV
 #include "opencv.hpp"
+#include <opencv2/imgproc.hpp>
+
+#include "dwt.hpp"
+
+#define DEBUG 0
 
 namespace mgr {
 namespace {
@@ -50,6 +55,11 @@ T memoryless_entropy(const U* restrict arr, int rows, int cols) {
     return mgr::memoryless_entropy<T>(arr,
                                       static_cast<std::size_t>(rows) *
                                           static_cast<std::size_t>(cols));
+}
+
+template<typename T>
+T memoryless_entropy(const cv::Mat& img) {
+    return memoryless_entropy<T>(img.data, img.rows, img.cols);
 }
 
 void normalize_img(cv::Mat& img) {
@@ -124,11 +134,14 @@ void demo_opencv_parallel_queue(const std::string& path) {
 
 void demo_opencv_entropy(const std::string& path) {
     cv::Mat img = read_img(path, cv::IMREAD_GRAYSCALE);
-
+#if not DEBUG
     auto par_queue = [&img](std::size_t i) mutable {
         auto out = img;
         float entropy = 0.F;
-        for (auto cb : dwt_queue<float>[i]) {
+        for (auto cb : dwt_queue<float>[i + 1]) {
+            if (cb == no_dwt_2d<float, float>) {
+                break;
+            }
             if (cb == dwt_2d<float, float>) {
                 auto out_hl = dwt_2d_img_wrapper(out,
                                                  lut_bior2_2_h_f,
@@ -139,9 +152,7 @@ void demo_opencv_entropy(const std::string& path) {
                                             dwt_2d_cols<float, float>,
                                             padding_mode::symmetric);
                 normalize_img(out_hl);
-                entropy += memoryless_entropy<float>(out_hl.data,
-                                                     out_hl.rows,
-                                                     out_hl.cols);
+                entropy += memoryless_entropy<float>(out_hl);
                 auto out_lh = dwt_2d_img_wrapper(out,
                                                  lut_bior2_2_f,
                                                  dwt_2d_rows<float, float>,
@@ -151,33 +162,71 @@ void demo_opencv_entropy(const std::string& path) {
                                             dwt_2d_cols<float, float>,
                                             padding_mode::symmetric);
                 normalize_img(out_lh);
-                entropy += memoryless_entropy<float>(out_lh.data,
-                                                     out_lh.rows,
-                                                     out_lh.cols);
+                entropy += memoryless_entropy<float>(out_lh);
             }
             auto out_h = dwt_2d_img_wrapper(out,
                                             lut_bior2_2_h_f,
                                             cb,
                                             padding_mode::symmetric);
             normalize_img(out_h);
-            entropy += memoryless_entropy<float>(out_h.data,
-                                                 out_h.rows,
-                                                 out_h.cols);
+            entropy += memoryless_entropy<float>(out_h);
+
             out = dwt_2d_img_wrapper(out,
                                      lut_bior2_2_f,
                                      cb,
                                      padding_mode::symmetric);
         }
         normalize_img(out);
-        entropy += memoryless_entropy<float>(out.data, out.rows, out.cols);
+        cv::Mat median;
+        cv::medianBlur(out, median, 3);
+        cv::Mat abs;
+        cv::absdiff(out, median, abs);
+        entropy += memoryless_entropy<float>(abs);
         return entropy;
     };
     Timer<std::chrono::milliseconds> t{};
-    auto entropies = parallel_for(n_threads, n_queue, std::move(par_queue));
-    auto max = std::distance(
+    auto entropies = parallel_for(n_threads,
+                                  n_queue - 1,
+                                  std::move(par_queue));
+    auto min = std::distance(
         entropies.begin(),
         std::min_element(entropies.begin(), entropies.end()));
-    std::cout << max << "\n";
+    std::cout << min + 1 << "\n";
+#else
+    cv::Mat median;
+    cv::medianBlur(img, median, 3);
+    imwrite("median.png", median);
+    cv::Mat out;
+    cv::absdiff(img, median, out);
+    imwrite("out.png", out);
+    std::cout << memoryless_entropy<float>(img) << "\n"
+              << memoryless_entropy<float>(out) << "\n";
+    auto out_l = dwt_2d_img_wrapper(out,
+                                    lut_bior2_2_f,
+                                    dwt_2d_rows<float, float>,
+                                    padding_mode::symmetric);
+    save_img("out_l.png", out_l);
+    auto out_h = dwt_2d_img_wrapper(img,
+                                    lut_bior2_2_h_f,
+                                    dwt_2d_rows<float, float>,
+                                    padding_mode::symmetric);
+    save_img("out_h.png", out_h);
+    std::cout << memoryless_entropy<float>(out_l) +
+                     memoryless_entropy<float>(out_h)
+              << "\n";
+    float dupa[6] = {55, 234, 70, 21, 88, 37};
+    float kupa[6] = {};
+    dwt_1d(dupa,
+           6,
+           lut_bior2_2_h_f.data(),
+           lut_bior2_2_h_f.size(),
+           kupa,
+           padding_mode::symmetric);
+    for (std::size_t i{}; i < 6; i++) {
+        std::cout << kupa[i] << " ";
+    }
+    std::cout << "\n";
+#endif
 }
 
 void demo_opencv_parallel_queue_rgb(const std::string& path) {

@@ -112,12 +112,20 @@ lut_bior2_2 = [
     0.0
 ]
 
+lut_bior2_2_h = [
+    0., 0.,
+    0.3535533905932737622004221810524,
+    -0.7071067811865475244008443621048,
+    0.3535533905932737622004221810524,
+    0.
+]
+
 lut_leg_l = [
     -0.125, 0.25, 0.75, 0.25, -0.125, 0
 ]
 
 lut_leg_h = [
-    0, -0.5, 1., -0.5, 0, 0
+    0, 0, 0.5, -1., 0.5, 0
 ]
 
 
@@ -129,7 +137,8 @@ def get_lut(wavelet: str):
         "db3": lut_db3,
         "bior2.2": lut_bior2_2,
         "leg_l": lut_leg_l,
-        "leg_h": lut_leg_h
+        "leg_h": lut_leg_h,
+        "bior2.2_h": lut_bior2_2_h
     }
     return luts.get(wavelet, 0)
 
@@ -184,14 +193,116 @@ def opencv_dwt():
     plot_subbands(LL, LH, HL, HH, titles)
 
 
+def memoryless_entropy(img):
+    hist = cv2.calcHist([img], [0], None, [256], [0, 256])
+    entropy = 0
+    img_size = img.shape[0] * img.shape[1]
+    for val in hist:
+        if val:
+            tmp = val[0] / img_size
+            entropy += tmp * np.log2(1. / tmp)
+    return entropy / img_size
+
+
+def dwt_cols(image, wavelet):
+    ll, hh = dwt(image.T, wavelet)
+    return ll.T, hh.T
+
+
+def normalize(img):
+    return cv2.normalize(img, dst=None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+
+
+def median_diff(img):
+    img = normalize(img)
+    median = cv2.medianBlur(img, 3)
+    return cv2.absdiff(img, median)
+
+
+def entropy(img):
+    img = normalize(img)
+    return memoryless_entropy(img)
+
+
+def no_dwt_estimate(img, cb_diff):
+    diff = cb_diff(img)
+    return memoryless_entropy(diff)
+
+
+def dwt_rows_estimate(img, wavelet, cb_diff):
+    ll, hh = dwt(img, wavelet)
+    diff = cb_diff(ll)
+    return entropy(hh) + memoryless_entropy(diff)
+
+
+def dwt_cols_estimate(img, wavelet, cb_diff):
+    ll, hh = dwt_cols(img, wavelet)
+    diff = cb_diff(ll)
+    return entropy(hh) + memoryless_entropy(diff)
+
+
+def dwt_2d_estimate(img, wavelet, cb_diff):
+    ll, (lh, hl, hh) = dwt2(img, wavelet)
+    diff = cb_diff(ll)
+    return entropy(lh) + entropy(hl) + entropy(hh) + memoryless_entropy(diff)
+
+
+def test_median():
+    original = cv2.imread('../img/lena.png', cv2.IMREAD_GRAYSCALE)
+    wavelet = 'bior2.2'
+    res = [no_dwt_estimate(original, median_diff),
+           dwt_rows_estimate(original, wavelet, median_diff),
+           dwt_cols_estimate(original, wavelet, median_diff),
+           dwt_2d_estimate(original, wavelet, median_diff)]
+    print(np.argmin(res))
+
+
+def shift_diff(img):
+    img = normalize(img)
+    num_rows, num_cols = img.shape[:2]
+    trans_mat = np.float32([[1, 0, 1], [0, 1, 0]])
+    img_translation = cv2.warpAffine(img, trans_mat, (num_cols, num_rows))
+    return cv2.absdiff(img, img_translation)
+
+
+def test_shift():
+    original = cv2.imread('../img/lena.png', cv2.IMREAD_GRAYSCALE)
+    wavelet = 'bior2.2'
+    res = [no_dwt_estimate(original, shift_diff),
+           dwt_rows_estimate(original, wavelet, shift_diff),
+           dwt_cols_estimate(original, wavelet, shift_diff),
+           dwt_2d_estimate(original, wavelet, shift_diff)]
+    print(np.argmin(res))
+
+
+def highpass(img):
+    _, hh = dwt(img, 'bior2.2')
+    hh = normalize(hh)
+    return hh
+
+
+def test_highpass():
+    original = cv2.imread('../img/lena.png', cv2.IMREAD_GRAYSCALE)
+    wavelet = 'bior2.2'
+    res = [no_dwt_estimate(original, highpass),
+           dwt_rows_estimate(original, wavelet, highpass),
+           dwt_cols_estimate(original, wavelet, highpass),
+           dwt_2d_estimate(original, wavelet, highpass)]
+    print(np.argmin(res))
+
+
 if __name__ == "__main__":
     # main()
     # dwt_testing()
     # opencv_dwt()
-    img = np.array([55, 234, 70, 21, 88, 37])
-    print(dwt_re(img, 'leg_l'))
-    print(dwt_re(img, 'leg_h'))
-    l, h = dwt(img, 'bior2.2')
-    print(f"{l / np.sqrt(2)}\n{h / np.sqrt(2)}")
-    debug_img = np.array([21, 70, 234, 55, 55, 234, 70, 21, 88, 37, 37, 88, 21, 70])
-    print(np.convolve(debug_img, [*reversed(lut_leg_h), ], mode='full'))
+    # img = np.array([55, 234, 70, 21, 88, 37])
+    # print(dwt_re(img, 'bior2.2'))
+    # print(dwt_re(img, 'bior2.2_h'))
+    # l, h = dwt(img, 'bior2.2')
+    # print(f"{l}\n{h}")
+    # print(f"{l / np.sqrt(2)}\n{h / np.sqrt(2)}")
+    # debug_img = np.array([21, 70, 234, 55, 55, 234, 70, 21, 88, 37, 37, 88, 21, 70])
+    # print(np.convolve(debug_img, [*reversed(lut_leg_h), ], mode='full'))
+    test_median()
+    test_shift()
+    test_highpass()
