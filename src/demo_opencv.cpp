@@ -50,6 +50,8 @@ void paintAlphaMat(cv::Mat& mat) {
     imwrite("beta.jp2", mat);
 }
 
+int orig_size = 0;
+
 template<typename T, typename U>
 T memoryless_entropy(const U* restrict arr, int rows, int cols) {
     return mgr::memoryless_entropy<T>(arr,
@@ -59,7 +61,8 @@ T memoryless_entropy(const U* restrict arr, int rows, int cols) {
 
 template<typename T>
 T memoryless_entropy(const cv::Mat& img) {
-    return memoryless_entropy<T>(img.data, img.rows, img.cols);
+    T factor = static_cast<T>(img.rows * img.cols) / static_cast<T>(orig_size);
+    return factor * memoryless_entropy<T>(img.data, img.rows, img.cols);
 }
 
 void normalize_img(cv::Mat& img) {
@@ -134,11 +137,12 @@ void demo_opencv_parallel_queue(const std::string& path) {
 
 void demo_opencv_entropy(const std::string& path) {
     cv::Mat img = read_img(path, cv::IMREAD_GRAYSCALE);
+    orig_size = img.rows * img.cols;
 #if not DEBUG
     auto par_queue = [&img](std::size_t i) mutable {
         auto out = img;
         float entropy = 0.F;
-        for (auto cb : dwt_queue<float>[i + 1]) {
+        for (auto cb : dwt_queue<float>[i]) {
             if (cb == no_dwt_2d<float, float>) {
                 break;
             }
@@ -185,13 +189,11 @@ void demo_opencv_entropy(const std::string& path) {
         return entropy;
     };
     Timer<std::chrono::milliseconds> t{};
-    auto entropies = parallel_for(n_threads,
-                                  n_queue - 1,
-                                  std::move(par_queue));
+    auto entropies = parallel_for(n_threads, n_queue, std::move(par_queue));
     auto min = std::distance(
         entropies.begin(),
         std::min_element(entropies.begin(), entropies.end()));
-    std::cout << min + 1 << "\n";
+    std::cout << min << "\n";
 #else
     cv::Mat median;
     cv::medianBlur(img, median, 3);

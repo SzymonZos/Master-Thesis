@@ -193,15 +193,18 @@ def opencv_dwt():
     plot_subbands(LL, LH, HL, HH, titles)
 
 
+original_size = 0
+
+
 def memoryless_entropy(img):
     hist = cv2.calcHist([img], [0], None, [256], [0, 256])
-    entropy = 0
+    res_ent = 0
     img_size = img.shape[0] * img.shape[1]
     for val in hist:
         if val:
             tmp = val[0] / img_size
-            entropy += tmp * np.log2(1. / tmp)
-    return entropy / img_size
+            res_ent += tmp * np.log2(1. / tmp)
+    return (img_size / original_size) * res_ent
 
 
 def dwt_cols(image, wavelet):
@@ -248,13 +251,17 @@ def dwt_2d_estimate(img, wavelet, cb_diff):
 
 
 def test_median():
-    original = cv2.imread('../img/lena.png', cv2.IMREAD_GRAYSCALE)
+    original = cv2.imread('../img/lena.png', cv2.IMREAD_COLOR)
+    global original_size
+    original_size = original.shape[0] * original.shape[1]
     wavelet = 'bior2.2'
-    res = [no_dwt_estimate(original, median_diff),
-           dwt_rows_estimate(original, wavelet, median_diff),
-           dwt_cols_estimate(original, wavelet, median_diff),
-           dwt_2d_estimate(original, wavelet, median_diff)]
-    print(np.argmin(res))
+    res = [[] for _ in range(4)]
+    for i in range(3):
+        res[0].append(no_dwt_estimate(original[:, :, i], median_diff))
+        res[1].append(dwt_rows_estimate(original[:, :, i], wavelet, median_diff))
+        res[2].append(dwt_cols_estimate(original[:, :, i], wavelet, median_diff))
+        res[3].append(dwt_2d_estimate(original[:, :, i], wavelet, median_diff))
+    print(np.argmin(np.sum(res, 1)))
 
 
 def shift_diff(img):
@@ -266,13 +273,17 @@ def shift_diff(img):
 
 
 def test_shift():
-    original = cv2.imread('../img/lena.png', cv2.IMREAD_GRAYSCALE)
+    original = cv2.imread('../img/lena.png', cv2.IMREAD_COLOR)
+    global original_size
+    original_size = original.shape[0] * original.shape[1]
     wavelet = 'bior2.2'
-    res = [no_dwt_estimate(original, shift_diff),
-           dwt_rows_estimate(original, wavelet, shift_diff),
-           dwt_cols_estimate(original, wavelet, shift_diff),
-           dwt_2d_estimate(original, wavelet, shift_diff)]
-    print(np.argmin(res))
+    res = [[] for _ in range(4)]
+    for i in range(3):
+        res[0].append(no_dwt_estimate(original[:, :, i], shift_diff))
+        res[1].append(dwt_rows_estimate(original[:, :, i], wavelet, shift_diff))
+        res[2].append(dwt_cols_estimate(original[:, :, i], wavelet, shift_diff))
+        res[3].append(dwt_2d_estimate(original[:, :, i], wavelet, shift_diff))
+    print(np.argmin(np.sum(res, 1)))
 
 
 def highpass(img):
@@ -282,13 +293,66 @@ def highpass(img):
 
 
 def test_highpass():
-    original = cv2.imread('../img/lena.png', cv2.IMREAD_GRAYSCALE)
+    original = cv2.imread('../img/lena.png', cv2.IMREAD_COLOR)
+    global original_size
+    original_size = original.shape[0] * original.shape[1]
     wavelet = 'bior2.2'
-    res = [no_dwt_estimate(original, highpass),
-           dwt_rows_estimate(original, wavelet, highpass),
-           dwt_cols_estimate(original, wavelet, highpass),
-           dwt_2d_estimate(original, wavelet, highpass)]
-    print(np.argmin(res))
+    res = [[] for _ in range(4)]
+    for i in range(3):
+        res[0].append(no_dwt_estimate(original[:, :, i], highpass))
+        res[1].append(dwt_rows_estimate(original[:, :, i], wavelet, highpass))
+        res[2].append(dwt_cols_estimate(original[:, :, i], wavelet, highpass))
+        res[3].append(dwt_2d_estimate(original[:, :, i], wavelet, highpass))
+    print(np.argmin(np.sum(res, 1)))
+
+
+def set_orig_size(img):
+    global original_size
+    original_size = img.shape[0] * img.shape[1]
+
+
+def test_part(img, wavelet):
+    res = [[] for _ in range(4)]
+    for i in range(3):
+        res[0].append(no_dwt_estimate(img[:, :, i], shift_diff))
+        res[1].append(dwt_rows_estimate(img[:, :, i], wavelet, shift_diff))
+        res[2].append(dwt_cols_estimate(img[:, :, i], wavelet, shift_diff))
+        res[3].append(dwt_2d_estimate(img[:, :, i], wavelet, shift_diff))
+    return np.argmin(np.sum(res, 1))
+
+
+def no_dwt(img):
+    return img
+
+
+def dwt_rows_low(img, wavelet):
+    ll, _ = dwt(img, wavelet)
+    return ll
+
+
+def dwt_cols_low(img, wavelet):
+    ll, _ = dwt(img.T, wavelet)
+    return ll.T
+
+
+def dwt_2d_low(img, wavelet):
+    ll, (_, _, _) = dwt2(img, wavelet)
+    return ll
+
+
+lut_dwt = [no_dwt, dwt_rows_low, dwt_cols_low, dwt_2d_low]
+
+
+def test_full(img, wavelet):
+    img_test = img
+    heuristics = []
+    for i in range(5):
+        res = test_part(img_test, wavelet)
+        heuristics.append(res)
+        if res == 0:
+            break
+        img_test = lut_dwt[res](img_test)
+    print(heuristics)
 
 
 if __name__ == "__main__":
@@ -303,6 +367,9 @@ if __name__ == "__main__":
     # print(f"{l / np.sqrt(2)}\n{h / np.sqrt(2)}")
     # debug_img = np.array([21, 70, 234, 55, 55, 234, 70, 21, 88, 37, 37, 88, 21, 70])
     # print(np.convolve(debug_img, [*reversed(lut_leg_h), ], mode='full'))
-    test_median()
-    test_shift()
-    test_highpass()
+    # test_median()
+    # test_shift()
+    # test_highpass()
+    original = cv2.imread('../img/photos_png/actress_1.png', cv2.IMREAD_COLOR)
+    set_orig_size(original)
+    test_full(original, 'bior2.2')
