@@ -17,8 +17,8 @@ def run_cmd(path, cmd):
     try:
         out = re.search(R"(Layer.+\n\D+)([\d\.]+)", out, re.M).group(2)
     except AttributeError:
-        out = "nil"
-    return f"Bitrate: {out}"
+        out = "inf"
+    return float(out)
 
 
 def test_kdu(path):
@@ -35,15 +35,20 @@ def test_kdu(path):
         for comp in comps:
             comp = ','.join(x[0] for x in comp)
             cmds.append(f'{level} Cdecomp="{comp}"')
+    results = dict()
     for cmd in cmds:
-        print(f"{cmd}: {run_cmd(path, cmd)}")
+        results[cmd] = run_cmd(path, cmd)
+    with open('kdu_logs.txt', 'a') as f:
+        f.write(f"{path}: {results}\n")
+    min_bitrate = min(results, key=results.get)
+    print(f"{min_bitrate}: {results[min_bitrate]}")
 
 
 def main():
     for file in os.scandir('./images_ppm'):
         print(file.path)
         test_kdu(file.path)
-        break
+        print("")
 
 
 if __name__ == '__main__':
