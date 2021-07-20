@@ -208,8 +208,8 @@ def memoryless_entropy(img):
 
 
 def dwt_cols(image, wavelet):
-    ll, hh = dwt(image.T, wavelet)
-    return ll.T, hh.T
+    ll, hh = dwt(image, wavelet, axis=1)
+    return ll, hh
 
 
 def normalize(img):
@@ -229,25 +229,25 @@ def entropy(img):
 
 def no_dwt_estimate(img, cb_diff):
     diff = cb_diff(img)
-    return memoryless_entropy(diff)
+    return 2 * memoryless_entropy(diff)
 
 
 def dwt_rows_estimate(img, wavelet, cb_diff):
-    ll, hh = dwt(img, wavelet)
+    ll, hh = dwt(img, wavelet, axis=0)
     diff = cb_diff(ll)
-    return entropy(hh) + memoryless_entropy(diff)
+    return entropy(hh) + 1.6 * memoryless_entropy(diff)
 
 
 def dwt_cols_estimate(img, wavelet, cb_diff):
     ll, hh = dwt_cols(img, wavelet)
     diff = cb_diff(ll)
-    return entropy(hh) + memoryless_entropy(diff)
+    return entropy(hh) + 1.6 * memoryless_entropy(diff)
 
 
 def dwt_2d_estimate(img, wavelet, cb_diff):
-    ll, (lh, hl, hh) = dwt2(img, wavelet)
+    ll, (lh, hl, hh) = dwt2(img, wavelet, axes=(0, 1))
     diff = cb_diff(ll)
-    return entropy(lh) + entropy(hl) + entropy(hh) + memoryless_entropy(diff)
+    return entropy(lh) + entropy(hl) + entropy(hh) + 1.5 * memoryless_entropy(diff)
 
 
 def test_median():
@@ -287,7 +287,7 @@ def test_shift():
 
 
 def highpass(img):
-    _, hh = dwt(img, 'bior2.2')
+    _, hh = dwt(img, 'bior2.2', axis=0)
     hh = normalize(hh)
     return hh
 
@@ -318,7 +318,9 @@ def test_part(img, wavelet):
         res[1].append(dwt_rows_estimate(img[:, :, i], wavelet, shift_diff))
         res[2].append(dwt_cols_estimate(img[:, :, i], wavelet, shift_diff))
         res[3].append(dwt_2d_estimate(img[:, :, i], wavelet, shift_diff))
-    return np.argmin(np.sum(res, 1))
+    sum_res = np.sum(res, 1)
+    arg_min_res = np.argmin(sum_res)
+    return arg_min_res, sum_res[arg_min_res]
 
 
 def no_dwt(img):
@@ -326,17 +328,17 @@ def no_dwt(img):
 
 
 def dwt_rows_low(img, wavelet):
-    ll, _ = dwt(img, wavelet)
+    ll, _ = dwt(img, wavelet, axis=0)
     return ll
 
 
 def dwt_cols_low(img, wavelet):
-    ll, _ = dwt(img.T, wavelet)
+    ll, _ = dwt(img.T, wavelet, axis=1)
     return ll.T
 
 
 def dwt_2d_low(img, wavelet):
-    ll, (_, _, _) = dwt2(img, wavelet)
+    ll, (_, _, _) = dwt2(img, wavelet, axes=(0, 1))
     return ll
 
 
@@ -347,12 +349,12 @@ def test_full(img, wavelet):
     img_test = img
     heuristics = []
     for i in range(5):
-        res = test_part(img_test, wavelet)
+        res, min_val = test_part(img_test, wavelet)
         heuristics.append(res)
         if res == 0:
             break
-        img_test = lut_dwt[res](img_test)
-    print(heuristics)
+        img_test = lut_dwt[res](img_test, wavelet)
+    return heuristics, min_val
 
 
 if __name__ == "__main__":
@@ -370,6 +372,11 @@ if __name__ == "__main__":
     # test_median()
     # test_shift()
     # test_highpass()
-    original = cv2.imread('../img/photos_png/actress_1.png', cv2.IMREAD_COLOR)
+    original = cv2.imread('../img/275000.ppm', cv2.IMREAD_COLOR)
     set_orig_size(original)
-    test_full(original, 'bior2.2')
+    results = dict()
+    for wavelet in ["bior2.2", "haar", "bior2.6"]:
+        results[wavelet] = test_full(original, wavelet)
+    min_result = min(results.items(), key=lambda k: k[1][1])
+    print(min_result)
+    print(results)
