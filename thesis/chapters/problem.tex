@@ -318,127 +318,16 @@ a powerful research tool, together with supporting more than niche compression a
 
 \subsection{Part 1 compliant applications}
 
-The OpenJPEG library is an open-source JPEG 2000 library developed to promote the use
-of JPEG 2000. The main part of the project consists of a JPEG 2000 codec compliant with
-Part 1 of the standard (Class-1 Profile-1 compliance). Besides this main codec, OpenJPEG
-integrates several other modules:
-- JP2 (JPEG 2000 standard Part 2, on handling of JP2 boxes and extended multiple
-component transforms for multispectral and hyperspectral imagery);
-- MJ2 (JPEG 2000 standard Part 3);
-- JPWL (JPEG 2000 standard Part 11);
-- OPJViewer, a GUI viewer for J2K, JP2, JPWL, and MJ2 files;
-- OPJIndexer, a code-stream indexer to view information about the headers and packets
-localization, and the rate-distortion contribution of each packet to the image.
-The OpenJPEG library is written in C language, released under the BSD license and
-targets Win32, Unix, and Mac OS platforms. The library is developed by the Communications
-and Remote Sensing Lab (TELE) of the Universit´e Catholique de Louvain (UCL),
-with the support of the CS company and CNES. The JPWL and OPJViewer modules
-are developed and maintained by the Digital Signal Processing Lab (DSPLab) of the
-University of Perugia (UNIPG). \cite{jpeg_suite}
-
-JasPer is a computer software project to create a reference implementation of the codec specified in the JPEG-2000 Part-1 standard (i.e. ISO/IEC 15444-1) - started in 1997 at Image Power Inc. and at the University of British Columbia. It consists of a C library and some sample applications useful for testing the codec.
-
-The copyright owner began licensing the code to the public under an MIT License-style license in 2004 in response to requests from the open-source community. As of 2011 JasPer operated as a component of many software projects, both free and proprietary, including (but not limited to) netpbm (as of release 10.12), ImageMagick and KDE (as of version 3.2). As of 22 June  2010 the GEGL graphics library supported JasPer in its latest Git versions.
-
-In a series of objective JPEG-2000-compression quality tests conducted in 2004, "JasPer was the best codec, closely followed by IrfanView and Kakadu". However, Jasper remains one of the slowest implementations of the JPEG-2000 codec, as it was designed for reference, not performance.
-
-
-In computer software, Grok is a library to encode and decode images in the JPEG 2000 format. It fully implements Part 1 of the ISO/IEC 15444-1 technical standard. It is designed for stability, high performance, and low memory usage. Grok is free and open-source software released under the GNU Affero General Public License (AGPL) version 3.
-High performance - grk_decompress is currently over 1/2 the speed of Kakadu, one of the leading commercial JPEG 2000 libraries
-Fast sub-tile decode
-Supports decoding to stdout for png, jpeg, bmp, pnm, and raw output formats
-Supports TLM code stream marker for fast single-tile and sub-tile decoding of large tiled images
-Supports PLT code stream marker for fast sub-tile decoding of large single-tile images
-Full support for ICC profiles and other meta-data such as XML, IPTC and XMP
-Supports new Part 15 of the standard, aka High Throughput JPEG 2000, which promises up to a 10x speed up over the original Part 1 of the JPEG 2000 standard
+\begin{itemize}
+    \item OpenJPEG
+    \item JasPer
+    \item Grok
+\end{itemize}
 
 \subsection{Kakadu}
 
-Kakadu is a closed-source library to encode and decode JPEG 2000 images. It implements the ISO/IEC 15444-1 standard fully in part 1, and partly in parts 2-3. Kakadu is a trademark of NewSouth Innovations Ltd.
-
-Kakadu was developed by and continues to be maintained by David Taubman from University of New South Wales (UNSW), Australia. He is also an author of EBCOT, one of the algorithms used in JPEG 2000.
-
-The software library is named after Kakadu National Park.
-
-It is used by several applications, such as for example Apple Inc. QuickTime. It is also used in Google Earth and the online implementation thereof as well as Internet Archive.
-
-Kakadu library is heavy optimized and is a fully compliant implementation. Also, it has built-in multi-threading. In a 2007 study Kakadu outperformed the JasPer library in terms of speed. A more thorough comparison done in 2005, however, has shown that Kakadu does not achieve the best performance, in terms of compression quality.
-
-Kakadu is a complete implementation of the JPEG 2000 standard Part 1, i.e. ISO/IEC
-15444-1 and a significant amount of Part 2 and Part 3. The software was developed by
-David Taubman of the University of New South Wales (UNSW), Australia, who is also
-known as the designer of EBCOT, the core coding component of JPEG 2000. Kakadu is
-named after the ‘Kakadu National Park,’ located in Australia’s Northern Territory.
-The Kakadu software framework, which is available under research or commercial
-licensing schemes, has been adopted by a large range of JPEG 2000 products (e.g. Apple’s
-Quicktime v6 for MAC, Yahoo’s Messenger, which utilizes JPEG 2000 for live video,
-and MicroImages TNT products for geospatial imagery).
-Currently, Kakadu is used in compression/decompression of JPEG 2000 images and
-video, medical imaging applications, geospatial imaging applications, interactive image
-rendering applications, remote browsing of large images and collections, and digital cinema
-applications. Kakaku can be considered as a comprehensive, heavily optimized,
-fully compliant software toolkit for JPEG 2000 developers. It supports, for instance,
-multithreaded processing to utilize fully parallel processing resources (multiple CPUs,
-multicore CPUs, or hyperthreading). Moreover, Kakadu provides a carefully engineered
-thread scheduler, so once you have created a multithreaded environment and populated
-it with one thread for each physical/virtual processor on your system, close to 100%
-utilization of all computational resources is typically achieved.
-Kakadu additionally supports Part 2 features such as general multicomponent transforms
-and arbitrary wavelet transform kernels. The toolkit offers extensive support for
-interactive client–server applications, implementing most features of the JPIP (JPEG
-2000 Internet Protocols) standard (see Chapter 6). More information can be found on the
-Kakadu website: www.kakadusoftware.com. \cite{jpeg_suite}
+Detailed description as it is main reference software.
 
 \subsection{Reversible denoising and lifting based color component transformation}
 
-An undesirable side effect of reversible color space transformation, which consists
-of lifting steps (LSs), is that while removing correlation it contaminates transformed
-components with noise from other components. Noise affects particularly
-adversely the compression ratios of lossless compression algorithms. To remove
-correlation without increasing noise, a reversible denoising and lifting step
-(RDLS) was proposed that integrates denoising filters into LS. Applying RDLS
-to color space transformation results in a new image component transformation
-that is perfectly reversible despite involving the inherently irreversible denoising;
-the first application of such a transformation is presented in this paper. For the
-JPEG-LS, JPEG 2000, and JPEG XR standard algorithms in lossless mode, the
-application of RDLS to the RDgDb color space transformation with simple
-denoising filters is especially effective for images in the native optical resolution
-of acquisition devices. It results in improving compression ratios of all those
-images in cases when unmodified color space transformation either improves or
-worsens ratios compared with the untransformed image. The average improvement
-is 5.0–6.0\% for two out of the three sets of such images, whereas average ratios
-of images from standard test-sets are improved by up to 2.2\%. For the efficient
-image-adaptive determination of filters for RDLS, a couple of fast entropy-based
-estimators of compression effects that may be used independently of the actual
-compression algorithm are investigated and an immediate filter selection method
-based on the detector precision characteristic model driven by image acquisition
-parameters is introduced. \cite{denoising}
-
 \subsection{Skipping Selected Steps of DWT Computation}
-
-In order to improve bitrates of lossless JPEG 2000, we propose to modify the discrete wavelet
-transform (DWT) by skipping selected steps of its computation. We employ a heuristic to
-construct the skipped steps DWT (SS-DWT) in an image-adaptive way and define fixed SSDWT
-variants. For a large and diverse set of images, we find that SS-DWT significantly
-improves bitrates of non-photographic images. From a practical standpoint, the most interesting
-results are obtained by applying entropy estimation of coding effects for selecting
-among the fixed SS-DWT variants. This way we get the compression scheme that, as
-opposed to the general SS-DWT case, is compliant with the JPEG 2000 part 2 standard. It
-provides average bitrate improvement of roughly 5\% for the entire test-set, whereas the
-overall compression time becomes only 3\% greater than that of the unmodified JPEG 2000.
-Bitrates of photographic and non-photographic images are improved by roughly 0.5\% and
-14\%, respectively. At a significantly increased cost of exploiting a heuristic, selecting the
-steps to be skipped based on the actual bitrate instead of an estimated one, and by applying
-reversible denoising and lifting steps to SS-DWT, we have attained greater bitrate improvements
-of up to about 17.5\% for non-photographic images. \cite{skipping_dwt}
-
-In this paper, we evaluate eects of applying the xed skipped
-steps discrete wavelet transform (fixed SS-DWT) variants in the lossless
-compression that is compliant with part 2 of the JPEG 2000 standard.
-Compared to results obtained previously using a modified JPEG 2000
-part 1 compressor, for a large and diverse set of test images, we found that
-extensions of part 2 of the standard allow further bitrate improvements.
-We experimentally confirmed that the fixed SS-DWT variants may be obtained
-in compliance with the standard and we identified practical JPEG
-2000 part 2-compliant compression schemes with various trade-offs between
-the bitrate improvement and the compression process complexity. \cite{practical_dwt} 
