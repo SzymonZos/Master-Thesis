@@ -3,6 +3,7 @@ import subprocess
 from pywt import dwt2, dwt
 import numpy as np
 import cv2
+from skimage.measure import shannon_entropy
 
 
 orig_size = 0
@@ -17,6 +18,11 @@ def memoryless_entropy(img):
             tmp = val[0] / img_size
             ent_res += tmp * np.log2(1. / tmp)
     return (img_size / orig_size) * ent_res
+
+
+def shan_entropy(img):
+    img_size = img.shape[0] * img.shape[1]
+    return (img_size / orig_size) * shannon_entropy(img)
 
 
 def dwt_cols(image, wavelet):
@@ -36,30 +42,30 @@ def median_diff(img):
 
 def entropy(img):
     img = normalize(img)
-    return memoryless_entropy(img)
+    return shan_entropy(img)
 
 
 def no_dwt_estimate(img, cb_diff):
     diff = cb_diff(img)
-    return 2 * memoryless_entropy(diff)
+    return shan_entropy(diff)
 
 
 def dwt_rows_estimate(img, wavelet, cb_diff):
     ll, hh = dwt(img, wavelet, axis=0)
     diff = cb_diff(ll)
-    return entropy(hh) + 1.6 * memoryless_entropy(diff)
+    return entropy(hh) + shan_entropy(diff)
 
 
 def dwt_cols_estimate(img, wavelet, cb_diff):
     ll, hh = dwt_cols(img, wavelet)
     diff = cb_diff(ll)
-    return entropy(hh) + 1.6 * memoryless_entropy(diff)
+    return entropy(hh) + shan_entropy(diff)
 
 
 def dwt_2d_estimate(img, wavelet, cb_diff):
     ll, (lh, hl, hh) = dwt2(img, wavelet, axes=(0, 1))
     diff = cb_diff(ll)
-    return entropy(lh) + entropy(hl) + entropy(hh) + 1.5 * memoryless_entropy(diff)
+    return entropy(lh) + entropy(hl) + entropy(hh) + shan_entropy(diff)
 
 
 def test_median(img):
@@ -122,7 +128,8 @@ def set_orig_size(img):
 def test_part(img, wavelet):
     res = [[] for _ in range(4)]
     for i in range(3):
-        res[0].append(no_dwt_estimate(img[:, :, i], shift_diff))
+        # res[0].append(no_dwt_estimate(original[:, :, i], shift_diff))
+        res[0].append(float("inf"))
         res[1].append(dwt_rows_estimate(img[:, :, i], wavelet, shift_diff))
         res[2].append(dwt_cols_estimate(img[:, :, i], wavelet, shift_diff))
         res[3].append(dwt_2d_estimate(img[:, :, i], wavelet, shift_diff))
@@ -167,7 +174,7 @@ def test_full(img, wavelet):
 
 if __name__ == "__main__":
     NEW_MODE = True
-    for file in os.scandir('./img/images_ppm'):
+    for file in os.scandir('../img/images_ppm'):
         print(file.path)
         if NEW_MODE:
             original = cv2.imread(file.path, cv2.IMREAD_COLOR)

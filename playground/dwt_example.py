@@ -7,6 +7,8 @@ import numpy as np
 import cv2
 from pywt import dwt, dwt2, Wavelet
 from pywt.data import camera
+from scipy.stats import entropy as sci_entropy
+from skimage.measure import shannon_entropy
 
 
 def plot_subbands(ll, lh, hl, hh, titles):
@@ -207,6 +209,11 @@ def memoryless_entropy(img):
     return (img_size / original_size) * res_ent
 
 
+def entropy1(labels, base=None):
+    value, counts = np.unique(labels, return_counts=True)
+    return sci_entropy(counts, base=base)
+
+
 def dwt_cols(image, wavelet):
     ll, hh = dwt(image, wavelet, axis=1)
     return ll, hh
@@ -357,6 +364,12 @@ def test_full(img, wavelet):
     return heuristics, min_val
 
 
+def entropy_2(img):
+    marg = np.histogramdd(np.ravel(img), bins=256)[0]/img.size
+    marg = list(filter(lambda p: p > 0, np.ravel(marg)))
+    return -np.sum(np.multiply(marg, np.log2(marg)))
+
+
 if __name__ == "__main__":
     # main()
     # dwt_testing()
@@ -372,11 +385,16 @@ if __name__ == "__main__":
     # test_median()
     # test_shift()
     # test_highpass()
-    original = cv2.imread('../img/275000.ppm', cv2.IMREAD_COLOR)
+    original = cv2.imread('../img/275000.ppm', cv2.IMREAD_GRAYSCALE)
     set_orig_size(original)
-    results = dict()
-    for wavelet in ["bior2.2", "haar", "bior2.6"]:
-        results[wavelet] = test_full(original, wavelet)
-    min_result = min(results.items(), key=lambda k: k[1][1])
-    print(min_result)
-    print(results)
+    my_entropy = memoryless_entropy(original)
+    their_entropy = entropy1(original, 2)
+    sh_entropy = shannon_entropy(original)
+    my_entropy_2 = entropy_2(original)
+    print("DAUPO")
+    # results = dict()
+    # for wavelet in ["bior2.2", "haar", "bior2.6"]:
+    #     results[wavelet] = test_full(original, wavelet)
+    # min_result = min(results.items(), key=lambda k: k[1][1])
+    # print(min_result)
+    # print(results)
