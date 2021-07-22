@@ -15,7 +15,7 @@ The linear convolution (filtering) of sequences $x(n)$ and $h(n)$ is defined as 
 \label{eq:convolution}
 \end{equation}
 The one dimensional discrete wavelet transform can be depicted as successive applications (convolutions) of
-one seleceted pair of high and low-pass filters. The output of such application is then followed
+one selected pair of high and low-pass filters. The output of such application is then followed
 by downsampling by the factor of two. For example, it can be achieved by discarding samples with
 odd indices after each of filtering operation. It is better visualized in the Figure \ref{fig:dwt_1d_anal_synth}. \cite{jpeg_suite} 
 The pair of low and high-pass filters is known as analysis filter bank in the encoding process.
@@ -24,17 +24,17 @@ using the inverse of discrete wavelet transform.
 
 Take into consideration a one dimensional signal $x(n) = \{55, 234, 70, 21, 88, 37\}$. It can be better
 understood as values of pixels in a part of the grayscale image row. It is followed with a pair of low
-and highpass filters designated by $h_{0}(n)$ and $h_{1}(n)$ respectively. An example of such pair is
-a lowpass filter $h_{0}(n) = \{-1, 2, 6, 2, -1\}/8$ and a highpass filter $h_{1}(n) = \{-1, 2, -1\}/2$. They are both
-symmetric and consist of only integer taps. Such pair can be presented in the notaion of (5, 3) filter bank.
-This convension indicates that the length of lowpass filter is five and the length of highpass filter is three.
-In fact the analysis fitler bank presented here was firstly proposed by LeGall and Tabatabai in 1988 and
+and high-pass filters designated by $h_{0}(n)$ and $h_{1}(n)$ respectively. An example of such pair is
+a lowpass filter $h_{0}(n) = \{-1, 2, 6, 2, -1\}/8$ and a high-pass filter $h_{1}(n) = \{-1, 2, -1\}/2$. They are both
+symmetric and consist of only integer operations. Such pair can be presented in the notation of (5, 3) filter bank.
+This convention indicates that the length of lowpass filter is five and the length of high-pass filter is three.
+In fact the analysis filter bank presented here was firstly proposed by LeGall and Tabatabai in 1988 and
 is used in the JPEG 2000 standard for lossless compression of images. The filtering operation has to
 be defined at the signal boundaries. Therefore, the one dimensional signal is extended in both directions.
-The Part 1 of the JPEG 2000 standard requires symmetrical extension to be perfomed in such case. \cite{jpeg_suite}
+The Part 1 of the JPEG 2000 standard requires symmetrical extension to be performed in such case. \cite{jpeg_suite}
 After applying the required symmetrical padding the signal is extended to
-$x(n) = \{21, 70, 234, 55, 55, 234, 70, 21, 88, 37, 37, 88, 21, 70\}$. Then, the lowpass fitler is applied
-resulting in $x'_{0}(n) = \{197.25, 75.5, 98.375, 67.125, 45.375\}$ and the higpass one which results in
+$x(n) = \{21, 70, 234, 55, 55, 234, 70, 21, 88, 37, 37, 88, 21, 70\}$. Then, the low-pass filter is applied
+resulting in $x'_{0}(n) = \{197.25, 75.5, 98.375, 67.125, 45.375\}$ and the high-pass one which results in
 $x'_{1}(n) = \{44.75, -85.75, 29, 12.75, -29.5\}$.
 
 \begin{figure}
@@ -49,16 +49,16 @@ no padding option is chosen this time which makes it non-compliant with the JPEG
 The filter used here is the most basic one, i.e. Haar analysis filter bank. It is the first wavelet
 from the Daubechies wavelet family. The calculation process is visualized in the Figure \ref{fig:dwt_1d_2_level}. \cite{dwt_impl}
 
-The input is chosen as 4-point signal $X_{\phi}(2, k) = \{2, 1, 3, 4\}$. This notaion emphasizes the fact
-that it is approximation of the input at scale 2. The so called scalling coefficients (or in other term
+The input is chosen as 4-point signal $X_{\phi}(2, k) = \{2, 1, 3, 4\}$. This notation emphasizes the fact
+that it is approximation of the input at scale 2. The so called scaling coefficients (or in other term
 approximation at scale 1) $X_{\phi}(1, k)$ are computed by convolving the input $x(k)$ with the low-pass
 Haar filter impulse response $l(k) = \{1/\sqrt{2}, 1/\sqrt{2}\}$. In the next step there is downsampling
 by a factor of 2 applied. The output of convolution has five values. The middle three from these fives 
-correspond to cases where both the given input values overlap with the impuse response. As it was described
+correspond to cases where both the given input values overlap with the impulse response. As it was described
 earlier, the odd values are preserved in the downsampling process. In a result first and third value of these
 three middle ones are the approximation output $X_{\phi}(1, k)$. In the similar way, the detail coefficients
-at scale 1 $X_{\psi}(1, k)$ are computed. The input $x(k)$ is convoled with the high-pass filter impulse
-response $h(k) = \{-1/\sqrt{2}, 1/\sqrt{2}\}$. Then the downsampling by factor of 2 is perfomed.
+at scale 1 $X_{\psi}(1, k)$ are computed. The input $x(k)$ is convolved with the high-pass filter impulse
+response $h(k) = \{-1/\sqrt{2}, 1/\sqrt{2}\}$. Then the downsampling by factor of 2 is performed.
 Note that only only approximation output $X_{\phi}(1, k)$ of the first stage goes to the second one.
 The $X_{\phi}(0, 0)$ and $X_{\psi}(0, 0)$ are calculated accordingly at the end of the second stage. \cite{dwt_impl}
 
@@ -66,9 +66,9 @@ The $X_{\phi}(0, 0)$ and $X_{\psi}(0, 0)$ are calculated accordingly at the end 
 
 The idea of using lowpass filter is the preservation of low frequencies of a signal while trying
 to eliminate or at least attenuate the high frequencies. In a result the output signal is the blurred
-version of the original one. Therefore, the operating principle of the highpass filter is completely
+version of the original one. Therefore, the operating principle of the high-pass filter is completely
 opposite. As a result of applying such filter, the high frequencies of the signal are preserved and
-the low ones are discarded or at least dimnished. The output is a signal consisting of edges, textures
+the low ones are discarded or at least diminished. The output is a signal consisting of edges, textures
 and other details. \cite{jpeg_suite} 
 
 \begin{figure}
@@ -81,9 +81,9 @@ and other details. \cite{jpeg_suite}
 There is presented an example of the effects of the two dimensional discrete wavelet transform on the Figure \ref{fig:dwt_2d_example_wiki}.
 The DWT used here is compliant with the Part 1 of the JPEG2000 standard. The number of DWT stages presented in this  
 example is equal to two. Two dimensional discrete wavelet transform applied first time to the original image
-yields four same sized subimages. The LL layer (upper left subimage) is an approximation of the image and contains the low frequencies.
-This layer is once more transformed in the next stage. The LH layer (upper right subimage) preserves high frequencies from the rows of the image.
-As a result vertical lines and details (brightness) can be seen in the produced subimage. On the other hand, the HL layer (bottom left)
+yields four same sized sub-images. The LL layer (upper left sub-image) is an approximation of the image and contains the low frequencies.
+This layer is once more transformed in the next stage. The LH layer (upper right sub-image) preserves high frequencies from the rows of the image.
+As a result vertical lines and details (brightness) can be seen in the produced sub-image. On the other hand, the HL layer (bottom left)
 contains high frequencies from the columns of the image. The horizontal details and lines can be noticed there.
 Lastly, the HH layer (bottom right) preserves the diagonal lines. \cite{dwt_example_wiki}
 
@@ -103,8 +103,8 @@ Coefficients $\mathbf{X}^{H}_{\psi}$ are calculated by applying high-pass filter
 2-D data $\mathbf{x}$ and then followed by applying sequence of low-pass filtering and downsampling to each
 column of the resulting data. Coefficients $\mathbf{X}^{V}_{\psi}$ are obtained by applying low-pass filtering
 and then downsampling to each column of the resulting data. Lastly, coefficients $\mathbf{X}^{D}_{\psi}$ are
-obtained by applying hig-pass filtering and downsampling to each row of the 2-D data $\mathbf{x}$ followed by
-applying highpass filtering and downsampling to each column of the resulting data. In the next stage of more
+obtained by applying high-pass filtering and downsampling to each row of the 2-D data $\mathbf{x}$ followed by
+applying high-pass filtering and downsampling to each column of the resulting data. In the next stage of more
 complex dwt calculating process only the coefficients $\mathbf{X}_{\phi}$ are taken into consideration. \cite{dwt_impl}
 
 \subsection{DWT features summary}
@@ -135,7 +135,7 @@ complex dwt calculating process only the coefficients $\mathbf{X}_{\phi}$ are ta
 Many ideas have been emerging as the JPEG 2000 was developed. These concept were full of
 value-added capabilities. However, they were not that important to be gone through the time-consuming
 ISO standardization process. The Part 1 (ISO/IEC, 2004a) of the standard, i.e. Core coding system, 
-was originally published in 2000. There was a need to created additional parts to include
+was originally published in 2000. There was a need to create additional parts to include
 missing features. The Part 2 of the standard, published as ISO/IEC 15444-2 or ITU Recommendation
 T.801 (ISO/IEC, 2004b), contains multiple such extensions. There is present group of rather small
 additions that could not merit entire documents of their own. In the Part 1 Core of JPEG 2000
@@ -219,7 +219,7 @@ specified optimization metric. \cite{jpeg_suite}
     \label{tab:anal_synth_97i}
 \begin{tabular}{ccc}
     \toprule
-    n         & Lowpass, $h_{0}(n)$ & Lowpass, $g_{0}(n)$ \\
+    n         & Low-pass, $h_{0}(n)$ & Low-pass, $g_{0}(n)$ \\
     \midrule
     $0$       & +0.602949018236360  & +1.115087052457000  \\
     $\pm 1$   & +0.266864118442875  & +0.591271763114250  \\
@@ -235,7 +235,7 @@ specified optimization metric. \cite{jpeg_suite}
 
 \begin{tabular}{cc}
     \toprule
-    n         & Highpass, $h_{1}(n)$ \\
+    n         & High-pass, $h_{1}(n)$ \\
     \midrule
     $-1$      & +1.115087052457000   \\
     $-2, 0$   & -0.591271763114250   \\
@@ -247,7 +247,7 @@ specified optimization metric. \cite{jpeg_suite}
 \quad
 \begin{tabular}{cc}
     \toprule
-    n        & Highpass, $g_{1}(n)$ \\
+    n        & High-pass, $g_{1}(n)$ \\
     \midrule
     $1$      & +0.602949018236360   \\
     $0, 2$   & -0.266864118442875   \\
@@ -264,7 +264,7 @@ specified optimization metric. \cite{jpeg_suite}
     \label{tab:anal_synth_53r}
 \begin{tabular}{ccc}
     \toprule
-    n         & Lowpass, $h_{0}(n)$ & Lowpass, $g_{0}(n)$ \\
+    n         & Low-pass, $h_{0}(n)$ & Low-pass, $g_{0}(n)$ \\
     \midrule
     $0$       & +0.75  & +1    \\
     $\pm 1$   & +0.25  & +0.5  \\
@@ -278,7 +278,7 @@ specified optimization metric. \cite{jpeg_suite}
 
 \begin{tabular}{cc}
     \toprule
-    n         & Highpass, $h_{1}(n)$ \\
+    n         & High-pass, $h_{1}(n)$ \\
     \midrule
     $-1$      & +1   \\
     $-2, 0$   & -0.5 \\
@@ -288,7 +288,7 @@ specified optimization metric. \cite{jpeg_suite}
 \quad
 \begin{tabular}{cc}
     \toprule
-    n        & Highpass, $g_{1}(n)$ \\
+    n        & High-pass, $g_{1}(n)$ \\
     \midrule
     $1$      & +0.75  \\
     $0, 2$   & -0.25  \\

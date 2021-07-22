@@ -1,7 +1,7 @@
 \section{Preface}
 
 The usage of digital images is constantly growing across whole world. There are multiple types
-of application where memory usage matters to the users. Image compression is a possible solution
+of applications where memory usage matters to the users. Image compression is a possible solution
 to this problem in some of these fields. For example it is mission critical component in medical
 and picture archiving and communication systems (PACSs). \cite{entropy} There are two major types
 of such compression. The one is lossy variant and the other one is lossless. Applying lossy methods
@@ -13,15 +13,15 @@ Images used for the sake of diagnostics can be taken as an example. In some coun
 regulations that forbid applying lossy compression to such images. \cite{entropy} Moreover, the
 usage of lossless variant is more desired when there exists some uncertainty whether information
 contained in the image can be discarded. In these scenarios not using any variant of compression
-can be the only subsitute of lossless one. \cite{entropy}
+can be the only substitute of lossless one. \cite{entropy}
 
 Taking into account mentioned before reasons, some compression algorithms have been introduced as ISO
-standards. \cite{entropy} Some notable examples of such papers are PNG, JPEG and JPEG 2000 (often written as JP2).
-The latter was orginally developed from 1997 to 2000 with the desire of expanding JPEG capabilities.
+standards. \cite{entropy} Some notable examples of such algorithms are PNG, JPEG and JPEG 2000 (often written as JP2).
+The latter was originally developed from 1997 to 2000 with the desire of expanding JPEG capabilities.
 The main feature of this standard is usage of discrete wavelet transform (DWT) instead of discrete
 cosine transform (DCT) which was introduced in the predecessor. \cite{jpeg2000} The other feature
-of JPEG 2000 are support for lossy and lossless compression. As can be described before, such compression
-is needed to be perfomed in mission critical systems such as medicine. Therefore, the JPEG 2000 standard
+of JPEG 2000 is support for lossy and lossless compression. As described before, such compression
+is needed to be performed in mission critical systems such as medicine. Therefore, the JPEG 2000 standard
 is utilized in PACSs and Digital Imaging and Communications in Medicine DICOM standard. \cite{entropy}
 This standard consist of 16 ISO parts which contain wide set of features. Some notable ones are core system
 coding and its extensions, motion images, testing and reference software. \cite{jpeg2000}
@@ -41,12 +41,12 @@ named multiresolution decomposition structure which makes such transformation tr
 \section{Objective of the project}
 
 The standard way of performing discrete wavelet transform (DWT) in the JPEG 2000 compliant with Part 1 is to decompose
-the image into subbands using a pair of low and high-pass filters. This decomposition is applied multiple times using
+the image into sub-bands using a pair of low- and high-pass filters. This decomposition is applied multiple times using
 higher DWT orders. The standard order which is used across whole industry is five. \cite{jpeg_suite} \cite{jpeg_summary}
 The Part 2 of the standard contains several types of extensions which can be applied to modify the encoding
-algorithm. For instance DWT can be modified in a way that makes decomposition of the image into subbands of different
+algorithm. For instance DWT can be modified in a way that makes decomposition of the image into sub-bands of different
 shapes possible. Moreover, the strict selection of the pair of filters imposed by Part 1 of the standard can be
-broken. However, the same pair has to be used for all subbands of the image. \cite{jpeg_suite} The oter type of applicable
+broken. However, the same pair has to be used for all sub-bands of the image. \cite{jpeg_suite} The other type of applicable
 modification is skipping some steps of discrete wavelet transform (SS-DWT). It is usually beneficial for processing
 non-photographic and screen content images. Another way of achieving improvement in terms of compression ratio is
 applying the reversible histogram packing. This type of extension significantly improves the ratio of compression
@@ -55,7 +55,7 @@ With the help of described Part 2 compliant extensions to the JPEG 2000 standard
 adjust the transform for a specified image to improve the compression ratio. The result of this operation can still
 be correctly decoded by every decompressor which is compatible with the Part 2 of the JPEG 2000 standard.
 
-The objective of the thesis is to develop, implement and test several form of heuristics which can determine
+The objective of the thesis is to develop, implement and test several forms of heuristics which can determine
 the optimal transform in terms of compression ratio of the given image. Transform shall be compliant with
 the Part 2 of JPEG 2000. The heuristics shall be rather fast and use entropy as an estimation of the JPEG 2000 encoding.
 Moreover, they can be greedy and use trial and error approach to some extent. The implementation of the program
@@ -63,7 +63,7 @@ shall be done in modern C++ to utilize such language capabilities as cross-platf
 application are multi-core CPU architectures. The result of the project work is a tool that quickly determines 
 the transform for the specified image and invokes the JPEG 2000 encoder with selected transform. However, it is acceptable
 to achieve small time overhead in terms of the entire compression process. The resulting image shall come with the
-improvemnt of the lossless JPEG 2000 compression ratio.
+improvement of the lossless JPEG 2000 compression ratio.
 
 \section{Scope of the thesis}
 
@@ -74,7 +74,7 @@ improvemnt of the lossless JPEG 2000 compression ratio.
     \item Development of advanced 2D DWT implementation with possibility of skipping transformation of columns or rows.
     \item Setup of Continuous Integration system and implementation of DWT testing component 
     \item Development of initial heuristics allowing to study the effects of DWT modifications compliant
-    with the JPEG 2000 standard such as decompositions into subbands and usage of different filters
+    with the JPEG 2000 standard such as decompositions into sub-bands and usage of different filters
     \item Support of loading and storing both grayscale and color images.
     \item Initial implementation of multi-threaded heuristics.
     \item Conducting preliminary tests and selecting modifications or their variants to be included in the final heuristics.
