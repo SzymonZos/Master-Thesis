@@ -17,7 +17,7 @@ The linear convolution (filtering) of sequences $x(n)$ and $h(n)$ is defined as 
 The one dimensional discrete wavelet transform can be depicted as successive applications (convolutions) of
 one selected pair of high and low-pass filters. The output of such application is then followed
 by downsampling by the factor of two. For example, it can be achieved by discarding samples with
-odd indices after each of filtering operation. It is better visualized in the Figure \ref{fig:dwt_1d_anal_synth}. \cite{jpeg_suite} 
+odd indices after each of filtering operation. It is better visualized in the Figure \ref{fig:dwt_1d_anal_synth} \cite{jpeg_suite}.
 The pair of low and high-pass filters is known as analysis filter bank in the encoding process.
 In the signal decoding process it is featured as a synthesis filter bank. The decoding step requires
 using the inverse of discrete wavelet transform. 
@@ -31,7 +31,7 @@ This convention indicates that the length of lowpass filter is five and the leng
 In fact the analysis filter bank presented here was firstly proposed by LeGall and Tabatabai in 1988 and
 is used in the JPEG 2000 standard for lossless compression of images. The filtering operation has to
 be defined at the signal boundaries. Therefore, the one dimensional signal is extended in both directions.
-The Part 1 of the JPEG 2000 standard requires symmetrical extension to be performed in such case. \cite{jpeg_suite}
+The Part 1 of the JPEG 2000 standard requires symmetrical extension to be performed in such case \cite{jpeg_suite}.
 After applying the required symmetrical padding the signal is extended to
 $x(n) = \{21, 70, 234, 55, 55, 234, 70, 21, 88, 37, 37, 88, 21, 70\}$. Then, the low-pass filter is applied
 resulting in $x'_{0}(n) = \{197.25, 75.5, 98.375, 67.125, 45.375\}$ and the high-pass one which results in
@@ -47,7 +47,7 @@ $x'_{1}(n) = \{44.75, -85.75, 29, 12.75, -29.5\}$.
 The next example shows how to compute the two levels of discrete wavelet transform. To speed up the process
 no padding option is chosen this time which makes it non-compliant with the JPEG 2000 standard.
 The filter used here is the most basic one, i.e. Haar analysis filter bank. It is the first wavelet
-from the Daubechies wavelet family. The calculation process is visualized in the Figure \ref{fig:dwt_1d_2_level}. \cite{dwt_impl}
+from the Daubechies wavelet family. The calculation process is visualized in the Figure \ref{fig:dwt_1d_2_level} \cite{dwt_impl}.
 
 The input is chosen as 4-point signal $X_{\phi}(2, k) = \{2, 1, 3, 4\}$. This notation emphasizes the fact
 that it is approximation of the input at scale 2. The so called scaling coefficients (or in other term
@@ -60,7 +60,7 @@ three middle ones are the approximation output $X_{\phi}(1, k)$. In the similar 
 at scale 1 $X_{\psi}(1, k)$ are computed. The input $x(k)$ is convolved with the high-pass filter impulse
 response $h(k) = \{-1/\sqrt{2}, 1/\sqrt{2}\}$. Then the downsampling by factor of 2 is performed.
 Note that only only approximation output $X_{\phi}(1, k)$ of the first stage goes to the second one.
-The $X_{\phi}(0, 0)$ and $X_{\psi}(0, 0)$ are calculated accordingly at the end of the second stage. \cite{dwt_impl}
+The $X_{\phi}(0, 0)$ and $X_{\psi}(0, 0)$ are calculated accordingly at the end of the second stage \cite{dwt_impl}.
 
 \subsection{Two dimensional DWT}
 
@@ -69,7 +69,7 @@ to eliminate or at least attenuate the high frequencies. In a result the output 
 version of the original one. Therefore, the operating principle of the high-pass filter is completely
 opposite. As a result of applying such filter, the high frequencies of the signal are preserved and
 the low ones are discarded or at least diminished. The output is a signal consisting of edges, textures
-and other details. \cite{jpeg_suite} 
+and other details \cite{jpeg_suite}.
 
 \begin{figure}
     \centering
@@ -85,7 +85,7 @@ yields four same sized sub-images. The LL layer (upper left sub-image) is an app
 This layer is once more transformed in the next stage. The LH layer (upper right sub-image) preserves high frequencies from the rows of the image.
 As a result vertical lines and details (brightness) can be seen in the produced sub-image. On the other hand, the HL layer (bottom left)
 contains high frequencies from the columns of the image. The horizontal details and lines can be noticed there.
-Lastly, the HH layer (bottom right) preserves the diagonal lines. \cite{dwt_example_wiki}
+Lastly, the HH layer (bottom right) preserves the diagonal lines \cite{dwt_example_wiki}.
 
 \begin{figure}
     \centering
@@ -105,7 +105,7 @@ column of the resulting data. Coefficients $\mathbf{X}^{V}_{\psi}$ are obtained 
 and then downsampling to each column of the resulting data. Lastly, coefficients $\mathbf{X}^{D}_{\psi}$ are
 obtained by applying high-pass filtering and downsampling to each row of the 2-D data $\mathbf{x}$ followed by
 applying high-pass filtering and downsampling to each column of the resulting data. In the next stage of more
-complex dwt calculating process only the coefficients $\mathbf{X}_{\phi}$ are taken into consideration. \cite{dwt_impl}
+complex dwt calculating process only the coefficients $\mathbf{X}_{\phi}$ are taken into consideration \cite{dwt_impl}.
 
 \subsection{DWT features summary}
 
@@ -118,11 +118,12 @@ complex dwt calculating process only the coefficients $\mathbf{X}_{\phi}$ are ta
     \item The second approach is factorization of the polyphase matrix into a product of a set of sparse matrices.
     \item The two dimensional discrete wavelet transform (with separable filters) is usually computed by the row-column method.
     One dimensional DWT of all the columns is computed at first. Then the 1-D DWT of all the resulting
-    rows is calculated. The order of the computation does not matter in terms of achieving the same result.
-    \item Additional memory of approximate half the size of the given data is required in the implementation of the DWT.
+    rows is calculated. The order of the computation in the row-column method can be swapped. The result remains the same.
+    \item Additional memory of approximate half the size of the given data is required in the some implementations of the DWT.
+    However, there also exist methods of computing DWT in-place which do not require additional memory. 
     \item Data reordering is required for an in-place computation of the DWT.
     \item Data expansion problem can occur due to the finite length of the data in the implementation of the asymmetric filters.
-    \item Symmetric filters provide linear phase response and an effective solution to the border problem. \cite{dwt_impl}
+    \item Symmetric filters provide linear phase response and an effective solution to the border problem \cite{dwt_impl}.
 \end{itemize}
 
 \section{Part 2 of the JPEG 2000}
@@ -145,13 +146,13 @@ implemented on demand to meet very specific requirements of the given market. Mo
 sections within an extension annex can be implemented separately. For example, subsets
 of extended file format JPX can be used on their own. Therefore, some features of the Part 2
 may be present in the wide spectrum of JPEG 2000 applications while the other ones can be
-less common in the decoders. \cite{jpeg_suite}
+less common in the decoders \cite{jpeg_suite}.
 
 As it was shown in the previous paragraph, the extensions present in the Part 2 consist of 
 very different set of topics that can modify or add some features to the Part 1 JPEG 2000 compliant 
 processing chain. Some tools can result in the compression efficiency improvement. Others can
 ameliorate the visual appearance of compressed images. Another group of extensions can modify
-or extend some functionalities in the other ways. The list of the major topics is presented below. \cite{jpeg_suite}
+or extend some functionalities in the other ways. The list of the major topics is presented below \cite{jpeg_suite}.
 \newline \newline Compression efficiency:
 \begin{itemize}
     \item Variable DC offset (VDCO) - Annex B
@@ -179,7 +180,7 @@ In the Part 1 of the JPEG 2000 standard there is only one wavelet decomposition 
 This wavelet is called Mallat dyadic decomposition. Such decomposition is a good first choice
 to be applied across a wide spectrum of images. However, other ones can improve the quality of the image
 over specialized classes of the applications. The other effect of applying such decompositions are
-unequal reductions in the horizontal and vertical dimensional of reduced resolution extracts. \cite{jpeg_suite}
+unequal reductions in the horizontal and vertical dimensional of reduced resolution extracts \cite{jpeg_suite}.
 
 \begin{figure}
     \centering
@@ -195,21 +196,21 @@ For instance, they come crucial at maintaining regular fine-grain texture. Moreo
 the applications that require processing synthetic aperture radar images can benefit
 from using this extension. The US Federal Bureau of Investigation actively uses a 500 ppi
 fingerprint compression standard, i.e. WSQ (CJIS, 1997). The decomposition is specialized
-for the characteristics of fingerprint imagery at 500 dpi. \cite{jpeg_suite}
+for the characteristics of fingerprint imagery at 500 dpi \cite{jpeg_suite}.
 
 Some of these decomposition can be seen of the Figure \ref{fig:part_2_decomp_examples}.
 Resolution decomposition is depicted as solid lines. Dashed lines represent extra sublevel
 decomposition. On the first example, i.e. image $(a)$, there is available full packet decomposition
 with such parameters: NL = 3: Ddfs = 111, Doads = 321, Dsads = all 1s. The next picture
 illustrates FBI decomposition wit specified parameters: NL = 5: Ddfs = 11111, Doads = 2321,
-Dsads = 11101111111111111. The last image is juts an arbitrary example. \cite{jpeg_suite}
+Dsads = 11101111111111111. The last image is juts an arbitrary example \cite{jpeg_suite}.
 
 The prespecified decomposition structures are not the only feature of this extension.
 Wavelet packet analysis can be also used to design custom decompositions for specific images
-or some types of images. It was implemented in Coifman and Wickerhauser, 1992; Ramchandan
-anad Vetterli, 1993; Meyer, Averbuch, and Stromberg, 2000. Such applications often start with
+or some types of images. It was implemented in these papers \cite{entropy_algos},
+\cite{wavelet_packet} and \cite{adaptive_wavelet}. Such applications often start with
 a large decomposition tree. Then, they tend to locate a good decomposition based upon
-specified optimization metric. \cite{jpeg_suite}
+specified optimization metric \cite{jpeg_suite}.
 
 \subsection{Arbitrary Wavelet Transforms}
 
@@ -307,7 +308,7 @@ classes can be compressed more efficiently with other types of wavelets. Such a 
 is allowed in the Part 2 compliant applications. The range of wavelet transforms is broadened
 to include not only the wider range of whole-sample symmetric ones but also half-sample and
 generic nonsymmetric ones. Such ability to handle generic filters makes JPEG 2000 standard
-a powerful research tool, together with supporting more than niche compression applications.  \cite{jpeg_suite}
+a powerful research tool, together with supporting more than niche compression applications \cite{jpeg_suite}.
 
 \section{Computer architecture}
 

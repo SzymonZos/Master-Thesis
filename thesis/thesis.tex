@@ -80,8 +80,8 @@
 \begin{abstract}
     Lorem ipsum\dots
 
-    \textbf{Keywords:} loseless image compression, image processing, JPEG 2000,
-    discrete wavelet transform, entropy estimation, multithreading, modern c++
+    \textbf{Keywords:} lossless image compression, image processing, JPEG 2000,
+    discrete wavelet transform, entropy estimation, multithreading, modern C++
 \end{abstract}
 
 \tableofcontents
@@ -107,6 +107,11 @@
 \chapter{Summary} \label{ch:summary}
 \input{chapters/summary}
 
+% Bibliography
+\nocite{*}
+\bibliographystyle{plplain}
+\bibliography{references}
+
 \begin{appendices}
     \input{chapters/appendices}
 \end{appendices}
@@ -116,11 +121,6 @@
 % Lists of objects
 \listoffigures
 \listoftables
-% \listoflistings
-
-% Bibliography
-\nocite{*}
-\bibliographystyle{plplain}
-\bibliography{references}
+\listoflistings
 
 \end{document}
