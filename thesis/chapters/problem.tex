@@ -319,11 +319,49 @@ a powerful research tool, together with supporting more than niche compression a
 
 \subsection{Part 1 compliant applications}
 
+There are multiple solutions that implement features from the Part 1 of the JPEG 2000 standard.
+The OpenJPEG library is an example of such application. It is open-source solution developed to
+promote wider usage of this standard. The main part of this project is the codec compliant with
+the Part 1 of the JPEG 2000 standard. Moreover, the OpenJPEG library integrates other parts
+of the standard \cite{jpeg_suite}. Few of them can be seen on the list below:
+
 \begin{itemize}
-    \item OpenJPEG
-    \item JasPer
-    \item Grok
+    \item from the Part 2: handling the JP2 boxes and extended multiple component
+    transforms for multi and hyperspectral imagery.
+    \item from the Part 3: MJ2 (Motion JPEG 2000).
+    \item from the Part 11: JPWL (JPEG 2000 Wireless).
+    \item OPJViewer, a GUI based tool for visualization of the J2K, JP2, JPWL and MJ2 files.
+    \item OPJIndexer, a code-stream indexer to view information about the headers and packets localization.
+    This tool is also capable of reading the rate-distortion contribution of each packet to the image \cite{jpeg_suite}.
 \end{itemize}
+
+The OpenJPEG library is written in the C programming language and released under the BSD license.
+The main targets of this software are desktop platforms, i.e. Win32, Unix and Mac OS platforms.
+The Communications and Remote Sensing Lab (TELE) of the Catholic University of Louvain (UCL)
+is the main developer group of this library. CS company and CNES is the supporting side.
+Some of the modules are maintained by the Digital Signal Processing Lab (DSPLab) of the University
+of Perugia, mainly the JPWL and OPJViewer. \cite{jpeg_suite}.
+
+Another example of Part 1 compliant application is the JasPer. This computer software project is aimed
+to create reference implementation of the standard codec. The project was started by the Image Power Inc.
+and the University of British Columbia back in the 1997. As OpenJPEG JasPer is written in the C programming language.
+There are some sample applications available in the codebase. They can come in handy while testing the codec. 
+JasPer is currently released publicly under the MIT license. The library is a component of several notable
+software projects. It includes but is not limited to netpbm, ImageMagick and KDE. In series of the JPEG 2000
+compression tests conducted in 2004 JasPer turned out to be the top performing solution, closely followed by
+IrfanView and Kakadu. The disadvantage of this implementation is its time performance. In the same tests
+JasPer was the slowest software. However, it is a feature as this codec was designed to be used as reference
+in non performance-critical systems.
+
+There is one more notable implementation of the Part 1, i.e. Grok. It is open-sourced software released under
+the GNU Affero General Public License (AGPL) version 3 license. Its design aims to provide stable, high
+performant and low memory using solution. The function responsible for decoding process (grk\_decompress)
+is currently over 0.5 the speed of the Kakadu software. Moreover, Grok supports fast sub-tile decoding
+to standard output for png, jpeg, bmp, pnm and raw formats. This library supports both TLM and PLT code stream markers
+for fast single-tile and sub-tile decoding of large tiled images. The support of meta-data formats such as
+XML, IPTC, XMP and ICC profiles is also included. There is also initial version of Part 15 implementation
+(High Throughput JPEG 2000) available. The final version of this solution should be ten times faster over
+the original Part 1 of the JPEG 2000 standard.
 
 \subsection{Kakadu}
 
