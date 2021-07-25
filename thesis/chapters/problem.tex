@@ -317,7 +317,7 @@ a powerful research tool, together with supporting more than niche compression a
 
 \section{Known solutions}
 
-\subsection{Part 1 compliant applications}
+\subsection{Part 1 compliant applications} \label{sec:part_1}
 
 There are multiple solutions that implement features from the Part 1 of the JPEG 2000 standard.
 The OpenJPEG library is an example of such application. It is open-source solution developed to
@@ -365,8 +365,79 @@ the original Part 1 of the JPEG 2000 standard.
 
 \subsection{Kakadu}
 
-Detailed description as it is main reference software.
+Kakadu is not only a complete implementation of the JPEG 2000 standard Part 1 but also an application
+that supports Part and Part 3 in a significant amount of features. The software was originally developed
+by David Taubman of the University of New South Wales (UNSW) in Australia. The author is also noticeably
+known for being the designer of EBCOT, i.e. the core coding component of JPEG 2000. The name of this library
+comes from ``Kakadu National Park'' which is located in the Northern Territory of Australia \cite{jpeg_suite}. Licensing
+is more advanced in comparison to solutions mentioned in \nameref{sec:part_1}. There are separate licensing
+schemes for research, commercial and demonstration-only applications.
+
+The Kakadu software framework is widely adopted in the substantial range of JPEG 2000 products. The few examples
+are Apple's Quicktime v6 for MAC, Yahoo's Messenger, Google Earth and Internet Archive \cite{jpeg_suite}. 
+Features that can be realized thanks to Kakadu's implementation by the named beforehand solutions include live video
+and products for geospatial imagery such as MicroImages TNT. Moreover, this framework is used in medical imaging applications,
+interactive image rendering applications, remote browsing of large collection and images, digital cinema applications
+and the other fields that require compression and decompression of JPEG 2000 images and videos \cite{jpeg_suite}.
+
+Kakadu is considered as a comprehensive, heavily optimized and fully compliant software toolkit for JPEG 2000
+developers. There are multiple features available that make runtime execution so flawless. Multithreaded
+processing is supported in such way that makes the most of parallel processing resources, i.e. multiple CPUS,
+multicore CPUs and hyperthreading \cite{jpeg_suite}. Compiler intrinsic functions are utilized to manually
+vectorize processing of data in processor's pipeline. Moreover, Kakadu comes with built-in thread scheduler.
+Such implementation enables possibility of utilizing all computational resources close to 100\%.
+In a 2007 the JasPer library was outperformed by Kakadu in terms of speed.
+
+Supported features of Part 2 include arbitrary wavelet transform kernels and general multicomponent transforms.
+The Kakadu library offers extensive support for interactive mode of client–server applications. It is done
+thanks to the implementation of the most notable features from the JPIP (JPEG 2000 Internet Protocols) standard \cite{jpeg_suite}.
 
 \subsection{Reversible denoising and lifting based color component transformation}
 
+Methods such as reversible denoising and lifting based color component transformation aim to improve
+overall quality of image compression. Color space transformation in reversible manner is required
+by the lossless image compression framework used in the JPEG 2000 standard. The undesirable side effect
+of such transformation is contamination of transformed components with noise from other ones.
+Therefore, the compression ratio of given image is substantially diminished \cite{denoising}.
+
+The work in this specific paper is aimed to remove correlation without increasing the noise.
+Therefore, a reversible denoising and lifting step (RDLS) was proposed which integrates
+usage of denoising filters into lifting step. New image component transformation is a result
+of applying RDLS to color space transformation. The main feature of this operation is
+being reversible despite involving the inherently irreversible denoising \cite{denoising}.
+
+The main targets using application of RDLS to the RDgDb color space transformation with
+simple denoising filters are the JPEG-LS, JPEG 2000 and JPEG XR lossless modes of the
+standard algorithms.
+The images which have native optical resolution of acquisition devices benefit the most
+from this application. Improvement in terms of compression ratios is the most visible
+in subset of images which unmodified color space transformation either improved or worsened
+ratios in comparison to the untransformed image. On the average improvement is between
+5\% and 6\% for such specific images. However, things differ for images from standard
+test-sets resulting in the improvement only up to 2.2\% \cite{denoising}.
+
+
 \subsection{Skipping Selected Steps of DWT Computation}
+
+The other method of improving image compression, i.e. bitrates of lossless JPEG 2000 is skipping
+selected steps of discrete wavelet computation (SS-DWT). As a precondition fixed SS-DWT variants
+were employed. Then, heuristic was employed to select from the mentioned before variants best
+one for certain image \cite{skipping_dwt}.
+
+The experiments on diverse set of images resulted in the improvement of bitrates vastly of
+non-photographic images. The entropy estimation of encoding effects was used to select the most
+feasible variant of applied fixed SS-DWT. It is especially important from the practical standpoint
+as time execution of such application is faster. Such compression scheme is compliant with the Part 2
+of the JPEG 2000 standard as opposed to the general SS-DWT case \cite{skipping_dwt}.
+
+The average improvement in terms of bitrate was around 5\% for the entire test-set. Moreover,
+the time needed to perform compression of the image was only 3\% great than the unmodified JPEG 2000
+variant. However, the results are quite different across the set of photographic and non-photographic
+images. The first ones are improved on average by 0.5\% while the latter by 14\%. The heuristic can
+be further exploited to perform more modifications and result with improvement of bitrate up to 17.5\%.
+These extra modifications include skipping the steps based on the actual bitrate rather than the
+estimated one and applying reversible denoising and lifting steps to SS-DWT. However it is achieved with
+great time penalty \cite{skipping_dwt}.
+Furthermore, it has been evaluated that applying the fixed skipped steps discrete wavelet
+transform (fixed SS-DWT) variants with the lossless compression compliant with the Part 2
+of JPEG 2000 standard can provide another improvements \cite{practical_dwt}.
