@@ -2,12 +2,91 @@
 
 \subsection{Proposed algorithm}
 
-\subsection{Different variants of DWT decomposition}
+Taking into consideration existing solutions mentioned in \nameref{ch:problem} it was decided to
+implement several extensions of the JPEG 2000 standard, Part 2. Moreover, proposed algorithm
+was designed to be parallelized. Such decision improves runtime performance especially in applications
+that require processing of great number of images. As it was announced in \nameref{ch:intro}, the standard
+way of computing discrete wavelet transform in the Part 1 of the JPEG 2000 standard is to decompose the
+image into sub-bands using a pair of low- and high-pass filters. This decomposition is performed both in
+vertical and horizontal directions. Moreover, it is applied multiple times across whole processing tree.
+
+Vast majority of available extensions was mentioned in \nameref{sec:part2_jpeg2000}. It was decided to choose
+\nameref{sec:arbitrary_decomposition} and \nameref{sec:arbitrary_wavelet_transform} in the planning phase of
+thesis development. As it was shown in the mentioned beforehand chapters, arbitrary decomposition
+extension creates a possibility of splitting the image into sub-bands of different shapes. The latter feature,
+i.e. arbitrary wavelet transform breaks strict selection rule of filters pair. With the help of these
+extensions and carefully chosen JPEG 2000 coder estimation process it is possible to adaptively choose
+best possible variant for the given image.
+
+The workflow of the presented solution is as follows.
+
+\begin{itemize}
+    \item The image is chosen by the user in the command line interface.
+    \item The image is transformed to grayscale or left in RGB space upon choice of the user.
+    \item The scheduler determines number of present hardware threads able to run program.
+    \item Each thread dispatches possible combination of decomposition from precomputed look up table.
+    \item The chain of selected DWTs is calculated in the context of each thread.
+    \item During decomposition process entropy of image is calculated and stored for later usage.
+    \item Minimal entropy is chosen after finish of the above mentioned calculations.
+    \item Process is repeated for other filter pairs.
+    \item Global minimum entropy is chosen and the best combination is shown to the user.
+\end{itemize}
+
+\subsection{Different variants of DWT decomposition} \label{sec:dwt_decompositions}
+
+As it was described in \nameref{sec:arbitrary_wavelet_transform} the Part 2 of JPEG 2000 standard allows to perform
+multiple modifications of decomposition even in the same step of DWT. The \nameref{sec:kakadu} solution supports
+such extensive set of DWT variants. However, in this solution the combinations were narrowed to the most
+generic case. Moreover, the depth of discrete wavelet transform chain was limited to 5.
+
+The chosen heuristic consists of four possible operation which are applied on the certain DWT level.
+The first one is a transformation compliant with Part 1 of the JPEG 2000 standard, i.e. 2D DWT. Therefore, in a result
+of such operation four sub-bands are created. The sub-band which was two time filtered with low-pass filter
+is once again transformed in the next DWT level. Another two options imply on transforming given image only
+row-wise or column-wise by applying 1D DWT. The low-pass filtered image is once again promoted to next DWT operations.
+Last possible transformation is basically no operation and resignation from another calculations
 
 \subsection{Selected filters}
 
+Although the design of the application is flexible in terms of selecting the pair of filters, it was decided
+to limit initial research to three options. The first option is Part 1 compliant solution, i.e. 5/3 LeGall filter.
+The other two filters are Haar (as a special case of the Daubechies wavelet, the Haar wavelet is also known as ``db1'')
+and 13x7 biorthogonal wavelet.
+
+TODO: Add some images and coefs.
+
 \subsection{Entropy as JPEG 2000 coder estimator}
 
+The entropy can be understood as the average level of ``information'', ``surprise'' or ``uncertainty'' in the variable's
+possible outcomes. It also called a Shannon entropy due to being introduced in the paper ``A Mathematical Theory of Communication'' \cite{entropy_wiki}.
+Given a discrete random variable $X$ with possible outcomes $x_{1},\dots,x_{n}$ that occur with probability
+$P(x_{1}),\dots,P(x_{n})$, the entropy of $X$ is defined as in the formula \ref{eq:entropy} \cite{entropy}.
+\begin{equation}
+    H(X)=-\sum_{i=1}^{n}P(x_{i})logP(x_{i})
+\label{eq:entropy}
+\end{equation}
+The base of logarithm mentioned in the formula \ref{eq:entropy} can vary across different applications. Base 2 is used
+in this application. Its unit is called bits or ``shannons'', while base 10 gives units called ``dits'' and base $e$
+natural units - ``nats'' \cite{entropy_wiki}. Moreover, it assumed that $0*log_{2}0=0$ in the process of entropy calculation.
+
+Claude Shannon originally described entropy as part of his theory of communication. A data communication system
+was characterized by three elements, i.e. a source of data, a communication channel and a receiver. Shannon described
+the main function of receiver as ability to identify what data was generated by the given source. Such determination
+is based only on the signal that was received through the channel of communication. Various ways of encoding,
+compressing and transmitting messages from a data source were considered in Shannon's theory. The entropy was described
+as absolute mathematical limit on how well data from the source can losslessly compressed and sent through perfectly
+noiseless channel \cite{entropy_wiki}.
+
+The memoryless entropy was chosen as an estimator of real compression results. Although it is not ideal estimation,
+such operation is good enough as results are proportional to these from JPEG 2000 coder \cite{entropy}.
+Therefore entropy can be used just to determine choice between variants of DWT as described in \ref{sec:dwt_decompositions}.
+However, such calculation of entropy can achieve not satisfying results for low filtered images.
+The reason for such behavior lays in the very different characteristics of these images. The actual JPEG 2000 coder
+is not context-free as memoryless entropy. High filtered images are free of such error due to context neutralizing
+nature of such filters. To achieve same effect for low filtered images several methods were tested.
+During tests it turned out that best results are achieved using difference between certain pixel and its left neighbor.
+
+TODO: write something about other methods
 
 \section{Implementation details}
 
