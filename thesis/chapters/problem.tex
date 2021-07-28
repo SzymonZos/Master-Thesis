@@ -310,9 +310,59 @@ to include not only the wider range of whole-sample symmetric ones but also half
 generic nonsymmetric ones. Such ability to handle generic filters makes JPEG 2000 standard
 a powerful research tool, together with supporting more than niche compression applications \cite{jpeg_suite}.
 
-\section{Computer architecture}
+\section{Parallelism in computer architecture}
 
-% some architectural blah blah, multiscaral, exhausted processor speed up curve -> cores, cores, more cores
+The parallelism as general term can be simply understood as two or more separate activities
+that appear to happen at the same time. It is not only computer science specific abstraction
+but also natural part of life. For instance a person can drive a car and simultaneously
+talk on the phone or one person can have a walk, while the other one is riding bike.
+However, the computer science aspect of parallelism is the interesting part in this paper.
+It can be depicted as single system performing multiple independent tasks at the same time
+rather than one after the other \cite{cpp_concurrency}. Multitasking operating systems have been
+in usage for many years. However, running multiple applications was firstly done only by context switching.
+The situation has been a little bit different in the server industry. High-end machines with multiple processors
+have been available there for years making utilization of the real parallelism possible.
+In recent years there is observed increase of personal computers capable of running multiple tasks
+in similar manner \cite{cpp_concurrency}.
+
+Nowadays, there is a trend in producing increasing amount of processors in multicore solutions by chip manufacturers.
+There can be found 16 or even more processor units on a single chip. Following this way is easier
+for improving performance over strengthening single core solutions. Therefore, multicore desktop
+computers and even embedded devices are growing share in the market. In the past, it was possible
+for programmers to get their application run faster without doing anything. Such situation
+was linked with the growing computation power within new generation for single core solutions. 
+The situation is quite different at the present time. If a software has to take advantage of
+increasing computing power, one has to design and utilize concurrent run of multiple tasks \cite{cpp_concurrency}.
+
+There are two approaches of utilizing concurrency in terms of performance. The most obvious one
+is just to divide a single task into separate parts. Then, such subtasks can be run in parallel
+reducing the total execution time of the program. This approach is called ``task parallelism''.
+Despite sounding rather straightforward, such operation can become a complex process.
+Especially whether there exist many dependencies between the separated parts. Such division
+can be applied in two different ways. The first one is connected with processing, i.e.
+one thread processes certain part of the given algorithm while the other ones perform operations
+at the different part. The other way is instead connected strictly with the data. Each thread
+performs the same operation on different parts of the given data. The latter approach is called
+data level parallelism \cite{cpp_concurrency}.
+
+There exists quite notable subgroup of algorithms which are basically ready to be parallelized.
+They are often referred as ``embarrassingly parallel'', ``naturally parallel'' or
+``conveniently concurrent'' \cite{cpp_concurrency}. Such algorithms are especially good in terms
+of scalability properties. As the number of available hardware resources, i.e. threads
+increases, the parallelism level in the algorithm is trivial to match. However, if there exist
+parts of the algorithm which are not easy to parallelize, one has to divide the algorithm
+into a fixed number of tasks. Therefore such application becomes not scalable one \cite{cpp_concurrency}.
+
+The another way to use parallelism for improving performance is to employ existing concurrent
+solutions to solve bigger issues. This approach can be depicted as processing 2, 5 or 10 files at
+given time instead of just one. Although it seems like another application of data level parallelism,
+there is different focus in performing such operation on sets of data concurrently.
+The amount of time needed to process one chunk of data is still the same. However, more data
+can be processed in the same amount of time. Unfortunately, there are limits on this specific
+approach as well. Moreover, there are cases where such attitude can be nonbeneficial at all.
+In the end, the increase in throughput which comes from this specific approach makes
+new things possible, e.g. increased resolution in video processing where different areas
+of the picture can be processed at the same time \cite{cpp_concurrency}.
     
 
 \section{Known solutions}

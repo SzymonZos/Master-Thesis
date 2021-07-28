@@ -92,6 +92,65 @@ TODO: write something about other methods
 
 \subsection{Chosen programming language}
 
+The features of given language exist to provide support for certain styles of programming. An individual
+language feature should never be perceived as a solution. Bjarne Stroustrup in his book ``The C++ Programming Language''
+suggests that language feature should be rather perceived as one building brick from a varied set which can
+furtherly combined to express desired solutions \cite{cpp_language_bjarne}. Moreover, there are listed
+basic requirements for design and programming:
+\begin{itemize}
+    \item Ideas shall directly be expressed in the code.
+    \item Independent ideas shall be independently expressed in the code.
+    \item Relationships shall be represented directly in code among directly in the code among other ideas.
+    \item Expressed ideas shall be combined freely, where and only where combinations make sense.
+    \item Simple ideas shall be expressed simply \cite{cpp_language_bjarne}.
+\end{itemize}
+
+Given that the C++ programming language supports four styles of programming:
+\begin{itemize}
+    \item Procedural programming.
+    \item Abstraction of data.
+    \item Object-oriented programming.
+    \item Generic programming.
+\end{itemize}
+Items in the list are not exclusive to each other. Moreover, as combination of chosen features
+more desirable solution can be achieved. There are several aspects that make software application
+successful, e.g. maintainability, readability, small size and fast time execution. To achieve it
+for a nontrivial problem these styles are recommended to use in conjunction \cite{cpp_language_bjarne}.
+
+The most notable solution present in the scope of algorithm implementation is generic programming.
+This type of programming is focused on the design, implementation and runtime use of general purpose
+algorithms. By ``general'' it is understood possibility of accepting variety of types by the algorithm.
+However, these types have to meet specified requirements of the given algorithm. The main support
+of generic programming in the C++ programming language is $template$ which provide static,
+i.e. compile-time polymorphism \cite{cpp_language_bjarne}.
+
+The C++11 standard introduced for the first time a thread library. It is heavily
+influenced by its ancestors, e.g. Boost Thread Library. These Boost classes were the primary model
+on which the standard library is based. Moreover, many entities share same names and structure \cite{cpp_concurrency}.
+However, there are some disadvantages in the standard threading library. Notable features are
+missing in comparison with other threading APIs, i.e. ``pthreads'' and Windows threads.
+The reason lays in the extensive set of constraints on compiler implementers. Nevertheless,
+multithreaded applications can be developed with standard behavior across all platforms.
+This enables a solid foundation on which libraries utilizing parallelism can be built.
+The concurrency elements of the Standard Library like futures, threads, mutexes and atomics
+are the important but not the only available solutions for developing concurrent C++ software \cite{cpp_meyers}.
+
+The thread-based programming provide higher level of abstraction in comparison to task-based one.
+Therefore it makes thread management easier. However, there are multiple types of ``thread''
+that can be encountered in concurrent C++ software:
+\begin{itemize}
+    \item Hardware threads are the ones that actually perform computation. Machine architectures
+    offer one or more hardware threads per CPU core.
+    \item Software threads, also known as system threads are the ones that operating system manages
+    across all processes. The scheduler prepares their execution on hardware threads. Therefore, it
+    is possible to create more software threads than the hardware ones. The motivation is execution
+    of unblocked threads when the other ones are blocked, e.g. wait for mutex.
+    \item $std::threads$ are C++ objects that act like handles to underlying software threads.
+    Standard thread can correspond to nothing so it represents ``null'' handle. There are several scenarios
+    leading to this behavior. Default-constructed objects with no function to execute are the first
+    example. The other ones include object state after being moved from, joined and detached thread \cite{cpp_meyers}.
+\end{itemize}
+
 \subsection{Build environment}
 
 \subsection{DWT interface}
