@@ -153,9 +153,98 @@ that can be encountered in concurrent C++ software:
 
 \subsection{Build environment}
 
+The build environment is setup around CMake. This software is open-sourced, cross-platform tool
+designed to not only build but also test and package various applications. CMake is aimed to
+control the compilation process of given software using compiler and platform agnostic configuration
+text files. Such setup allows to generate platform native tools to build project, e.g. Makefiles
+for GNU/Linux or nmake for Windows. Moreover, it is possible to generate Visual Studio project
+files with the help of CMake. This software is also capable of generating wrappers, creating
+both dynamic and static libraries and building executables in arbitrary combinations. Another
+viable CMake feature is its caching system. Upon running build such text file is generated
+and is ready to be investigated using graphical editor. The located files, libraries, executables
+and optional build directives are placed in the cache \cite{cmake}.
+
+\begin{listing}[htb]
+\begin{minted}[linenos, breaklines]{cmake}
+project(jpeg2000_src)
+add_subdirectory(dwt)
+if(BUILD_EXTERNALS AND EXISTS ${JP3D_PATH})
+    add_subdirectory(${JP3D_PATH})
+endif()
+
+set(SOURCES
+    demo_dwt.cpp
+    demo_queue.cpp
+    demo_opencv.cpp
+    arg_parser.cpp
+    main.cpp
+)
+add_executable(jpeg2000 ${SOURCES})
+set_target_properties(jpeg2000 PROPERTIES COMPILE_FLAGS "-save-temps")
+if(BUILD_EXTERNALS)
+    target_include_directories(jpeg2000 SYSTEM PRIVATE
+        ${OPENCV_PATH}/modules/core/include
+        ${OPENCV_PATH}/modules/imgcodecs/include
+        ${OPENCV_PATH}/modules/imgproc/include
+        ${CMAKE_BINARY_DIR} # OpenCV is looking for opencv2/opencv_modules.hpp
+        ${CXXOPTS_PATH}/include
+    )
+    target_compile_definitions(jpeg2000 PRIVATE BUILD_OPENCV)
+endif()
+target_include_directories(jpeg2000 SYSTEM PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${TIMER_PATH}
+)
+target_link_libraries(jpeg2000 PRIVATE
+    dwt
+    cxxopts
+)
+if(BUILD_EXTERNALS)
+    target_link_libraries(jpeg2000 PRIVATE
+        opencv_core
+        opencv_imgcodecs
+        opencv_imgproc
+    )
+    if(EXISTS ${JP3D_PATH})
+        target_link_libraries(jpeg2000 PRIVATE jp3d)
+    endif()
+endif()
+\end{minted}
+\caption{Sample CMakeLists.txt file}
+\label{lst:sample_cmake_file}
+\end{listing}
+
+The CMake tool is arranged to support complex structure of directory hierarchies and applications
+which can be dependent on other libraries. The other complex scenario that can be handled by CMake
+is building the executables in the specific order to generate code which is compiled and linked
+into eventual application. The building processes is managed by CMakeLists.txt files that have
+to be located in each directory containing source files. The sample CMakeLists.txt file can be
+seen at the listing \ref{lst:sample_cmake_file}. This software provides not only predefined commands
+but also a possibility of adding user functions.
+
 \subsection{DWT interface}
 
 \subsection{Testing}
+
+The testing, especially test driven development takes essential place in the software development
+process. For the purpose of checking correctness of proposed discrete wavelet transform algorithm
+``PyWavelets'' (Wavelet Transforms in Python) software was used as the reference model \cite{pywavelets}.
+Thanks to pybind11 \cite{pybind11} C++ was exposed to the Python and then tested using pytest framework.
+The first one is a lightweight header-only library that synergizes both Python and C++. The main purpose
+is to create Python bindings for existing C++ code. Boilerplate code is minimized thanks to inferring
+type information using introspection during compile-time \cite{pywavelets}. On the other hand pytest framework makes
+writing small and readable tests easier. Moreover, it can scale up to support complex functional
+testing for other libraries and applications \cite{pytest}.
+
+
+% What fixtures are
+% In testing, a fixture provides a defined, reliable and consistent context for the tests. This could include environment (for example a database configured with known parameters) or content (such as a dataset).
+
+% Fixtures define the steps and data that constitute the arrange phase of a test (see Anatomy of a test). In pytest, they are functions you define that serve this purpose. They can also be used to define a test’s act phase; this is a powerful technique for designing more complex tests.
+
+% The services, state, or other operating environments set up by fixtures are accessed by test functions through arguments. For each fixture used by a test function there is typically a parameter (named after the fixture) in the test function’s definition.
+
+% We can tell pytest that a particular function is a fixture by decorating it with @pytest.fixture. Here’s a simple example of what a fixture in pytest might look like:
 
 \subsection{Parallel for}
 
@@ -239,3 +328,18 @@ auto parallel_for(std::size_t n_threads, std::size_t n_elements, Func&& func) {
 \end{listing}
 
 \subsection{OpenCV}
+
+% OpenCV (Open Source Computer Vision Library: http://opencv.org) is an open-source library that includes several hundreds of computer vision algorithms. The document describes the so-called OpenCV 2.x API, which is essentially a C++ API, as opposed to the C-based OpenCV 1.x API (C API is deprecated and not tested with "C" compiler since OpenCV 2.4 releases)
+
+% OpenCV has a modular structure, which means that the package includes several shared or static libraries. The following modules are available:
+
+% Core functionality (core) - a compact module defining basic data structures, including the dense multi-dimensional array Mat and basic functions used by all other modules.
+% Image Processing (imgproc) - an image processing module that includes linear and non-linear image filtering, geometrical image transformations (resize, affine and perspective warping, generic table-based remapping), color space conversion, histograms, and so on.
+% Video Analysis (video) - a video analysis module that includes motion estimation, background subtraction, and object tracking algorithms.
+% Camera Calibration and 3D Reconstruction (calib3d) - basic multiple-view geometry algorithms, single and stereo camera calibration, object pose estimation, stereo correspondence algorithms, and elements of 3D reconstruction.
+% 2D Features Framework (features2d) - salient feature detectors, descriptors, and descriptor matchers.
+% Object Detection (objdetect) - detection of objects and instances of the predefined classes (for example, faces, eyes, mugs, people, cars, and so on).
+% High-level GUI (highgui) - an easy-to-use interface to simple UI capabilities.
+% Video I/O (videoio) - an easy-to-use interface to video capturing and video codecs.
+% ... some other helper modules, such as FLANN and Google test wrappers, Python bindings, and others.
+% The further chapters of the document describe functionality of each module. But first, make sure to get familiar with the common API concepts used thoroughly in the library.
