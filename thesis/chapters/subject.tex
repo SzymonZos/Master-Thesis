@@ -236,15 +236,46 @@ type information using introspection during compile-time \cite{pywavelets}. On t
 writing small and readable tests easier. Moreover, it can scale up to support complex functional
 testing for other libraries and applications \cite{pytest}.
 
+\begin{listing}[htb]
+\begin{minted}[linenos, breaklines]{python}
+def get_all_test_suits():
+    return chain(
+        get_precision_test_suits(np.float32),
+        get_precision_test_suits(np.float64)
+    )
 
-% What fixtures are
-% In testing, a fixture provides a defined, reliable and consistent context for the tests. This could include environment (for example a database configured with known parameters) or content (such as a dataset).
 
-% Fixtures define the steps and data that constitute the arrange phase of a test (see Anatomy of a test). In pytest, they are functions you define that serve this purpose. They can also be used to define a test’s act phase; this is a powerful technique for designing more complex tests.
+@pytest.fixture
+def dwt_fixture(request):
+    data, wavelet, padding_mode, dwt_func = request.param
+    precision = data.dtype.name
+    dwt_ref, dwt_impl = DWT_FUNCS[dwt_func]
+    dwt_impl = dwt_impl[PRECISION[precision]]
+    ref = dwt_ref(data, wavelet, padding_mode)
+    out = dwt_impl(data, WAVELETS[wavelet][PRECISION[precision]],
+                   PADDING_MODES[padding_mode])
+    print(f"{ref}\n{out}")
+    return ref, out
 
-% The services, state, or other operating environments set up by fixtures are accessed by test functions through arguments. For each fixture used by a test function there is typically a parameter (named after the fixture) in the test function’s definition.
 
-% We can tell pytest that a particular function is a fixture by decorating it with @pytest.fixture. Here’s a simple example of what a fixture in pytest might look like:
+@pytest.mark.parametrize("dwt_fixture", get_all_test_suits(), indirect=True)
+def test_dwt(dwt_fixture):
+    assert np.allclose(*dwt_fixture)
+\end{minted}
+\caption{Test fixture of DWT}
+\label{lst:dwt_test_fixture}
+\end{listing}
+
+The used technique to check correctness of written dwt functions in this application are testing
+fixtures. Their purpose is to provide a defined, reliable and consistent context for the written tests.
+The environment, e.g. database configured with known parameters or content, e.g. dataset can also
+be included in such a fixture. Moreover, steps and data constituting the arrange phase of a test
+are defined. For more complex scenarios fixtures can be also used to define active phase 
+of given test which is a case in the thesis. Moreover, the state, services and other operating
+environment set up by the fixtures can be accessed by testing functions through argument lists.
+Every fixture that is used by test function has its special parameter named after the fixture name
+in the definition of the function \cite{pytest}. The example fixture defined with the help
+of pytest is present at the listing \ref{lst:dwt_test_fixture}.
 
 \subsection{Parallel for}
 
@@ -290,6 +321,19 @@ void parallel_for(std::size_t n_threads, const Func& func) {
 \label{lst:parallel_for_base_function}
 \end{listing}
 
+The base function of the parallelized for version is available at the listing \ref{lst:parallel_for_base_function}.
+The signature of this function makes its usage very flexible. All types of callable entities
+can be employed to perform operations on specified thread index. Moreover, vector from Standard
+Template Library is used as safe and extensible abstraction over dynamically created arrays.
+Each thread from c++ standard requires initialization with some type of callback to
+be able to start. The thing that is worth to notice is intentional pass of such function by
+constant reference instead of forwarding reference. The reason of this implementation is that
+threads should operate on copied context from the main thread. There is no advantage of moving
+function objects between the master thread and first forked one because other threads may
+end up with hanging state of its context. Lastly, main thread has to wait for worker threads
+to be ready with their specified tasks. Therefore join method is used at the end of scope.
+
+
 \begin{listing}[htb]
 \begin{minted}[linenos, breaklines]{cpp}
 template<typename Func>
@@ -327,19 +371,178 @@ auto parallel_for(std::size_t n_threads, std::size_t n_elements, Func&& func) {
 \label{lst:parallel_for_user_interface}
 \end{listing}
 
+User interface of the parallel for is available at the listing \ref{lst:parallel_for_user_interface}.
+Two separate functions were developed during implementation phase of thesis creation.
+Thanks to one of the major features of C++20, i.e. concepts, interface of these functions
+is not that complicated. Other solutions include using SFINAE based approach which is very
+hard to reason about and has many pitfalls. Another possible substitute of concepts is just
+different naming of these functions. The drawback of this scenario is loose in readability
+and usability. It is worth noticing that there is no possibility of overload function basing
+on its return type in C++. The reason of this behavior is that return type is not included
+in the signature of function.
+
+The first function allows to conveniently parallelize set of computations with no return type.
+Thanks to functionalities split there is no runtime penalty in this case. From the user perspective
+any callable type can be passed as parameter of this function. However, there is one unnamed
+requirement. Fortunately enough it is caught during compilation time instead of runtime. Passed
+function-like object has to be invoked with one argument. The reason of such design is to
+make user responsible for specifying what should happen during calculation process of each
+loop iteration. During dispatchment of first for iteration each thread starts at the different index.
+Furtherly such index is incremented with number of threads specified by the user. Therefore,
+each calculation is guaranteed to take place in the appropriate thread context.
+
+The second function extends the properties of the first one by adding the possibility of returning
+value from each loop iteration. The return type is deduced thanks to compile time introspection
+capabilities of ``std::invoke\_result'' which works on any callable entity \cite{cppreference}. 
+It is worth to notice that ``std::vector'' which stores eventual results is zero-initialized
+at first. The reasoning includes concurrent access to its elements. Therefore, it is virtually
+impossible to ensure that ``push\_back'' or ``emplace\_back'' methods do not result in data race
+without locking mechanism.
+
+
+\subsection{Queue generation}
+
+\begin{listing}[htb]
+\begin{minted}[linenos, breaklines]{cpp}
+#ifndef JPEG2000_QUEUE_HPP
+#define JPEG2000_QUEUE_HPP
+
+#include "config.hpp"
+#include "dwt_2d.hpp"
+#include "template_helpers.hpp"
+
+#include <array>
+
+namespace mgr {
+namespace detail {
+
+constexpr std::size_t depth = 5;
+constexpr std::size_t n_dwt_cbs = lut_dwt_2d_cbs<float, float>.size() - 1;
+
+consteval std::size_t get_queue_size() {
+    std::size_t temp{1};
+    std::size_t result{temp};
+    for (std::size_t i{}; i < depth; i++) {
+        temp *= n_dwt_cbs;
+        result += temp;
+    }
+    return result;
+}
+\end{minted}
+\caption{Calculation of size in dwt processing queue}
+\label{lst:dwt_queue_size}
+\end{listing}
+
+The calculation process of dwt processing size is available at the listing \ref{lst:dwt_queue}.
+As was described earlier in the thesis, depth of dwt calculations is set to five. From the
+mathematical point of view, such processing queue is a cartesian product of its values.
+However, the processing chain includes not performing discrete wavelet transform at all
+and returning early from algorithm. Therefore, it was decided to limit scope of possible
+results. This function features new keyword in C++20, i.e. ``consteval'' which makes sure
+that function can be used only in the compile time.
+
+\begin{listing}[htb]
+\begin{minted}[linenos, breaklines]{cpp}
+template<typename Elem, Elem Pad>
+struct cartesian_prod {
+    template<typename T,
+                std::size_t CartesianCounter = depth,
+                typename... Args>
+    consteval auto calculate(T&& array, Args&&... args) {
+        for (std::size_t i{}; i < array.size(); i++) {
+            if constexpr (CartesianCounter != 0) {
+                if (i) {
+                    calculate<T, CartesianCounter - 1>(
+                        array,
+                        std::forward<Args>(args)...,
+                        array[i]);
+                } else {
+                    fill_queue(pad_sequence<Elem, Pad, CartesianCounter>{},
+                                std::forward<Args>(args)...);
+                }
+            } else {
+                fill_queue(std::forward<Args>(args)...);
+                break;
+            }
+        }
+        return queue_;
+    }
+
+private:
+    template<typename... Args, typename T, T... Is>
+    consteval void fill_queue(sequence<T, Is...>, Args&&... args) {
+        queue_[queue_counter_++] = std::to_array(
+            {std::forward<Args>(args)..., Is...});
+    }
+
+    template<typename... Args>
+    consteval void fill_queue(Args&&... args) {
+        queue_[queue_counter_++] = std::to_array(
+            {std::forward<Args>(args)...});
+    }
+
+    std::array<std::array<Elem, depth>, get_queue_size()> queue_{};
+    std::size_t queue_counter_{};
+};
+} // namespace detail
+\end{minted}
+\caption{Generation of dwt processing queue}
+\label{lst:dwt_queue}
+\end{listing}
+
+\begin{listing}[htb]
+\begin{minted}[linenos, breaklines]{cpp}
+template<typename T>
+inline constexpr auto
+    dwt_queue = detail::cartesian_prod<dwt_2d_cb<T, T>, no_dwt_2d<T, T>>{}
+                    .calculate(lut_dwt_2d_cbs<T, T>);
+
+} // namespace mgr
+\end{minted}
+\caption{Instantiation of dwt processing queue}
+\label{lst:dwt_queue_instantiation}
+\end{listing}
+
+The generation and then instantiation of dwt processing queue is available at the consecutive listings
+\ref{lst:dwt_queue} and \ref{lst:dwt_queue_instantiation}. As it was specified earlier, these
+computations are done in the compile time thanks to ``template'' and ``constexpr'' meta programming.
+The instantiation process requires three pieces of information. First one is type of single
+element in the queue which is set up to specific dwt callback in this case. Second one is related
+to the element which is supposed to stop chain of calculations. Lastly, array containing all
+needed callbacks is required.
+
+On the other hand, generation process is more convoluted. The main algorithm consists of recursive
+call of function which performs calculation of modified cartesian product described earlier.
+In the basic path previously generated arguments are forwarded and the new one is appended
+at the end. However, if the ``stop'' operation is detected, the recursive chain is terminated
+and the results are saved to the buffer. Last case involves break of the whole process when
+the maximum dwt level is reached. All of these steps are performed during compile-time so
+there is no runtime penalty. In the result look-up table is produced in the ``.rodata''
+memory section.
+
 \subsection{OpenCV}
 
-% OpenCV (Open Source Computer Vision Library: http://opencv.org) is an open-source library that includes several hundreds of computer vision algorithms. The document describes the so-called OpenCV 2.x API, which is essentially a C++ API, as opposed to the C-based OpenCV 1.x API (C API is deprecated and not tested with "C" compiler since OpenCV 2.4 releases)
-
-% OpenCV has a modular structure, which means that the package includes several shared or static libraries. The following modules are available:
-
-% Core functionality (core) - a compact module defining basic data structures, including the dense multi-dimensional array Mat and basic functions used by all other modules.
-% Image Processing (imgproc) - an image processing module that includes linear and non-linear image filtering, geometrical image transformations (resize, affine and perspective warping, generic table-based remapping), color space conversion, histograms, and so on.
-% Video Analysis (video) - a video analysis module that includes motion estimation, background subtraction, and object tracking algorithms.
-% Camera Calibration and 3D Reconstruction (calib3d) - basic multiple-view geometry algorithms, single and stereo camera calibration, object pose estimation, stereo correspondence algorithms, and elements of 3D reconstruction.
-% 2D Features Framework (features2d) - salient feature detectors, descriptors, and descriptor matchers.
-% Object Detection (objdetect) - detection of objects and instances of the predefined classes (for example, faces, eyes, mugs, people, cars, and so on).
-% High-level GUI (highgui) - an easy-to-use interface to simple UI capabilities.
-% Video I/O (videoio) - an easy-to-use interface to video capturing and video codecs.
-% ... some other helper modules, such as FLANN and Google test wrappers, Python bindings, and others.
-% The further chapters of the document describe functionality of each module. But first, make sure to get familiar with the common API concepts used thoroughly in the library.
+The OpenCV, i.e. Open Source Computer Vision Library, is a software module that includes
+several hundreds of specific algorithms used in computer vision. This library has modular
+structure. Therefore, packages can include several shared or static sub-libraries.
+Since version 2.x OpenCV exposes only C++ API in opposition to C based first version.
+The following list of modules is available:
+\begin{itemize}
+    \item Core functionality is a compact library that defines basic data structures. Dense
+    multi-dimensional array, i.e. $Mat$ and fundamental functions, used all over the place
+    by other parts of the OpenCV, are included in this module.
+    \item Image Processing includes both liner and non-linear image filtering and geometrical
+    transformations such as resizing, affine and perspective warping. Moreover, this module
+    support color space conversion and histogram calculation. 
+    \item Video Analysis consists of features like motion estimation, background
+    subtraction and object tracking algorithms.
+    \item Camera Calibration and 3D Reconstruction includes basic multiple-view geometry
+    algorithms, both single and stereo camera calibration, object pose estimation, stereo
+    correspondence algorithms and elements of three dimensional reconstruction.
+    \item 2D Features Framework consists of salient feature detectors, descriptors and their matchers. 
+    \item Object Detection features possibility of objects and instances of predefined classes detection.
+    It includes for instance faces, eyes, mugs, people and cars. 
+    \item High-Level GUI is a simple interface supporting basic user needs.
+    \item Video I/O supports video capturing of various video codecs.
+    \item Other helper modules, e.g. Google test wrapper and Python bindings.
+\end{itemize}
