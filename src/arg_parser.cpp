@@ -1,8 +1,11 @@
 #include "arg_parser.hpp"
 
+#include "check_entropy.hpp"
 #include "demo_dwt.hpp"
 #include "demo_opencv.hpp"
 #include "demo_queue.hpp"
+
+#include <thread>
 
 #include <cxxopts.hpp>
 
@@ -31,6 +34,11 @@ void parse_args(int argc, char** argv) {
                 ("opencv-queue-entropy", "Demo of dwt queue with opencv and entropy", cxxopts::value<std::string>())
                 ("opencv-queue-parallel-rgb", "Demo of parallel dwt queue with opencv for rgb images",
                     cxxopts::value<std::string>())
+                ("threads", "Number of used threads", cxxopts::value<unsigned int>())
+                ("check-entropy-threads", "Check which dwt decomposition has lowest entropy with threads",
+                    cxxopts::value<std::string>())
+                ("check-entropy-exec-policies", "Check which dwt decomposition has lowest entropy with exec policies",
+                 cxxopts::value<std::string>())
                 ("h,help", "Print help");
 
         // clang-format on
@@ -85,6 +93,18 @@ void parse_args(int argc, char** argv) {
         if (result.count("opencv-queue-parallel-rgb")) {
             demo_opencv_parallel_queue_rgb(
                 result["opencv-queue-parallel-rgb"].as<std::string>());
+        }
+        unsigned int n_threads = std::thread::hardware_concurrency();
+        if (result.count("threads")) {
+            n_threads = result["threads"].as<unsigned int>();
+        }
+        if (result.count("check-entropy-threads")) {
+            auto path = result["check-entropy-threads"].as<std::string>();
+            check_entropy_threads(path, n_threads);
+        }
+        if (result.count("check-entropy-exec-policies")) {
+            auto p = result["check-entropy-exec-policies"].as<std::string>();
+            check_entropy_exec_policies(p, n_threads);
         }
 
     } catch (const cxxopts::OptionException& e) {

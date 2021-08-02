@@ -10,6 +10,7 @@ set(SOURCES
     demo_dwt.cpp
     demo_queue.cpp
     demo_opencv.cpp
+    check_entropy.cpp
     arg_parser.cpp
     main.cpp
 )
