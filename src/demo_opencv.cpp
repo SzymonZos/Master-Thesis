@@ -13,6 +13,7 @@
 
 #ifdef BUILD_OPENCV
 #include "opencv.hpp"
+#include <opencv2/imgproc.hpp>
 
 namespace mgr {
 namespace {
@@ -45,11 +46,19 @@ void paintAlphaMat(cv::Mat& mat) {
     imwrite("beta.jp2", mat);
 }
 
+int orig_size = 0;
+
 template<typename T, typename U>
 T memoryless_entropy(const U* restrict arr, int rows, int cols) {
     return mgr::memoryless_entropy<T>(arr,
                                       static_cast<std::size_t>(rows) *
                                           static_cast<std::size_t>(cols));
+}
+
+template<typename T>
+T memoryless_entropy(const cv::Mat& img) {
+    T factor = static_cast<T>(img.rows * img.cols) / static_cast<T>(orig_size);
+    return factor * memoryless_entropy<T>(img.data, img.rows, img.cols);
 }
 
 void normalize_img(cv::Mat& img) {
@@ -124,12 +133,18 @@ void demo_opencv_parallel_queue(const std::string& path) {
 
 void demo_opencv_entropy(const std::string& path) {
     cv::Mat img = read_img(path, cv::IMREAD_GRAYSCALE);
-
+    orig_size = img.rows * img.cols;
     auto par_queue = [&img](std::size_t i) mutable {
         auto out = img;
         float entropy = 0.F;
+        float scale = 0.F;
         for (auto cb : dwt_queue<float>[i]) {
+            if (cb == no_dwt_2d<float, float>) {
+                scale = 2.F;
+                break;
+            }
             if (cb == dwt_2d<float, float>) {
+                scale = 1.6F;
                 auto out_hl = dwt_2d_img_wrapper(out,
                                                  lut_bior2_2_h_f,
                                                  dwt_2d_rows<float, float>,
@@ -139,9 +154,7 @@ void demo_opencv_entropy(const std::string& path) {
                                             dwt_2d_cols<float, float>,
                                             padding_mode::symmetric);
                 normalize_img(out_hl);
-                entropy += memoryless_entropy<float>(out_hl.data,
-                                                     out_hl.rows,
-                                                     out_hl.cols);
+                entropy += memoryless_entropy<float>(out_hl);
                 auto out_lh = dwt_2d_img_wrapper(out,
                                                  lut_bior2_2_f,
                                                  dwt_2d_rows<float, float>,
@@ -151,33 +164,34 @@ void demo_opencv_entropy(const std::string& path) {
                                             dwt_2d_cols<float, float>,
                                             padding_mode::symmetric);
                 normalize_img(out_lh);
-                entropy += memoryless_entropy<float>(out_lh.data,
-                                                     out_lh.rows,
-                                                     out_lh.cols);
+                entropy += memoryless_entropy<float>(out_lh);
             }
             auto out_h = dwt_2d_img_wrapper(out,
                                             lut_bior2_2_h_f,
                                             cb,
                                             padding_mode::symmetric);
             normalize_img(out_h);
-            entropy += memoryless_entropy<float>(out_h.data,
-                                                 out_h.rows,
-                                                 out_h.cols);
+            entropy += memoryless_entropy<float>(out_h);
+
             out = dwt_2d_img_wrapper(out,
                                      lut_bior2_2_f,
                                      cb,
                                      padding_mode::symmetric);
         }
         normalize_img(out);
-        entropy += memoryless_entropy<float>(out.data, out.rows, out.cols);
+        cv::Mat median;
+        cv::medianBlur(out, median, 3);
+        cv::Mat abs;
+        cv::absdiff(out, median, abs);
+        entropy += scale * memoryless_entropy<float>(abs);
         return entropy;
     };
     Timer<std::chrono::milliseconds> t{};
     auto entropies = parallel_for(n_threads, n_queue, std::move(par_queue));
-    auto max = std::distance(
+    auto min = std::distance(
         entropies.begin(),
         std::min_element(entropies.begin(), entropies.end()));
-    std::cout << max << "\n";
+    std::cout << min << "\n";
 }
 
 void demo_opencv_parallel_queue_rgb(const std::string& path) {
