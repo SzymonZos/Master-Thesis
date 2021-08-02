@@ -109,16 +109,9 @@ def test_highpass(img):
 
 
 if __name__ == "__main__":
-    PYTHON_APP = True
     for file in os.scandir('science_png'):
         print(file.path)
-        if PYTHON_APP:
-            test_median(file.path)
-            test_shift(file.path)
-            test_highpass(file.path)
-        else:
-            res = subprocess.run(["./bin/jpeg2000.exe",
-                              "--opencv-queue-entropy",
-                              f"{file.path}"], stdout=subprocess.PIPE)
-            print(res.stdout.decode('utf-8'))
+        test_median(file.path)
+        test_shift(file.path)
+        test_highpass(file.path)
         print("")

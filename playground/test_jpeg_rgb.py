@@ -1,5 +1,4 @@
 import os
-import subprocess
 from pywt import dwt2, dwt
 import numpy as np
 import cv2
@@ -42,30 +41,30 @@ def median_diff(img):
 
 def entropy(img):
     img = normalize(img)
-    return shan_entropy(img)
+    return memoryless_entropy(img)
 
 
 def no_dwt_estimate(img, cb_diff):
     diff = cb_diff(img)
-    return shan_entropy(diff)
+    return 2 * memoryless_entropy(diff)
 
 
 def dwt_rows_estimate(img, wavelet, cb_diff):
     ll, hh = dwt(img, wavelet, axis=0)
     diff = cb_diff(ll)
-    return entropy(hh) + shan_entropy(diff)
+    return entropy(hh) + 1.6 * memoryless_entropy(diff)
 
 
 def dwt_cols_estimate(img, wavelet, cb_diff):
     ll, hh = dwt_cols(img, wavelet)
     diff = cb_diff(ll)
-    return entropy(hh) + shan_entropy(diff)
+    return entropy(hh) + 1.6 * memoryless_entropy(diff)
 
 
 def dwt_2d_estimate(img, wavelet, cb_diff):
     ll, (lh, hl, hh) = dwt2(img, wavelet, axes=(0, 1))
     diff = cb_diff(ll)
-    return entropy(lh) + entropy(hl) + entropy(hh) + shan_entropy(diff)
+    return entropy(lh) + entropy(hl) + entropy(hh) + 1.5 * memoryless_entropy(diff)
 
 
 def test_median(img):
@@ -128,8 +127,7 @@ def set_orig_size(img):
 def test_part(img, wavelet):
     res = [[] for _ in range(4)]
     for i in range(3):
-        # res[0].append(no_dwt_estimate(original[:, :, i], shift_diff))
-        res[0].append(float("inf"))
+        res[0].append(no_dwt_estimate(original[:, :, i], shift_diff))
         res[1].append(dwt_rows_estimate(img[:, :, i], wavelet, shift_diff))
         res[2].append(dwt_cols_estimate(img[:, :, i], wavelet, shift_diff))
         res[3].append(dwt_2d_estimate(img[:, :, i], wavelet, shift_diff))
@@ -173,20 +171,14 @@ def test_full(img, wavelet):
 
 
 if __name__ == "__main__":
-    NEW_MODE = True
     for file in os.scandir('../img/images_ppm'):
         print(file.path)
-        if NEW_MODE:
-            original = cv2.imread(file.path, cv2.IMREAD_COLOR)
-            set_orig_size(original)
-            results = dict()
-            for wavelet in ["bior2.2", "haar", "bior2.6"]:
-                results[wavelet] = test_full(original, wavelet)
-            min_result = min(results.items(), key=lambda k: k[1][1])
-            print(min_result)
-            print(results)
-        else:
-            test_median(file.path)
-            test_shift(file.path)
-            test_highpass(file.path)
+        original = cv2.imread(file.path, cv2.IMREAD_COLOR)
+        set_orig_size(original)
+        results = dict()
+        for wavelet in ["bior2.2", "haar", "bior2.6"]:
+            results[wavelet] = test_full(original, wavelet)
+        min_result = min(results.items(), key=lambda k: k[1][1])
+        print(min_result)
+        print(results)
         print("")
