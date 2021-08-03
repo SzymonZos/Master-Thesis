@@ -104,7 +104,7 @@ void parse_args(int argc, char** argv) {
         }
         if (result.count("check-entropy-exec-policies")) {
             auto p = result["check-entropy-exec-policies"].as<std::string>();
-            check_entropy_exec_policies(p, n_threads);
+            check_entropy_exec_policies(p);
         }
 
     } catch (const cxxopts::OptionException& e) {

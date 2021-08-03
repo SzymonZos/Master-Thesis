@@ -23,7 +23,7 @@ bool imwrite(auto&&... params) {
     return false;
 }
 
-cv::Mat read_img(const std::string& path, cv::ImreadModes img_mode) {
+inline cv::Mat read_img(const std::string& path, cv::ImreadModes img_mode) {
     cv::Mat img = cv::imread(path, img_mode);
     if (img.empty()) {
         throw std::runtime_error("cv::imread() failed: image not found");
@@ -32,7 +32,7 @@ cv::Mat read_img(const std::string& path, cv::ImreadModes img_mode) {
     return img;
 }
 
-void save_img(const std::string& path, cv::Mat& img) {
+inline void save_img(const std::string& path, cv::Mat& img) {
     cv::normalize(img, img, 0., 1., cv::NORM_MINMAX, CV_32F);
     img.convertTo(img, CV_8U, 255);
     imwrite(path, img);
