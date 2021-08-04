@@ -45,7 +45,7 @@ def test_kdu(path):
 
 
 def main():
-    for file in os.scandir('./images_ppm'):
+    for file in os.scandir('../img/FINAL'):
         print(file.path)
         test_kdu(file.path)
         print("")

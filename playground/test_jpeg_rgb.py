@@ -3,6 +3,7 @@ from pywt import dwt2, dwt
 import numpy as np
 import cv2
 from skimage.measure import shannon_entropy
+from pathlib import Path
 
 
 orig_size = 0
@@ -171,14 +172,14 @@ def test_full(img, wavelet):
 
 
 if __name__ == "__main__":
-    for file in os.scandir('../img/images_ppm'):
-        print(file.path)
+    for file in os.scandir('../img/FINAL'):
         original = cv2.imread(file.path, cv2.IMREAD_COLOR)
         set_orig_size(original)
         results = dict()
         for wavelet in ["bior2.2", "haar", "bior2.6"]:
             results[wavelet] = test_full(original, wavelet)
         min_result = min(results.items(), key=lambda k: k[1][1])
-        print(min_result)
-        print(results)
-        print("")
+        # print(min_result)
+        res = {dwt_filter: decomp for dwt_filter, (decomp, _) in results.items()}
+        with open('../img/results_processed.txt', 'a') as log:
+            log.write(f"./FINAL/{Path(file.path).name}\n{res}\n\n")
