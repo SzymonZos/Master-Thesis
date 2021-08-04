@@ -18,7 +18,7 @@ def test_kdu(commands):
     for file, cmds in commands.items():
         with open(f"./results/{Path(file).stem}.txt", "a") as f:
             for cmd in cmds:
-                f.write(f"{file}: {run_cmd(cmd)}")
+                f.write(f"{cmd}: {run_cmd(cmd)}\n")
 
 
 def read_dwts_dict():
@@ -44,7 +44,7 @@ DWT_COMPS = ['', 'H(-)', 'V(-)', 'B(-:-:-)']
 
 
 def make_decomp(decomp):
-    return f"Clevels=5 Cdecomp={','.join([*map(lambda x: DWT_COMPS[x], decomp),])}"
+    return f'Clevels=5 Cdecomp="{",".join([*map(lambda x: DWT_COMPS[x], decomp),])}"'
 
 
 def make_commands(dwts_dict):
@@ -52,10 +52,10 @@ def make_commands(dwts_dict):
     for file, dwts in dwts_dict.items():
         cmds = []
         for filt, decomp in dwts.items():
-            cmd = f"{BASE} -i {file} {OUT} {FILTERS[filt]}"
-            cmds.append(f"{cmd} {make_decomp(decomp)}")
+            cmd = f'{BASE} -i {file} {OUT} {FILTERS[filt]}'
+            cmds.append(f'{cmd} {make_decomp(decomp)}')
             if decomp != [3, 3, 3, 3, 3]:
-                cmds.append(f"{cmd}")
+                cmds.append(cmd)
         commands[file] = cmds
     return commands
 
