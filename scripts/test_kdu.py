@@ -58,7 +58,7 @@ def test_kdu_filter(path):
 def main():
     for file in os.scandir('../img/FINAL'):
         print(file.path)
-        dwt_filter = test_kdu_filter()
+        dwt_filter = test_kdu_filter(file.path)
         test_kdu_dwt_comp(file.path, dwt_filter)
         print("")
 

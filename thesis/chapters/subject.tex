@@ -145,7 +145,7 @@ that can be encountered in concurrent C++ software:
     across all processes. The scheduler prepares their execution on hardware threads. Therefore, it
     is possible to create more software threads than the hardware ones. The motivation is execution
     of unblocked threads when the other ones are blocked, e.g. wait for mutex.
-    \item $std::threads$ are C++ objects that act like handles to underlying software threads.
+    \item ``std::threads'' are C++ objects that act like handles to underlying software threads.
     Standard thread can correspond to nothing so it represents ``null'' handle. There are several scenarios
     leading to this behavior. Default-constructed objects with no function to execute are the first
     example. The other ones include object state after being moved from, joined and detached thread \cite{cpp_meyers}.
@@ -277,7 +277,7 @@ Every fixture that is used by test function has its special parameter named afte
 in the definition of the function \cite{pytest}. The example fixture defined with the help
 of pytest is present at the listing \ref{lst:dwt_test_fixture}.
 
-\subsection{Parallel for}
+\subsection{Parallel for} \label{sec:parallel_for}
 
 \begin{listing}[htb]
 \begin{minted}[linenos, breaklines]{cpp}
