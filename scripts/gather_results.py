@@ -1,5 +1,6 @@
 import os
 import re
+import numpy as np
 
 
 def main():
@@ -18,7 +19,10 @@ def main():
     delta = []
     for ref, out in zip(refs, outs):
         delta.append((out - ref) / ref * 100)
-    print(sum(delta) / len(delta))
+    print(f"mean: {np.mean(delta)}")
+    print(f"stddev: {np.std(delta)}")
+    print(f"min: {np.min(delta)}")
+    print(f"max: {np.max(delta)}")
 
 
 if __name__ == '__main__':

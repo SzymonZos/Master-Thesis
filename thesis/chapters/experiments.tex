@@ -229,15 +229,50 @@ figures \ref{fig:example_1}, \ref{fig:example_2} and \ref{fig:example_3}. It is 
 
 \section{Results}
 
-\begin{itemize}
-	\item presentation of results, analysis and wide discussion of elaborated results, conclusions
-\end{itemize}
+\subsection{Reference results} \label{sec:ref_results}
 
-\subsection{Reference results}
+The mean improvement in terms of image compression between Part 1 and Part 2 compliant solutions
+turned out to be on average equal to 1.982\% with the standard deviation of 1.307\%. The maximum
+possible improvement achieved on specific image was 10.661\% while the minimum was set to 0.
 
-\subsection{Estimated best configuration}
+As far as only reference results are concerned it can be concluded that Part 2 extensions such as modification
+of discrete wavelet decomposition and change of selected filter pair improve compression ratio
+in selected data set. However the results are quite differentiated. For some images the improvement
+was significant (over 10\%), while for others there was no improvement. Such behavior probably
+involves crash of Kakadu application for certain image.
+
+% mean: -1.9822555180454076
+% stddev: 1.3068419882544533
+% min: -10.660713840765169
+% max: 0.0
+
+\subsection{Estimated best configuration} \label{sec:my_results}
+
+The mean improvement in terms of image compression between Part 1 and Part 2 compliant solutions
+turned out to be on average equal to 1.5\% with the standard deviation of 1.305\%. The maximum
+possible improvement achieved on specific image was 10.169\% while the minimum was set to 0.
+
+As far as only proposed solution is concerned it can be concluded that Part 2 extensions such as modification
+of discrete wavelet decomposition and change of selected filter pair improve compression ratio
+in selected data set. However the results are quite differentiated. For some images the improvement
+was significant (over 10\%), while for others there was no improvement. Such behavior is present
+due to fact that Part 1 solution was used as fallback when no better results were found
+
+% mean: -1.5002908618506086
+% stddev: 1.3048358424565147
+% min: -10.16940102729851
+% max: 0.0
 
 \subsection{Comparison with reference}
+
+Taking into consideration results presented in the \nameref{sec:ref_results} and \nameref{sec:my_results}
+it can be stated that they are quite similar. The reference results on average are better by 33\%.
+This behavior is expected as the estimation method of proposed solution was memoryless entropy,
+while the JPEG 2000 codec has its own memory. Another thing that is worth to notice is that the
+choice of filter pair was more important for the final result than the dwt decomposition.
+Therefore proposed solution of estimating different shapes of discrete wavelet transform applied
+to the image does not guarantee the best possible results. This is due to fact that there was
+an impasse on selecting best fisible filter.
 
 \subsection{Time comparison}
 
