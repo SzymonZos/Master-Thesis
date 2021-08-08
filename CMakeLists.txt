@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.17)
 set(CMAKE_CXX_STANDARD 20)
 option(BUILD_EXTERNALS OFF)
 option(BUILD_TESTS OFF)
+option(USE_LIBCPP OFF)
 
 set(TOOLCHAIN_BUILD "${CMAKE_CXX_COMPILER_ID}${CMAKE_BUILD_TYPE}")
 set(OPENCV_PATH ${CMAKE_SOURCE_DIR}/external/opencv)
@@ -25,7 +26,7 @@ project(jpeg2000)
 
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(USE_LIBCPP AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(
         -stdlib=libc++
     )

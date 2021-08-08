@@ -104,7 +104,8 @@ void check_entropy_threads(const std::string& path, unsigned int n_threads) {
         }
         return entropy;
     };
-    Timer<std::chrono::milliseconds> t{};
+    std::string timer_path = "threads_" + std::to_string(n_threads) + ".txt";
+    Timer<std::chrono::milliseconds> t{timer_path};
     auto entropies = parallel_for(n_threads, n_queue, std::move(par_queue));
     auto min = std::distance(
         entropies.begin(),
@@ -121,7 +122,7 @@ void check_entropy_exec_policies(const std::string& path) {
     std::vector<cv::Mat> channels(3);
     cv::split(img, channels);
 
-    Timer<std::chrono::milliseconds> t{};
+    Timer<std::chrono::milliseconds> t{"exec_policies_times.txt"};
     std::for_each(
         std::execution::par_unseq,
         dwt_queue<float>.begin(),
