@@ -1,5 +1,6 @@
-\section{Realized tasks}
+\section{Realized tasks and results}
 
+The realized tasks during the all phases of thesis development are as follows.
 \begin{itemize}
     \item Initial research in fields of image processing and compression, analysis of JPEG 2000 algorithm. 
     \item More advanced research of algorithms such as DWT, SS-DWT, HP and JPEG 2000 implementation - Kakadu.
@@ -16,23 +17,65 @@
     SS-DWT transformation and the transformation determined by an exhaustive search.
 \end{itemize}
 
-\section{Results}
-
-\begin{itemize}
-    \item synthetic description of performed work
-\end{itemize}
-
 
 \section{Conclusions}
 
-\begin{itemize}
-    \item conclusions
-    \item Has the objective been reached?
-\end{itemize}
+Moreover, some conclusions were made according to the achieved results. As it was presented
+in the \nameref{sec:time_results}, the custom implementation of multithreading achieved
+the best performance. The number of worker threads should be closely related to number of
+hardware threads available on the specific platform. There are also improvements in terms of
+image compression as described in \nameref{sec:results_comparison}. Despite the reference results
+being better on average by 33\%, the described solution managed to improve bit rate by 1.5\% in
+comparison to JPEG 2000 Part 1 compliant solution. Therefore it can be concluded that the objective
+of the thesis has been reached.
 
 
 \section{Future development}
 
-\begin{itemize}
-    \item Future development, potential future research
-\end{itemize}
+Despite being successful in the field of compression improvement in lossless image compression, the best
+possible performance was not achieved. Moreover, run-time of described algorithm can also be reduced.
+As study shows, compression rate on average was lagging behind the reference at the rate of 33\%. Although
+this gap cannot be fully filled, more research on investigating better heuristic’s weights can be developed.
+The hypothetical improvement can be also achieved by proposing algorithm that is able to distinguish best
+possible filter pair from the other ones.
+
+As it was stated before, the run-time performance of the algorithm and its future extensions can also be improved.
+The process of best possible filter pair and discrete wavelet transformation searching can be optimized to perform
+more iterative based approach. Currently all possible configuration are generated at the compile time. At the
+run-time of application every possible decomposition for selected filter pair is calculated and then compared
+with other ones. At the end global minimum of entropy is chosen. This process can be simplified. Instead, each of
+possible decomposition at certain discrete wavelet transform step can be evaluated. Therefore, the minimum entropy
+could be calculated on the fly and not promising results could be discarded.
+
+The proposed algorithmic development is not as trivial to parallelize as current solution. There are at least
+three approaches that are worth to be tested during implementation phase. Firstly, asynchronous primitives from
+the standard C++ library such as ``std::async'', ``std::future'' and ``std::promise'' can be employed to perform
+this task. This approach leads to the C++ run-time execution determining whether it is beneficial to employ several
+threads for certain task. However, as it was shown before in \nameref{sec:time_results}, one can easy be deceived by relying
+on the automatic tools that are supposed to make work parallel. The other solution requires employing producer-consumer
+architecture to solve described problem. The run-time execution should be able to determine whether more than one
+filter pairs can be processed at the same time. Therefore it should be evaluated whether there are hardware threads
+available to speed up whole process. Lastly, more sophisticated architecture connected with build custom thread
+pools can be employed and benchmarked.
+
+Currently, the implementation of discrete wavelet transform is done in native C++ or even C language. To ensure
+the best possible performance this algorithm can be optimized by explicit applying vector instructions depending
+on the used CPU. There are two approaches to solve this issue. Firstly, existing implementation which is wrapping
+essential function such convolution and downsampling can be used. Secondly, single instruction, multiple data (SIMD)
+can be written in-place to leverage the optimal solution. SIMD is a type of parallel computing primitive which stands
+for multiple processing of elements performing the same operation on multiple points of data simultaneously. It is
+usually part of hardware design and can be directly accessed through the instruction set (ISA). The application can
+take advantage of SIMD when the same value is being added from a large number of data points. This is the case
+in many multimedia applications.
+
+It is desired not only to compare described earlier solutions but also to profile them at first. This process can
+include profiling of generated machine code which is often the case when dealing with compiler intrinsics such as
+SIMD functions. For this particular ``llvm-mca'' tool can be used. This application statically measures the performance
+of machine code in a specific CPU. It is measured in terms of throughput as well as processor resource consumption.
+On the other hand, profiling can include analysis of overall time complexity, frequency and duration of function calls.
+Such tools, i.e. profilers use great variety of techniques that aim to collect data. Hardware interrupts, operating
+system hooks and performance are included. For this task tools ``callgrind'' (a subprogram of ``valgrind''), ``gprof''
+and ``orbit'' can be employed. The first one is able of recording call history among functions in a program's run in
+the form of call-graph. Such data consists of number of instructions executed, their relationship to source lines,
+caller and callee dependencies among functions and the general number of such calls. The other tools, i.e. ``gprof''
+and ``orbit'' (Open Run-time Binary Instrumentation Tool) work in similar fashion.
