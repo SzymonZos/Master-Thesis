@@ -9,6 +9,41 @@ benchmarked with the usage of the same hardware. Moreover, several threads confi
 in the case of custom implementation. The expected best performance is to be available around
 the number of available hardware threads.
 
+At the listing \ref{lst:timer_interface} there is presented timer class used to measure execution of dwt
+processing chain. It is written in RAII format, i.e. Resource Acquisition Is Initialization. RAII is 
+popular modern C++ idiom to control the lifetime of the object, e.g. it is used for scope based
+dynamic memory management wrappers. Another use case is control of locking and unlocking mechanisms such
+as mutexes. The C++ standard library implements such resource managers in a similar way. One action
+is taken upon construction time of the object, i.e. in its constructor and the opposite procedure
+takes place during destruction process. This approach enables possibility of time measurement automatization.
+Firstly, time is measured at the end of initialization process to avoid overhead of constructing helper
+objects. Secondly, such measurement takes place at the beginning of the destruction handling for
+very similar reason \cite{cppreference}.
+
+Class ``std::chrono::high\_resolution\_clock'' is aimed to represent time measurement mechanism with the
+smallest tick period that is provided by certain implementation of the standard C++ library. Usually
+the compiler vendors implement this entity as an alias of ``std::chrono::system\_clock'' or
+``std::chrono::steady\_clock'', or another independent clock \cite{cppreference}. In the case of used implementation,
+i.e. gcc's libstdc++, it is an alias of ``std::chrono::system\_clock''. Such decision is dictated by
+the need of using so called wall-clock time \cite{cppreference}.
+
+Elapsed real time or wall-clock time is the actual time that is needed to take from the start of a given
+computer program to its end. It can be understood as a difference between the time when a certain task 
+finishes and the time when that task started running \cite{wall_clock}. Wall time is thus distinguishable
+from CPU time. The latter one measures only the time during active work on given task is performed by the
+processor. This difference comes from architecture and runtime dependent factors. For example, it can involve
+intentional delays and waiting for availability of certain system resources. It can be better understood
+in the following example. Take into consideration mathematical script which results in producing such report:
+``Measured CPU time: 0.09s and wall-time: 5m 20.36s''. For over 5 minutes this program was active and during
+that time the processor spent only fraction of second performing mathematical operations. Therefore it was
+found to be suitable solution in the concurrent execution of dwt processing chain.
+
+At the listing \ref{lst:timer_specializations} there are depicted several template specializations for
+handling different types of measurements. The user of this class can specify the accuracy with the C++ standard
+aliases for time primitives. If there is need for such low unit of time as nanoseconds, the actual time
+is returned to the user in the bigger format. This approach is a convenient way of handling time measurement
+for this particular application.
+
 \begin{listing}[htb]
 \begin{minted}[linenos, breaklines]{cpp}
 #include <chrono>
@@ -99,41 +134,6 @@ void Timer<std::chrono::hours>::SaveTime(Count start, Count end) {
 \caption{Timer.hpp: Template specializations}
 \label{lst:timer_specializations}
 \end{listing}
-
-At the listing \ref{lst:timer_interface} there is presented timer class used to measure execution of dwt
-processing chain. It is written in RAII format, i.e. Resource Acquisition Is Initialization. RAII is 
-popular modern C++ idiom to control the lifetime of the object, e.g. it is used for scope based
-dynamic memory management wrappers. Another use case is control of locking and unlocking mechanisms such
-as mutexes. The C++ standard library implements such resource managers in a similar way. One action
-is taken upon construction time of the object, i.e. in its constructor and the opposite procedure
-takes place during destruction process. This approach enables possibility of time measurement automatization.
-Firstly, time is measured at the end of initialization process to avoid overhead of constructing helper
-objects. Secondly, such measurement takes place at the beginning of the destruction handling for
-very similar reason \cite{cppreference}.
-
-Class ``std::chrono::high\_resolution\_clock'' is aimed to represent time measurement mechanism with the
-smallest tick period that is provided by certain implementation of the standard C++ library. Usually
-the compiler vendors implement this entity as an alias of ``std::chrono::system\_clock'' or
-``std::chrono::steady\_clock'', or another independent clock \cite{cppreference}. In the case of used implementation,
-i.e. gcc's libstdc++, it is an alias of ``std::chrono::system\_clock''. Such decision is dictated by
-the need of using so called wall-clock time \cite{cppreference}.
-
-Elapsed real time or wall-clock time is the actual time that is needed to take from the start of a given
-computer program to its end. It can be understood as a difference between the time when a certain task 
-finishes and the time when that task started running \cite{wall_clock}. Wall time is thus distinguishable
-from CPU time. The latter one measures only the time during active work on given task is performed by the
-processor. This difference comes from architecture and runtime dependent factors. For example, it can involve
-intentional delays and waiting for availability of certain system resources. It can be better understood
-in the following example. Take into consideration mathematical script which results in producing such report:
-``Measured CPU time: 0.09s and wall-time: 5m 20.36s''. For over 5 minutes this program was active and during
-that time the processor spent only fraction of second performing mathematical operations. Therefore it was
-found to be suitable solution in the concurrent execution of dwt processing chain.
-
-At the listing \ref{lst:timer_specializations} there are depicted several template specializations for
-handling different types of measurements. The user of this class can specify the accuracy with the C++ standard
-aliases for time primitives. If there is need for such low unit of time as nanoseconds, the actual time
-is returned to the user in the bigger format. This approach is a convenient way of handling time measurement
-for this particular application.
 
 The measurements took place on the one specific hardware setup. The notebook used in the experiments
 is not usually used as reference in the benchmarking process. However, it represents quite well
@@ -275,6 +275,53 @@ to the image does not guarantee the best possible results. This is due to fact t
 an impasse on selecting best feasible filter.
 
 \subsection{Time comparison} \label{sec:time_results}
+
+The runtime of discussed solution was measured and later evaluated. Comparison of different
+methods at examplary image is presented at the figure \ref{fig:time_comparison_example}. The consecutive
+numbers placed after ``thread'' indicate usage of parallel for version presented earlier.
+These numbers correspond to number of software threads used in the experiment. The last record, i.e.
+``policies'' describes usage of execution policies introduced in C++17. As can be seen at this
+figure, selected compiler haven't managed to optimize this particular problem. The reason of
+this failure may be caused by obscure and non-trivial code. However, proposed version of parallel
+computation works as expected. The speedup is strictly connected to the number of hardware threads
+which is 8 in this case.
+
+During evaluation process one anomaly was observed (figure \ref{fig:time_comparison_sus}). After investigation
+it was concluded that operating system decided to suspend execution of the program due to inactivity.
+As can be observed at the figure \ref{fig:time_comparison_means_base} this anomaly higly contributed
+to the average measures. It was decided that it has to be eliminated from the data set in the
+preprocessing step. At the figure \ref{fig:time_comparison_means_mod} such change is shown.
+These results are very similar to the ones presented at first (figure \ref{fig:time_comparison_example}).
+The improvement was exhausted around number of hardware threads. Therefore it is not beneficial to
+use number of workers greater than hardware concurrency.
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{img_0.png}
+    \caption{Elapsed time comparison of different execution methods at examplary image}
+    \label{fig:time_comparison_example}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{img_73.png}
+    \caption{Elapsed time comparison of different execution methods at suspicious run}
+    \label{fig:time_comparison_sus}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{means_base.png}
+    \caption{Mean improvement over single thread execution comparison without outliers detection}
+    \label{fig:time_comparison_means_base}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{means_mod.png}
+    \caption{Mean improvement over single thread execution comparison after outliers removal}
+    \label{fig:time_comparison_means_mod}
+\end{figure}
 
 \subsection{Visualized sample results}
 
