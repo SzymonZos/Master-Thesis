@@ -44,7 +44,7 @@ aliases for time primitives. If there is need for such low unit of time as nanos
 is returned to the user in the bigger format. This approach is a convenient way of handling time measurement
 for this particular application.
 
-\begin{listing}[htb]
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cpp}
 #include <chrono>
 #include <fstream>
@@ -93,7 +93,7 @@ private:
 \label{lst:timer_interface}
 \end{listing}
 
-\begin{listing}[htb]
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cpp}
 template<>
 template<typename Count>
@@ -205,21 +205,21 @@ on color pictures is applied as well. The examplary elements of the image data s
 figures \ref{fig:example_1}, \ref{fig:example_2} and \ref{fig:example_3}. It is worth noticing that only ppm
 (portable PixMap) images were selected due to lack of png format support in Kakadu library.
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{384007.png}
     \caption{The example image from the reference data set \cite{ref_images}}
     \label{fig:example_1}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{im_0069.png}
     \caption{The example image from the reference data set \cite{ref_images}}
     \label{fig:example_2}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.4]{kodim23.png}
     \caption{The example image from the reference data set \cite{ref_images}}
@@ -295,28 +295,28 @@ These results are very similar to the ones presented at first (figure \ref{fig:t
 The improvement was exhausted around number of hardware threads. Therefore it is not beneficial to
 use number of workers greater than hardware concurrency.
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{img_0.png}
     \caption{Elapsed time comparison of different execution methods at examplary image}
     \label{fig:time_comparison_example}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{img_73.png}
     \caption{Elapsed time comparison of different execution methods at suspicious run}
     \label{fig:time_comparison_sus}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{means_base.png}
     \caption{Mean improvement over single thread execution comparison without outliers detection}
     \label{fig:time_comparison_means_base}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{means_mod.png}
     \caption{Mean improvement over single thread execution comparison after outliers removal}
@@ -334,28 +334,28 @@ illustrates mainly row-wised based dwt.
 Another figure \ref{fig:lena_dwt_326} depicts mixed version of discrete wavelet transform described
 before. Last one \ref{fig:lena_dwt_363} is the output of Part 1 compliant decomposition.
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{lena_dwt_5.png}
     \caption{The example output image of dwt processing chain using Lena test image \cite{lena}}
     \label{fig:lena_dwt_5}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=1]{lena_dwt_199.png}
     \caption{The example output image of dwt processing chain using Lena test image \cite{lena}}
     \label{fig:lena_dwt_199}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=1]{lena_dwt_326.png}
     \caption{The example output image of dwt processing chain using Lena test image \cite{lena}}
     \label{fig:lena_dwt_326}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=1]{lena_dwt_363.png}
     \caption{The example output image of dwt processing chain using Lena test image \cite{lena}}
