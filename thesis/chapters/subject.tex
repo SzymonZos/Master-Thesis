@@ -50,10 +50,72 @@ Last possible transformation is basically no operation and resignation from anot
 
 Although the design of the application is flexible in terms of selecting the pair of filters, it was decided
 to limit initial research to three options. The first option is Part 1 compliant solution, i.e. 5/3 LeGall filter.
-The other two filters are Haar (as a special case of the Daubechies wavelet, the Haar wavelet is also known as ``db1'')
-and 13x7 biorthogonal wavelet.
+The other two filters are Haar (due to being special case of the Daubechies wavelet, the Haar wavelet is also
+known as ``db1'') and 13x7 biorthogonal wavelet. The first pair of filters is depicted in the Table \ref{tab:anal_synth_haar},
+while the second one is presented in the Table \ref{tab:anal_synth_137}).
 
-TODO: Add some images and coefs.
+\begin{table}[!htb]
+    \centering
+    \caption{Analysis and synthesis filter taps for the Haar filter bank}
+    \label{tab:anal_synth_haar}
+\begin{tabular}{ccc}
+    \toprule
+    n         & Low-pass, $h_{0}(n)$ & Low-pass, $g_{0}(n)$ \\
+    \midrule
+    $0$       & 0.7071067811865476  & 0.7071067811865476  \\
+    $1$       & 0.7071067811865476  & 0.7071067811865476  \\
+    \bottomrule
+\end{tabular}
+
+\bigskip
+\bigskip
+
+\begin{tabular}{ccc}
+    \toprule
+    n         & High-pass, $h_{1}(n)$ & High-pass, $g_{1}(n)$ \\
+    \midrule
+    $0$       & -0.7071067811865476  & 0.7071067811865476  \\
+    $1$       & 0.7071067811865476  & -0.7071067811865476  \\
+    \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+    \centering
+    \caption{Analysis and synthesis filter taps for the 13x7 biorthogonal wavelet filter bank}
+    \label{tab:anal_synth_137}
+\begin{tabular}{ccc}
+    \toprule
+    n         & Low-pass, $h_{0}(n)$ & Low-pass, $g_{0}(n)$ \\
+    \midrule
+    $0$       & +0.966747552403483     & +0.7071067811865476  \\
+    $\pm 1$   & +0.4474660099696121    & +0.3535533905932738  \\
+    $\pm 2$   & -0.16987135563661201   & -0.057543526228500  \\
+    $\pm 3$   & -0.1077232986963881    & -0.091271763114250  \\
+    $\pm 4$   & +0.04695630968816917   &                     \\
+    $\pm 5$   & +0.013810679320049757  &                     \\
+    $\pm 6$   & -0.006905339660024878  &                     \\
+    \bottomrule
+\end{tabular}
+
+\bigskip
+\bigskip
+
+
+\begin{tabular}{ccc}
+    \toprule
+    n         & High-pass, $h_{1}(n)$ & High-pass, $g_{1}(n)$ \\
+    \midrule
+    $0$       & -0.7071067811865476    & -0.966747552403483  \\
+    $\pm 1$   & +0.3535533905932738    & +0.4474660099696121  \\
+    $\pm 2$   & -0.057543526228500     & +0.16987135563661201  \\
+    $\pm 3$   & +0.091271763114250     & -0.1077232986963881  \\
+    $\pm 4$   &                        & -0.04695630968816917 \\
+    $\pm 5$   &                        & +0.013810679320049757 \\
+    $\pm 6$   &                        & +0.006905339660024878 \\
+    \bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Entropy as JPEG 2000 coder estimator}
 
@@ -86,7 +148,7 @@ is not context-free as memoryless entropy. High filtered images are free of such
 nature of such filters. To achieve same effect for low filtered images several methods were tested.
 During tests it turned out that best results are achieved using difference between certain pixel and its left neighbor.
 
-TODO: write something about other methods
+% TODO: write something about other methods
 
 \section{Implementation details}
 
@@ -164,7 +226,15 @@ viable CMake feature is its caching system. Upon running build such text file is
 and is ready to be investigated using graphical editor. The located files, libraries, executables
 and optional build directives are placed in the cache \cite{cmake}.
 
-\begin{listing}[htb]
+The CMake tool is arranged to support complex structure of directory hierarchies and applications
+which can be dependent on other libraries. The other complex scenario that can be handled by CMake
+is building the executables in the specific order to generate code which is compiled and linked
+into eventual application. The building processes is managed by CMakeLists.txt files that have
+to be located in each directory containing source files. The sample CMakeLists.txt file can be
+seen at the listing \ref{lst:sample_cmake_file}. This software provides not only predefined commands
+but also a possibility of adding user functions.
+
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cmake}
 project(jpeg2000_src)
 add_subdirectory(dwt)
@@ -214,15 +284,49 @@ endif()
 \label{lst:sample_cmake_file}
 \end{listing}
 
-The CMake tool is arranged to support complex structure of directory hierarchies and applications
-which can be dependent on other libraries. The other complex scenario that can be handled by CMake
-is building the executables in the specific order to generate code which is compiled and linked
-into eventual application. The building processes is managed by CMakeLists.txt files that have
-to be located in each directory containing source files. The sample CMakeLists.txt file can be
-seen at the listing \ref{lst:sample_cmake_file}. This software provides not only predefined commands
-but also a possibility of adding user functions.
-
 \subsection{DWT interface}
+
+As shown at the listing \ref{lst:dwt_interface}, two dimensional discrete wavelet transform
+is strictly connected to the one dimensional. The reuse of this function makes design more
+flexible. It is worth pointing out that these function are allocation agnostic. Therefore
+the user is obligated allocate memory at first and then make use of dwt processing. Such
+decision is dictated upon fact that actual type of matrix containing data is not specified.
+Therefore a pointer to first element and total size are the most feasible solution.
+There is one disadvantage that hits the runtime of presented algorithm. The results
+from ``cols'' and ``rows'' functions are not cached in memory. Thus, upon calculating
+``full'' dwt variant operations are unnecessarily doubled.
+
+\begin{listing}[!htb]
+\begin{minted}[linenos, breaklines]{cpp}
+REGISTER_DWT_2D(dwt_2d_rows) {
+    std::size_t out_cols = get_n_dwt_output(cols, n_filter);
+    for (std::size_t i{}; i < rows; i++) {
+        dwt_1d(input + i * cols,
+               cols,
+               filter,
+               n_filter,
+               output + i * out_cols,
+               mode);
+    }
+}
+
+REGISTER_DWT_2D(dwt_2d_cols) {
+    for (std::size_t i{}; i < cols; i++) {
+        dwt_1d(input + i, rows, filter, n_filter, output + i, mode, cols);
+    }
+}
+
+REGISTER_DWT_2D(dwt_2d) {
+    std::size_t out_cols = get_n_dwt_output(cols, n_filter);
+    std::vector<T> tmp;
+    tmp.reserve(out_cols * rows);
+    dwt_2d_rows(input, rows, cols, filter, n_filter, tmp.data(), mode);
+    dwt_2d_cols(tmp.data(), rows, out_cols, filter, n_filter, output, mode);
+}
+\end{minted}
+\caption{Two dimensional discrete wavelet implementation}
+\label{lst:dwt_interface}
+\end{listing}
 
 \subsection{Testing}
 
@@ -236,7 +340,18 @@ type information using introspection during compile-time \cite{pywavelets}. On t
 writing small and readable tests easier. Moreover, it can scale up to support complex functional
 testing for other libraries and applications \cite{pytest}.
 
-\begin{listing}[htb]
+The used technique to check correctness of written dwt functions in this application are testing
+fixtures. Their purpose is to provide a defined, reliable and consistent context for the written tests.
+The environment, e.g. database configured with known parameters or content, e.g. dataset can also
+be included in such a fixture. Moreover, steps and data constituting the arrange phase of a test
+are defined. For more complex scenarios fixtures can be also used to define active phase 
+of given test which is a case in the thesis. Moreover, the state, services and other operating
+environment set up by the fixtures can be accessed by testing functions through argument lists.
+Every fixture that is used by test function has its special parameter named after the fixture name
+in the definition of the function \cite{pytest}. The example fixture defined with the help
+of pytest is present at the listing \ref{lst:dwt_test_fixture}.
+
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{python}
 def get_all_test_suits():
     return chain(
@@ -253,7 +368,7 @@ def dwt_fixture(request):
     dwt_impl = dwt_impl[PRECISION[precision]]
     ref = dwt_ref(data, wavelet, padding_mode)
     out = dwt_impl(data, WAVELETS[wavelet][PRECISION[precision]],
-                   PADDING_MODES[padding_mode])
+                    PADDING_MODES[padding_mode])
     print(f"{ref}\n{out}")
     return ref, out
 
@@ -266,20 +381,21 @@ def test_dwt(dwt_fixture):
 \label{lst:dwt_test_fixture}
 \end{listing}
 
-The used technique to check correctness of written dwt functions in this application are testing
-fixtures. Their purpose is to provide a defined, reliable and consistent context for the written tests.
-The environment, e.g. database configured with known parameters or content, e.g. dataset can also
-be included in such a fixture. Moreover, steps and data constituting the arrange phase of a test
-are defined. For more complex scenarios fixtures can be also used to define active phase 
-of given test which is a case in the thesis. Moreover, the state, services and other operating
-environment set up by the fixtures can be accessed by testing functions through argument lists.
-Every fixture that is used by test function has its special parameter named after the fixture name
-in the definition of the function \cite{pytest}. The example fixture defined with the help
-of pytest is present at the listing \ref{lst:dwt_test_fixture}.
-
 \subsection{Parallel for} \label{sec:parallel_for}
 
-\begin{listing}[htb]
+The base function of the parallelized for version is available at the listing \ref{lst:parallel_for_base_function}.
+The signature of this function makes its usage very flexible. All types of callable entities
+can be employed to perform operations on specified thread index. Moreover, vector from Standard
+Template Library is used as safe and extensible abstraction over dynamically created arrays.
+Each thread from c++ standard requires initialization with some type of callback to
+be able to start. The thing that is worth to notice is intentional pass of such function by
+constant reference instead of forwarding reference. The reason of this implementation is that
+threads should operate on copied context from the main thread. There is no advantage of moving
+function objects between the master thread and first forked one because other threads may
+end up with hanging state of its context. Lastly, main thread has to wait for worker threads
+to be ready with their specified tasks. Therefore join method is used at the end of scope.
+
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cpp}
 #ifndef JPEG2000_PARALLEL_FOR_HPP
 #define JPEG2000_PARALLEL_FOR_HPP
@@ -321,20 +437,35 @@ void parallel_for(std::size_t n_threads, const Func& func) {
 \label{lst:parallel_for_base_function}
 \end{listing}
 
-The base function of the parallelized for version is available at the listing \ref{lst:parallel_for_base_function}.
-The signature of this function makes its usage very flexible. All types of callable entities
-can be employed to perform operations on specified thread index. Moreover, vector from Standard
-Template Library is used as safe and extensible abstraction over dynamically created arrays.
-Each thread from c++ standard requires initialization with some type of callback to
-be able to start. The thing that is worth to notice is intentional pass of such function by
-constant reference instead of forwarding reference. The reason of this implementation is that
-threads should operate on copied context from the main thread. There is no advantage of moving
-function objects between the master thread and first forked one because other threads may
-end up with hanging state of its context. Lastly, main thread has to wait for worker threads
-to be ready with their specified tasks. Therefore join method is used at the end of scope.
+User interface of the parallel for is available at the listing \ref{lst:parallel_for_user_interface}.
+Two separate functions were developed during implementation phase of thesis creation.
+Thanks to one of the major features of C++20, i.e. concepts, interface of these functions
+is not that complicated. Other solutions include using SFINAE based approach which is very
+hard to reason about and has many pitfalls. Another possible substitute of concepts is just
+different naming of these functions. The drawback of this scenario is loose in readability
+and usability. It is worth noticing that there is no possibility of overload function basing
+on its return type in C++. The reason of this behavior is that return type is not included
+in the signature of function.
 
+The first function allows to conveniently parallelize set of computations with no return type.
+Thanks to functionalities split there is no runtime penalty in this case. From the user perspective
+any callable type can be passed as parameter of this function. However, there is one unnamed
+requirement. Fortunately enough it is caught during compilation time instead of runtime. Passed
+function-like object has to be invoked with one argument. The reason of such design is to
+make user responsible for specifying what should happen during calculation process of each
+loop iteration. During dispatchment of first for iteration each thread starts at the different index.
+Furtherly such index is incremented with number of threads specified by the user. Therefore,
+each calculation is guaranteed to take place in the appropriate thread context.
 
-\begin{listing}[htb]
+The second function extends the properties of the first one by adding the possibility of returning
+value from each loop iteration. The return type is deduced thanks to compile time introspection
+capabilities of ``std::invoke\_result'' which works on any callable entity \cite{cppreference}. 
+It is worth to notice that ``std::vector'' which stores eventual results is zero-initialized
+at first. The reasoning includes concurrent access to its elements. Therefore, it is virtually
+impossible to ensure that ``push\_back'' or ``emplace\_back'' methods do not result in data race
+without locking mechanism.
+
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cpp}
 template<typename Func>
 requires detail::no_returnable<Func, std::size_t>
@@ -371,38 +502,17 @@ auto parallel_for(std::size_t n_threads, std::size_t n_elements, Func&& func) {
 \label{lst:parallel_for_user_interface}
 \end{listing}
 
-User interface of the parallel for is available at the listing \ref{lst:parallel_for_user_interface}.
-Two separate functions were developed during implementation phase of thesis creation.
-Thanks to one of the major features of C++20, i.e. concepts, interface of these functions
-is not that complicated. Other solutions include using SFINAE based approach which is very
-hard to reason about and has many pitfalls. Another possible substitute of concepts is just
-different naming of these functions. The drawback of this scenario is loose in readability
-and usability. It is worth noticing that there is no possibility of overload function basing
-on its return type in C++. The reason of this behavior is that return type is not included
-in the signature of function.
-
-The first function allows to conveniently parallelize set of computations with no return type.
-Thanks to functionalities split there is no runtime penalty in this case. From the user perspective
-any callable type can be passed as parameter of this function. However, there is one unnamed
-requirement. Fortunately enough it is caught during compilation time instead of runtime. Passed
-function-like object has to be invoked with one argument. The reason of such design is to
-make user responsible for specifying what should happen during calculation process of each
-loop iteration. During dispatchment of first for iteration each thread starts at the different index.
-Furtherly such index is incremented with number of threads specified by the user. Therefore,
-each calculation is guaranteed to take place in the appropriate thread context.
-
-The second function extends the properties of the first one by adding the possibility of returning
-value from each loop iteration. The return type is deduced thanks to compile time introspection
-capabilities of ``std::invoke\_result'' which works on any callable entity \cite{cppreference}. 
-It is worth to notice that ``std::vector'' which stores eventual results is zero-initialized
-at first. The reasoning includes concurrent access to its elements. Therefore, it is virtually
-impossible to ensure that ``push\_back'' or ``emplace\_back'' methods do not result in data race
-without locking mechanism.
-
-
 \subsection{Queue generation}
 
-\begin{listing}[htb]
+The calculation process of dwt processing size is available at the listing \ref{lst:dwt_queue}.
+As was described earlier in the thesis, depth of dwt calculations is set to five. From the
+mathematical point of view, such processing queue is a cartesian product of its values.
+However, the processing chain includes not performing discrete wavelet transform at all
+and returning early from algorithm. Therefore, it was decided to limit scope of possible
+results. This function features new keyword in C++20, i.e. ``consteval'' which makes sure
+that function can be used only in the compile time.
+
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cpp}
 #ifndef JPEG2000_QUEUE_HPP
 #define JPEG2000_QUEUE_HPP
@@ -433,15 +543,24 @@ consteval std::size_t get_queue_size() {
 \label{lst:dwt_queue_size}
 \end{listing}
 
-The calculation process of dwt processing size is available at the listing \ref{lst:dwt_queue}.
-As was described earlier in the thesis, depth of dwt calculations is set to five. From the
-mathematical point of view, such processing queue is a cartesian product of its values.
-However, the processing chain includes not performing discrete wavelet transform at all
-and returning early from algorithm. Therefore, it was decided to limit scope of possible
-results. This function features new keyword in C++20, i.e. ``consteval'' which makes sure
-that function can be used only in the compile time.
+The generation and then instantiation of dwt processing queue is available at the consecutive listings
+\ref{lst:dwt_queue} and \ref{lst:dwt_queue_instantiation}. As it was specified earlier, these
+computations are done in the compile time thanks to ``template'' and ``constexpr'' meta programming.
+The instantiation process requires three pieces of information. First one is type of single
+element in the queue which is set up to specific dwt callback in this case. Second one is related
+to the element which is supposed to stop chain of calculations. Lastly, array containing all
+needed callbacks is required.
 
-\begin{listing}[htb]
+On the other hand, generation process is more convoluted. The main algorithm consists of recursive
+call of function which performs calculation of modified cartesian product described earlier.
+In the basic path previously generated arguments are forwarded and the new one is appended
+at the end. However, if the ``stop'' operation is detected, the recursive chain is terminated
+and the results are saved to the buffer. Last case involves break of the whole process when
+the maximum dwt level is reached. All of these steps are performed during compile-time so
+there is no runtime penalty. In the result look-up table is produced in the ``.rodata''
+memory section.
+
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cpp}
 template<typename Elem, Elem Pad>
 struct cartesian_prod {
@@ -490,7 +609,7 @@ private:
 \label{lst:dwt_queue}
 \end{listing}
 
-\begin{listing}[htb]
+\begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cpp}
 template<typename T>
 inline constexpr auto
@@ -502,23 +621,6 @@ inline constexpr auto
 \caption{Instantiation of dwt processing queue}
 \label{lst:dwt_queue_instantiation}
 \end{listing}
-
-The generation and then instantiation of dwt processing queue is available at the consecutive listings
-\ref{lst:dwt_queue} and \ref{lst:dwt_queue_instantiation}. As it was specified earlier, these
-computations are done in the compile time thanks to ``template'' and ``constexpr'' meta programming.
-The instantiation process requires three pieces of information. First one is type of single
-element in the queue which is set up to specific dwt callback in this case. Second one is related
-to the element which is supposed to stop chain of calculations. Lastly, array containing all
-needed callbacks is required.
-
-On the other hand, generation process is more convoluted. The main algorithm consists of recursive
-call of function which performs calculation of modified cartesian product described earlier.
-In the basic path previously generated arguments are forwarded and the new one is appended
-at the end. However, if the ``stop'' operation is detected, the recursive chain is terminated
-and the results are saved to the buffer. Last case involves break of the whole process when
-the maximum dwt level is reached. All of these steps are performed during compile-time so
-there is no runtime penalty. In the result look-up table is produced in the ``.rodata''
-memory section.
 
 \subsection{OpenCV}
 
