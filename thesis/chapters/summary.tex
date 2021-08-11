@@ -16,10 +16,10 @@ The realized tasks during the all phases of thesis development are as follows.
 \end{itemize}
 
 Moreover, some conclusions were made according to the achieved results. As it was presented
-in the \nameref{sec:time_results}, the custom implementation of multithreading achieved
+in the \fullref{sec:time_results}, the custom implementation of multithreading achieved
 the best performance. The number of worker threads should be closely related to number of
 hardware threads available on the specific platform. There are also improvements in terms of
-image compression as described in \nameref{sec:results_comparison}. Despite the reference results
+image compression as described in \fullref{sec:results_comparison}. Despite the reference results
 being better on average by 33\%, the described solution managed to improve bit rate by 1.5\% in
 comparison to JPEG 2000 Part 1 compliant solution. Therefore it can be concluded that the objective
 of the thesis has been reached.
@@ -43,7 +43,7 @@ The proposed algorithmic development is not as trivial to parallelize as current
 three approaches that are worth to be tested during implementation phase. Firstly, asynchronous primitives from
 the standard C++ library such as ``std::async'', ``std::future'' and ``std::promise'' can be employed to perform
 this task. This approach leads to the C++ run-time execution determining whether it is beneficial to employ several
-threads for certain task. However, as it was shown before in \nameref{sec:time_results}, one can easy be deceived by relying
+threads for certain task. However, as it was shown before in \fullref{sec:time_results}, one can easy be deceived by relying
 on the automatic tools that are supposed to make work parallel. The other solution requires employing producer-consumer
 architecture to solve described problem. The run-time execution should be able to determine whether more than one
 filter pairs can be processed at the same time. Therefore it should be evaluated whether there are hardware threads

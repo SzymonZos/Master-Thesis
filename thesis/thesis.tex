@@ -49,6 +49,9 @@
 \titleformat{\chapter}[hang]{\huge\bfseries}{\chaptertitlename\ \thechapter.}{0.3em}{}
 \titlespacing*{\chapter}{0pt}{0pt}{40pt}
 
+ % Reference with chapter number and its title
+\newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} \nameref*{#1}}}
+
 \renewcommand{\listoflistingscaption}{List of listings}
 \renewcommand{\appendixtocname}{Appendices}
 \renewcommand{\appendixpagename}{Appendices}

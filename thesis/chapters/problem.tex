@@ -105,7 +105,7 @@ column of the resulting data. Coefficients $\mathbf{X}^{V}_{\psi}$ are obtained 
 and then downsampling to each column of the resulting data. Lastly, coefficients $\mathbf{X}^{D}_{\psi}$ are
 obtained by applying high-pass filtering and downsampling to each row of the 2-D data $\mathbf{x}$ followed by
 applying high-pass filtering and downsampling to each column of the resulting data. In the next stage of more
-complex dwt calculating process only the coefficients $\mathbf{X}_{\phi}$ are taken into consideration \cite{dwt_impl}.
+complex DWT calculating process only the coefficients $\mathbf{X}_{\phi}$ are taken into consideration \cite{dwt_impl}.
 
 \subsection{DWT features summary}
 
@@ -326,7 +326,7 @@ In recent years there is observed increase of personal computers capable of runn
 in similar manner \cite{cpp_concurrency}.
 
 Nowadays, there is a trend in producing increasing amount of processors in multicore solutions by chip manufacturers.
-There can be found 16 or even more processor units on a single chip. Following this way is easier
+There can be found 16 or even more processor cores on a single chip. Following this way is easier
 for improving performance over strengthening single core solutions. Therefore, multicore desktop
 computers and even embedded devices are growing share in the market. In the past, it was possible
 for programmers to get their application run faster without doing anything. Such situation
@@ -340,8 +340,8 @@ reducing the total execution time of the program. This approach is called ``task
 Despite sounding rather straightforward, such operation can become a complex process.
 Especially whether there exist many dependencies between the separated parts. Such division
 can be applied in two different ways. The first one is connected with processing, i.e.
-one thread processes certain part of the given algorithm while the other ones perform operations
-at the different part. The other way is instead connected strictly with the data. Each thread
+one thread executes certain part of the given algorithm while the other ones perform operations
+at the different part. The other way is connected strictly with the data. Each thread
 performs the same operation on different parts of the given data. The latter approach is called
 data level parallelism \cite{cpp_concurrency}.
 
@@ -380,7 +380,8 @@ of the standard \cite{jpeg_suite}. Few of them can be seen on the list below:
     transforms for multi and hyperspectral imagery.
     \item from the Part 3: MJ2 (Motion JPEG 2000).
     \item from the Part 11: JPWL (JPEG 2000 Wireless).
-    \item OPJViewer, a GUI based tool for visualization of the J2K, JP2, JPWL and MJ2 files.
+    \item OPJViewer, a GUI based tool for visualization of the J2K (extension used for storing
+    code-stream JPEG 2000 data), JP2 (standard JPEG 2000 file extension), JPWL and MJ2 files.
     \item OPJIndexer, a code-stream indexer to view information about the headers and packets localization.
     This tool is also capable of reading the rate-distortion contribution of each packet to the image \cite{jpeg_suite}.
 \end{itemize}
@@ -416,11 +417,11 @@ the original Part 1 of the JPEG 2000 standard.
 \subsection{Kakadu} \label{sec:kakadu}
 
 Kakadu is not only a complete implementation of the JPEG 2000 standard Part 1 but also an application
-that supports Part and Part 3 in a significant amount of features. The software was originally developed
+that supports Part 2 and Part 3 in a significant amount of features. The software was originally developed
 by David Taubman of the University of New South Wales (UNSW) in Australia. The author is also noticeably
 known for being the designer of EBCOT, i.e. the core coding component of JPEG 2000. The name of this library
 comes from ``Kakadu National Park'' which is located in the Northern Territory of Australia \cite{jpeg_suite}. Licensing
-is more advanced in comparison to solutions mentioned in \nameref{sec:part_1}. There are separate licensing
+is more advanced in comparison to solutions mentioned in \fullref{sec:part_1}. There are separate licensing
 schemes for research, commercial and demonstration-only applications.
 
 The Kakadu software framework is widely adopted in the substantial range of JPEG 2000 products. The few examples
@@ -470,9 +471,9 @@ test-sets resulting in the improvement only up to 2.2\% \cite{denoising}.
 \subsection{Skipping Selected Steps of DWT Computation}
 
 The other method of improving image compression, i.e. bitrates of lossless JPEG 2000 is skipping
-selected steps of discrete wavelet computation (SS-DWT). As a precondition fixed SS-DWT variants
-were employed. Then, heuristic was employed to select from the mentioned before variants best
-one for certain image \cite{skipping_dwt}.
+selected steps of discrete wavelet computation (SS-DWT). At the first phase of implementing
+this particular method fixed SS-DWT variants were employed. Then, heuristic was employed to select
+from the mentioned before variants best one for certain image \cite{skipping_dwt}.
 
 The experiments on diverse set of images resulted in the improvement of bitrates vastly of
 non-photographic images. The entropy estimation of encoding effects was used to select the most

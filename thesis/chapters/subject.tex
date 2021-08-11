@@ -2,17 +2,17 @@
 
 \subsection{Proposed algorithm}
 
-Taking into consideration existing solutions mentioned in \nameref{ch:problem} it was decided to
+Taking into consideration existing solutions mentioned in \fullref{ch:problem} it was decided to
 implement several extensions of the JPEG 2000 standard, Part 2. Moreover, proposed algorithm
 was designed to be parallelized. Such decision improves runtime performance especially in applications
-that require processing of great number of images. As it was announced in \nameref{ch:intro}, the standard
+that require processing of great number of images. As it was announced in \fullref{ch:intro}, the standard
 way of computing discrete wavelet transform in the Part 1 of the JPEG 2000 standard is to decompose the
 image into sub-bands using a pair of low- and high-pass filters. This decomposition is performed both in
 vertical and horizontal directions. Moreover, it is applied multiple times across whole processing tree.
 
-Vast majority of available extensions was mentioned in \nameref{sec:part2_jpeg2000}. It was decided to choose
-\nameref{sec:arbitrary_decomposition} and \nameref{sec:arbitrary_wavelet_transform} in the planning phase of
-thesis development. As it was shown in the mentioned beforehand chapters, arbitrary decomposition
+Vast majority of available extensions was mentioned in \fullref{sec:part2_jpeg2000}. It was decided to choose
+solutions described in \fullref{sec:arbitrary_decomposition} and \fullref{sec:arbitrary_wavelet_transform} in the
+planning phase of thesis development. As it was shown in the mentioned beforehand chapters, arbitrary decomposition
 extension creates a possibility of splitting the image into sub-bands of different shapes. The latter feature,
 i.e. arbitrary wavelet transform breaks strict selection rule of filters pair. With the help of these
 extensions and carefully chosen JPEG 2000 coder estimation process it is possible to adaptively choose
@@ -34,8 +34,8 @@ The workflow of the presented solution is as follows.
 
 \subsection{Different variants of DWT decomposition} \label{sec:dwt_decompositions}
 
-As it was described in \nameref{sec:arbitrary_wavelet_transform} the Part 2 of JPEG 2000 standard allows to perform
-multiple modifications of decomposition even in the same step of DWT. The \nameref{sec:kakadu} solution supports
+As it was described in \fullref{sec:arbitrary_wavelet_transform}, the Part 2 of JPEG 2000 standard allows to perform
+multiple modifications of decomposition even in the same step of DWT. The solution mentioned in \fullref{sec:kakadu} supports
 such extensive set of DWT variants. However, in this solution the combinations were narrowed to the most
 generic case. Moreover, the depth of discrete wavelet transform chain was limited to 5.
 
@@ -128,7 +128,7 @@ $P(x_{1}),\dots,P(x_{n})$, the entropy of $X$ is defined as in the formula \ref{
 \label{eq:entropy}
 \end{equation}
 The base of logarithm mentioned in the formula \ref{eq:entropy} can vary across different applications. Base 2 is used
-in this application. Its unit is called bits or ``shannons'', while base 10 gives units called ``dits'' and base $e$
+in this application. Its unit is called bits, while base 10 gives units called ``dits'' and base $e$
 natural units - ``nats'' \cite{entropy_wiki}. Moreover, it assumed that $0*log_{2}0=0$ in the process of entropy calculation.
 
 Claude Shannon originally described entropy as part of his theory of communication. A data communication system
@@ -162,12 +162,12 @@ basic requirements for design and programming:
 \begin{itemize}
     \item Ideas shall directly be expressed in the code.
     \item Independent ideas shall be independently expressed in the code.
-    \item Relationships shall be represented directly in code among directly in the code among other ideas.
+    \item Relationships shall be represented directly in code among other ideas.
     \item Expressed ideas shall be combined freely, where and only where combinations make sense.
     \item Simple ideas shall be expressed simply \cite{cpp_language_bjarne}.
 \end{itemize}
 
-Given that the C++ programming language supports four styles of programming:
+Given that, the C++ programming language supports four styles of programming:
 \begin{itemize}
     \item Procedural programming.
     \item Abstraction of data.
@@ -294,7 +294,7 @@ decision is dictated upon fact that actual type of matrix containing data is not
 Therefore a pointer to first element and total size are the most feasible solution.
 There is one disadvantage that hits the runtime of presented algorithm. The results
 from ``cols'' and ``rows'' functions are not cached in memory. Thus, upon calculating
-``full'' dwt variant operations are unnecessarily doubled.
+``full'' DWT variant operations are unnecessarily doubled.
 
 \begin{listing}[!htb]
 \begin{minted}[linenos, breaklines]{cpp}
@@ -340,7 +340,7 @@ type information using introspection during compile-time \cite{pywavelets}. On t
 writing small and readable tests easier. Moreover, it can scale up to support complex functional
 testing for other libraries and applications \cite{pytest}.
 
-The used technique to check correctness of written dwt functions in this application are testing
+The used technique to check correctness of written DWT functions in this application are testing
 fixtures. Their purpose is to provide a defined, reliable and consistent context for the written tests.
 The environment, e.g. database configured with known parameters or content, e.g. dataset can also
 be included in such a fixture. Moreover, steps and data constituting the arrange phase of a test
@@ -504,8 +504,8 @@ auto parallel_for(std::size_t n_threads, std::size_t n_elements, Func&& func) {
 
 \subsection{Queue generation}
 
-The calculation process of dwt processing size is available at the listing \ref{lst:dwt_queue}.
-As was described earlier in the thesis, depth of dwt calculations is set to five. From the
+The calculation process of DWT processing size is available at the listing \ref{lst:dwt_queue}.
+As was described earlier in the thesis, depth of DWT calculations is set to five. From the
 mathematical point of view, such processing queue is a cartesian product of its values.
 However, the processing chain includes not performing discrete wavelet transform at all
 and returning early from algorithm. Therefore, it was decided to limit scope of possible
@@ -539,15 +539,15 @@ consteval std::size_t get_queue_size() {
     return result;
 }
 \end{minted}
-\caption{Calculation of size in dwt processing queue}
+\caption{Calculation of size in DWT processing queue}
 \label{lst:dwt_queue_size}
 \end{listing}
 
-The generation and then instantiation of dwt processing queue is available at the consecutive listings
+The generation and then instantiation of DWT processing queue is available at the consecutive listings
 \ref{lst:dwt_queue} and \ref{lst:dwt_queue_instantiation}. As it was specified earlier, these
 computations are done in the compile time thanks to ``template'' and ``constexpr'' meta programming.
 The instantiation process requires three pieces of information. First one is type of single
-element in the queue which is set up to specific dwt callback in this case. Second one is related
+element in the queue which is set up to specific DWT callback in this case. Second one is related
 to the element which is supposed to stop chain of calculations. Lastly, array containing all
 needed callbacks is required.
 
@@ -556,7 +556,7 @@ call of function which performs calculation of modified cartesian product descri
 In the basic path previously generated arguments are forwarded and the new one is appended
 at the end. However, if the ``stop'' operation is detected, the recursive chain is terminated
 and the results are saved to the buffer. Last case involves break of the whole process when
-the maximum dwt level is reached. All of these steps are performed during compile-time so
+the maximum DWT level is reached. All of these steps are performed during compile-time so
 there is no runtime penalty. In the result look-up table is produced in the ``.rodata''
 memory section.
 
@@ -605,7 +605,7 @@ private:
 };
 } // namespace detail
 \end{minted}
-\caption{Generation of dwt processing queue}
+\caption{Generation of DWT processing queue}
 \label{lst:dwt_queue}
 \end{listing}
 
@@ -618,7 +618,7 @@ inline constexpr auto
 
 } // namespace mgr
 \end{minted}
-\caption{Instantiation of dwt processing queue}
+\caption{Instantiation of DWT processing queue}
 \label{lst:dwt_queue_instantiation}
 \end{listing}
 

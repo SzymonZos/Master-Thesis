@@ -4,12 +4,12 @@
 
 The main purpose of time execution comparison in this paper is to deliver results of hypothetical runtime
 improvements between the single threaded application, C++ standard execution policies and the custom
-implementation described in the section \nameref{sec:parallel_for}. Therefore described methods are
+implementation described in the \fullref{sec:parallel_for}. Therefore described methods are
 benchmarked with the usage of the same hardware. Moreover, several threads configuration are tested
 in the case of custom implementation. The expected best performance is to be available around
 the number of available hardware threads.
 
-At the listing \ref{lst:timer_interface} there is presented timer class used to measure execution of dwt
+At the listing \ref{lst:timer_interface} there is presented timer class used to measure execution of DWT
 processing chain. It is written in RAII format, i.e. Resource Acquisition Is Initialization. RAII is 
 popular modern C++ idiom to control the lifetime of the object, e.g. it is used for scope based
 dynamic memory management wrappers. Another use case is control of locking and unlocking mechanisms such
@@ -36,7 +36,7 @@ intentional delays and waiting for availability of certain system resources. It 
 in the following example. Take into consideration mathematical script which results in producing such report:
 ``Measured CPU time: 0.09s and wall-time: 5m 20.36s''. For over 5 minutes this program was active and during
 that time the processor spent only fraction of second performing mathematical operations. Therefore it was
-found to be suitable solution in the concurrent execution of dwt processing chain.
+found to be suitable solution in the concurrent execution of DWT processing chain.
 
 At the listing \ref{lst:timer_specializations} there are depicted several template specializations for
 handling different types of measurements. The user of this class can specify the accuracy with the C++ standard
@@ -184,7 +184,7 @@ discrete wavelet transform decompositions in product with different filter pairs
 number of thousand in specific cases. Taking into consideration not small number of test images
 it was decided to improve this process by dropping empirically chosen types of transforms. Firstly,
 during the experiments it was observed that vast majority of images performs best in terms of
-image compression when the level of dwt chain reached number of five. Therefore it was decided to
+image compression when the level of DWT chain reached number of five. Therefore it was decided to
 drop exhaustive search method for smaller ranks. Another observation was made, i.e. the pair of used
 filters with the Part 1 compliant decomposition determined the obtained result in the more significant
 way than Part 2 compliant discrete wavelet transform chain with the Part 1 filter. Therefore
@@ -265,11 +265,11 @@ due to fact that Part 1 solution was used as fallback when no better results wer
 
 \subsection{Comparison with reference} \label{sec:results_comparison}
 
-Taking into consideration results presented in the \nameref{sec:ref_results} and \nameref{sec:my_results}
+Taking into consideration results presented in the \fullref{sec:ref_results} and \fullref{sec:my_results}
 it can be stated that they are quite similar. The reference results on average are better by 33\%.
 This behavior is expected as the estimation method of proposed solution was memoryless entropy,
 while the JPEG 2000 codec has its own memory. Another thing that is worth to notice is that the
-choice of filter pair was more important for the final result than the dwt decomposition.
+choice of filter pair was more important for the final result than the DWT decomposition.
 Therefore proposed solution of estimating different shapes of discrete wavelet transform applied
 to the image does not guarantee the best possible results. This is due to fact that there was
 an impasse on selecting best feasible filter.
@@ -281,7 +281,7 @@ methods at examplary image is presented at the figure \ref{fig:time_comparison_e
 numbers placed after ``thread'' indicate usage of parallel for version presented earlier.
 These numbers correspond to number of software threads used in the experiment. The last record, i.e.
 ``policies'' describes usage of execution policies introduced in C++17. As can be seen at this
-figure, selected compiler haven't managed to optimize this particular problem. The reason of
+figure, selected compiler has not managed to optimize this particular problem. The reason of
 this failure may be caused by obscure and non-trivial code. However, proposed version of parallel
 computation works as expected. The speedup is strictly connected to the number of hardware threads
 which is 8 in this case.
@@ -325,39 +325,39 @@ use number of workers greater than hardware concurrency.
 
 \subsection{Visualized sample results}
 
-There are presentend sample outputs of various dwt variants applied to famous 512x512 picture
+There are presentend sample outputs of various DWT variants applied to famous 512x512 picture
 of Lena Forsén \cite{lena}. All the images are results of low-pass filtering from the last
 rank of discrete wavelet transform. The first image \ref{fig:lena_dwt_5} represents the Part 2
 compatible decomposition variant where transformation is applied each time only to columns.
 Therefore the shape of result is very thin rectangle. Second picture \ref{fig:lena_dwt_199}
-illustrates mainly row-wised based dwt.
+illustrates mainly row-wised based DWT.
 Another figure \ref{fig:lena_dwt_326} depicts mixed version of discrete wavelet transform described
 before. Last one \ref{fig:lena_dwt_363} is the output of Part 1 compliant decomposition.
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{lena_dwt_5.png}
-    \caption{The example output image of dwt processing chain using Lena test image \cite{lena}}
+    \caption{The example output image of DWT processing chain using Lena test image \cite{lena}}
     \label{fig:lena_dwt_5}
 \end{figure}
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=1]{lena_dwt_199.png}
-    \caption{The example output image of dwt processing chain using Lena test image \cite{lena}}
+    \caption{The example output image of DWT processing chain using Lena test image \cite{lena}}
     \label{fig:lena_dwt_199}
 \end{figure}
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=1]{lena_dwt_326.png}
-    \caption{The example output image of dwt processing chain using Lena test image \cite{lena}}
+    \caption{The example output image of DWT processing chain using Lena test image \cite{lena}}
     \label{fig:lena_dwt_326}
 \end{figure}
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=1]{lena_dwt_363.png}
-    \caption{The example output image of dwt processing chain using Lena test image \cite{lena}}
+    \caption{The example output image of DWT processing chain using Lena test image \cite{lena}}
     \label{fig:lena_dwt_363}
 \end{figure}
