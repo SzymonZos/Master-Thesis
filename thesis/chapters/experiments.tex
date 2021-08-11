@@ -201,7 +201,8 @@ Tilo Strutz's papers \cite{ref_images}. It was used at first to evaluate multipl
 color transforms. The main purpose of that paper was to propose an entire family of multiplierless
 reversible color transforms and investigate their performance in lossless image compression \cite{multiplierless_rct}.
 Therefore it was found out to be suitable for the case of this thesis as lossless image compression
-on color pictures is applied as well. The examplary elements of the image data set are available at
+on color pictures is applied as well. In the selected data set there are 104 element available.
+The examplary elements of the image data set are available at
 figures \ref{fig:example_1}, \ref{fig:example_2} and \ref{fig:example_3}. It is worth noticing that only ppm
 (portable PixMap) images were selected due to lack of png format support in Kakadu library.
 
@@ -227,10 +228,11 @@ figures \ref{fig:example_1}, \ref{fig:example_2} and \ref{fig:example_3}. It is 
 \end{figure}
 
 
-\section{Results}
+\section{Results} \label{sec:results}
 
 \subsection{Reference results} \label{sec:ref_results}
 
+The reference results were gathered using the actual JPEG 2000 codec instead of an estimation.
 The mean improvement in terms of image compression between Part 1 and Part 2 compliant solutions
 turned out to be on average equal to 1.982\% with the standard deviation of 1.307\%. The maximum
 possible improvement achieved on specific image was 10.661\% while the minimum was set to 0.
@@ -239,7 +241,8 @@ As far as only reference results are concerned it can be concluded that Part 2 e
 of discrete wavelet decomposition and change of selected filter pair improve compression ratio
 in selected data set. However the results are quite differentiated. For some images the improvement
 was significant (over 10\%), while for others there was no improvement. Such behavior probably
-involves crash of Kakadu application for certain image.
+involves crash of Kakadu application for certain image. Taking into consideration the size of
+data set (104 images), the standard deviation seems credible.
 
 % mean: -1.9822555180454076
 % stddev: 1.3068419882544533

@@ -82,7 +82,16 @@
 % Introductory pages
 
 \begin{abstract}
-    Lorem ipsum\dots
+    The objective of presented paper is to demonstrate JPEG 2000 Part 2 compliant solution rensposible
+    for reducing lossless image compression ratio. The chosen extensions from the Part 2 of JPEG 2000
+    standard include decomposition using discrete wavelet transform in a way which is not compliant with
+    Part 1 of the mentioned before standard. Moreover, different pairs of low- and high-pass filters are used.
+    The application features entropy estimation to reduce runtime of image processing.
+    As far as the results are concerned, the mean improvement in terms of image compression between
+    Part 1 and Part 2 compliant solutions turned out to be on average equal to 1.5\% with the
+    standard deviation of 1.305\%. The reference results that were gathered using actual JPEG 2000
+    codec came in to be on average equal to 1.982\%. The standard deviation equaled 1.305\% in this particular case.
+    Moreover, the multithreading allowed to greatly reduce runtime of the application.
 
     \textbf{Keywords:} lossless image compression, image processing, JPEG 2000,
     discrete wavelet transform, entropy estimation, multithreading, modern C++

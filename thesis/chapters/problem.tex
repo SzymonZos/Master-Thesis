@@ -443,7 +443,7 @@ Supported features of Part 2 include arbitrary wavelet transform kernels and gen
 The Kakadu library offers extensive support for interactive mode of client–server applications. It is done
 thanks to the implementation of the most notable features from the JPIP (JPEG 2000 Internet Protocols) standard \cite{jpeg_suite}.
 
-\subsection{Reversible denoising and lifting based color component transformation}
+\subsection{Reversible denoising and lifting steps with step skipping}
 
 Methods such as reversible denoising and lifting based color component transformation aim to improve
 overall quality of image compression. Color space transformation in reversible manner is required
@@ -467,6 +467,24 @@ ratios in comparison to the untransformed image. On the average improvement is b
 5\% and 6\% for such specific images. However, things differ for images from standard
 test-sets resulting in the improvement only up to 2.2\% \cite{denoising}.
 
+Another application of the RDLS (reversible denoising and lifting step) is described
+in the paper \cite{entropy}. New method of using hybrid transform was introduced there.
+The main contribution to that paper was discrete wavelet transform using custom prediction
+mechanism. Although simple prediction is considered to be ineffective when combined with DWT,
+the application of modified discrete wavelet transform using RLDS with step skipping is able to
+take advantages of its strengths. The usage of heuristics and estimation of entropy resulted
+in making described transform image-adaptive \cite{entropy}.
+
+The data set used for experiments in the presented paper contained 247 non-photographic and
+499 photographic images. As a result it was found that described approach using combination
+of RDLS with step skipping, DWT and prediction turned out to be effective. The prediction
+mechanism allowed to double the JPEG 2000 compression ratio improvements made by using only RDLS.
+Compression schemes with various tradeoffs were proposed due to fact that for some images
+applying prediction instead of DWT could be more beneficial. The compression ratios of non-photographic
+and photographic images improved by 30.9\% and 1.2\%, respectively, in comparison to solution
+compliant with Part 1 of the JPEG 2000 standard. The cost was present in the increase of compression
+time by 2\% and breaking mentioned before compliance. Greater ratio improvements were claimed to
+be possible with greater cost in runtime performance \cite{entropy}.
 
 \subsection{Skipping Selected Steps of DWT Computation}
 

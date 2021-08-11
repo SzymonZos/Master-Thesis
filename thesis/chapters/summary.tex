@@ -1,4 +1,10 @@
-The realized tasks during the all phases of thesis development are as follows.
+The objective of the thesis was to develop, implement and test certain type of application. The software
+should be capable of determining specific configuration of chosen JPEG 2000 Part 2 extensions for
+the given image. These extensions include decomposition using discrete wavelet transform in a way
+which is not compliant with Part 1 of the JPEG 2000 standard and making use of different pair of filters.
+The main goal was to achieve better results in terms of compression ratio than the mentioned before
+``Part 1''. As was concluded in the \fullref{sec:results}, the objective of the thesis was fulfilled.
+The realized tasks during all the phases of thesis development are as follows.
 \begin{itemize}
     \item Initial research in fields of image processing and compression, analysis of JPEG 2000 algorithm. 
     \item More advanced research of algorithms such as DWT, SS-DWT, HP and JPEG 2000 implementation - Kakadu.
@@ -14,6 +20,12 @@ The realized tasks during the all phases of thesis development are as follows.
     \item Research on final heuristics - comparison in terms of obtained compression ratio and time with: unmodified JPEG 2000,
     SS-DWT transformation and the transformation determined by an exhaustive search.
 \end{itemize}
+
+As far as the results are concerned, the mean improvement in terms of image compression between
+Part 1 and Part 2 compliant solutions turned out to be on average equal to 1.5\% with the
+standard deviation of 1.305\%. The reference results that were gathered using actual JPEG 2000
+codec came in to be on average equal to 1.982\%. As was described in \fullref{sec:results},
+the standard deviation equaled 1.305\% in this particular case.
 
 Moreover, some conclusions were made according to the achieved results. As it was presented
 in the \fullref{sec:time_results}, the custom implementation of multithreading achieved
