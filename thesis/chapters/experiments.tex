@@ -202,7 +202,7 @@ color transforms. The main purpose of that paper was to propose an entire family
 reversible color transforms and investigate their performance in lossless image compression \cite{multiplierless_rct}.
 Therefore it was found out to be suitable for the case of this thesis as lossless image compression
 on color pictures is applied as well. In the selected data set there are 104 element available.
-The examplary elements of the image data set are available at
+The exemplary elements of the image data set are available at
 figures \ref{fig:example_1}, \ref{fig:example_2} and \ref{fig:example_3}. It is worth noticing that only ppm
 (portable PixMap) images were selected due to lack of png format support in Kakadu library.
 
@@ -269,9 +269,9 @@ due to fact that Part 1 solution was used as fallback when no better results wer
 \subsection{Comparison with reference} \label{sec:results_comparison}
 
 Taking into consideration results presented in the \fullref{sec:ref_results} and \fullref{sec:my_results}
-it can be stated that they are quite similar. The reference results on average are better by 33\%.
-This behavior is expected as the estimation method of proposed solution was memoryless entropy,
-while the JPEG 2000 codec has its own memory. Another thing that is worth to notice is that the
+it can be stated that they are quite similar. The improvement coming from the reference results on average
+is  better by 33\%. This behavior is expected as the estimation method of proposed solution was memoryless
+entropy, while the JPEG 2000 codec has its own memory. Another thing that is worth to notice is that the
 choice of filter pair was more important for the final result than the DWT decomposition.
 Therefore proposed solution of estimating different shapes of discrete wavelet transform applied
 to the image does not guarantee the best possible results. This is due to fact that there was
@@ -280,7 +280,7 @@ an impasse on selecting best feasible filter.
 \subsection{Time comparison} \label{sec:time_results}
 
 The runtime of discussed solution was measured and later evaluated. Comparison of different
-methods at examplary image is presented at the figure \ref{fig:time_comparison_example}. The consecutive
+methods at exemplary image is presented at the figure \ref{fig:time_comparison_example}. The consecutive
 numbers placed after ``thread'' indicate usage of parallel for version presented earlier.
 These numbers correspond to number of software threads used in the experiment. The last record, i.e.
 ``policies'' describes usage of execution policies introduced in C++17. As can be seen at this
@@ -291,17 +291,21 @@ which is 8 in this case.
 
 During evaluation process one anomaly was observed (figure \ref{fig:time_comparison_sus}). After investigation
 it was concluded that operating system decided to suspend execution of the program due to inactivity.
-As can be observed at the figure \ref{fig:time_comparison_means_base} this anomaly higly contributed
+As can be observed at the figure \ref{fig:time_comparison_means_base} this anomaly highly contributed
 to the average measures. It was decided that it has to be eliminated from the data set in the
 preprocessing step. At the figure \ref{fig:time_comparison_means_mod} such change is shown.
 These results are very similar to the ones presented at first (figure \ref{fig:time_comparison_example}).
 The improvement was exhausted around number of hardware threads. Therefore it is not beneficial to
 use number of workers greater than hardware concurrency.
 
+The time comparison of discussed solution with the reference cannot be established as the computations
+took place on different machine. However, it was observed that using Kakadu with JPEG 2000 compliant codec
+was several times slower on average than the proposed algorithm.
+
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.5]{img_0.png}
-    \caption{Elapsed time comparison of different execution methods at examplary image}
+    \caption{Elapsed time comparison of different execution methods at exemplary image}
     \label{fig:time_comparison_example}
 \end{figure}
 
@@ -328,7 +332,7 @@ use number of workers greater than hardware concurrency.
 
 \subsection{Visualized sample results}
 
-There are presentend sample outputs of various DWT variants applied to famous 512x512 picture
+There are presented sample outputs of various DWT variants applied to famous 512x512 picture
 of Lena Forsén \cite{lena}. All the images are results of low-pass filtering from the last
 rank of discrete wavelet transform. The first image \ref{fig:lena_dwt_5} represents the Part 2
 compatible decomposition variant where transformation is applied each time only to columns.

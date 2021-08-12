@@ -1,6 +1,108 @@
 \chapter*{Technical documentation}
 \addcontentsline{toc}{chapter}{Technical documentation}
 
+At the listing \ref{lst:python_kdu_cmd} there are available both ``FILTERS'' dictionary
+containing needed options to perform lossless image compression of given input using Kakadu
+software and wrapper of running such command from the subshell with the output decoding.
+The keys from mentioned before dictionary correspond to their ``pywt'' names. More complex
+filters require more verbose command line input. The output of Kakadu is searched with
+specific regular expression to retrieve the bitrate of compressed image and then converted to
+floating point number. On the other hand, at the listing \ref{lst:python_kdu_script} the
+generation process of possible DWT decompositions is depicted. In this example only five
+level of DWT chain is calculated. ``V(-)'' stands for vertical decomposition, ``H(-)''
+for horizontal and ``B(-:-:-)'' for both. It is worth pointing out that further decomposition
+can be applied at the certain level by filling ``-'' in the brackets.
+
+The exemplary command using arbitrary DWT decomposition is shown below. \\
+\mintinline{bash}{./bin/Linux-x86-64-gcc/kdu_compress -i ./img/02_Schluesselfelder_Schiff.ppm} \\
+\mintinline{bash}{-o ./image.jpx Creversible=yes Clevels=5} \\
+\mintinline{bash}{Cdecomp="B(-:-:-),B(-:-:-),B(-:-:-),B(-:-:-),H(-)"}. \\
+Other example involves using not Part 1 compliant filter, i.e. Haar \\
+\mintinline{bash}{./bin/Linux-x86-64-gcc/kdu_compress -i ./img/02_Schluesselfelder_Schiff.ppm} \\
+\mintinline{bash}{-o ./image.jpx Catk=2 Kkernels:I2=R2X2 Clevels=5} \\
+\mintinline{bash}{Cdecomp="B(-:-:-),B(-:-:-),B(-:-:-),H(-),V(-)"}.
+
+\begin{listing}[!htb]
+\begin{minted}[linenos, breaklines]{python}
+import os
+import re
+import subprocess
+from itertools import product
+from pathlib import Path
+
+
+BASE = "./bin/Linux-x86-64-gcc/kdu_compress"
+FILTERS = {
+    'bior2.2': 'Creversible=yes',
+    'haar': 'Catk=2 Kkernels:I2=R2X2',
+    'bior2.6': 'Catk=2 Kextension:I2=SYM Kreversible:I2=yes '
+               '"Ksteps:I2={4,-1,4,8},{4,-2,4,8}" '
+               'Kcoeffs:I2=0.0625,-0.5625,-0.5625,0.0625,'
+               '-0.0625,0.3125,0.3125,-0.0625'
+}
+
+
+def run_cmd(path, cmd):
+    imgs = f"-i {path} -o ./image.jpx"
+    cmd_base = f"{BASE} {imgs}"
+    res = subprocess.run(f"{cmd_base} {cmd}",
+                         stdout=subprocess.PIPE, shell=True)
+    out = res.stdout.decode('utf-8')
+    try:
+        out = re.search(R"(Layer.+\n\D+)([\d\.]+)", out, re.M).group(2)
+    except AttributeError:
+        out = "inf"
+    return float(out)
+\end{minted}
+\caption{Python function used to call Kakadu with desired parameters}
+\label{lst:python_kdu_cmd}
+\end{listing}
+
+\begin{listing}[!htb]
+\begin{minted}[linenos, breaklines]{python}
+def test_kdu_dwt_comp(path, dwt_filter):
+    vertical = ['V(-)']
+    horizontal = ['H(-)']
+    both = ['B(-:-:-)']
+    comb = [vertical, horizontal, both]
+    comps = [*product(comb, repeat=5), ]
+    cmds = []
+    level = "Clevels=5"
+    for comp in comps:
+        comp = ','.join(x[0] for x in comp)
+        cmds.append(f'{FILTERS[dwt_filter]} {level} Cdecomp="{comp}"')
+    results = dict()
+    for cmd in cmds:
+        results[cmd] = run_cmd(path, cmd)
+    min_bitrate = min(results, key=results.get)
+    with open(f"./ref_results/{Path(path).stem}.txt", "a") as f:
+        f.write(f"best: {results[min_bitrate]}\n")
+
+
+def test_kdu_filter(path):
+    results = dict()
+    for dwt_filter, cmd in FILTERS.items():
+        results[dwt_filter] = run_cmd(path, cmd)
+    with open(f"./ref_results/{Path(path).stem}.txt", "a") as f:
+        f.write(f"ref: {results['bior2.2']}\n")
+    return min(results, key=results.get)
+
+
+def main():
+    for file in os.scandir('./img'):
+        print(file.path)
+        dwt_filter = test_kdu_filter(file.path)
+        test_kdu_dwt_comp(file.path, dwt_filter)
+        print("")
+
+
+if __name__ == '__main__':
+    main()
+\end{minted}
+\caption{Python script used to test various configurations using Kakadu}
+\label{lst:python_kdu_script}
+\end{listing}
+
 \chapter*{List of abbreviations and symbols}
 \addcontentsline{toc}{chapter}{List of abbreviations and symbols}
 

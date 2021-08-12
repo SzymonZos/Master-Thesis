@@ -13,7 +13,7 @@ The realized tasks during all the phases of thesis development are as follows.
     \item Setup of Continuous Integration system and implementation of DWT testing component 
     \item Development of initial heuristics allowing to study the effects of DWT modifications compliant
     with the JPEG 2000 standard such as decompositions into sub-bands and usage of different filters
-    \item Support of loading and storing both grayscale and color images.
+    \item Support for both grayscale and color images.
     \item Initial implementation of multi-threaded heuristics.
     \item Conducting preliminary tests and selecting modifications or their variants to be included in the final heuristics.
     \item Development of multi-threaded optimized implementation of final heuristics.
@@ -30,15 +30,17 @@ the standard deviation equaled 1.305\% in this particular case.
 Moreover, some conclusions were made according to the achieved results. As it was presented
 in the \fullref{sec:time_results}, the custom implementation of multithreading achieved
 the best performance. The number of worker threads should be closely related to number of
-hardware threads available on the specific platform. There are also improvements in terms of
-image compression as described in \fullref{sec:results_comparison}. Despite the reference results
-being better on average by 33\%, the described solution managed to improve bit rate by 1.5\% in
-comparison to JPEG 2000 Part 1 compliant solution. Therefore it can be concluded that the objective
-of the thesis has been reached.
+hardware threads available on the specific platform. There are also enhancements in terms of
+image compression as described in \fullref{sec:results_comparison}. Despite the improvement from
+reference results being better on average by 33\%, the described solution managed to improve bit
+rate by 1.5\% in comparison to JPEG 2000 Part 1 compliant solution. Therefore it can be concluded
+that the objective of the thesis has been reached.
 
 Despite being successful in the field of compression improvement in lossless image compression, the best
 possible performance was not achieved. Moreover, run-time of described algorithm can also be reduced.
-As study shows, compression rate on average was lagging behind the reference at the rate of 33\%. Although
+However, it was observed that using Kakadu with JPEG 2000 compliant codec
+was several times slower on average than the proposed algorithm.
+As study shows, compression rate on average was lagging behind the reference at the rate improvement of 33\%. Although
 this gap cannot be fully filled, more research on investigating better heuristic’s weights can be developed.
 The hypothetical improvement can be also achieved by proposing algorithm that is able to distinguish best
 possible filter pair from the other ones.
