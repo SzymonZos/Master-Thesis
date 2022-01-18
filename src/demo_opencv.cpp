@@ -11,7 +11,6 @@
 #include "Timer.hpp"
 #include <iostream>
 
-#ifdef BUILD_OPENCV
 #include "opencv.hpp"
 #include <opencv2/imgproc.hpp>
 
@@ -224,10 +223,3 @@ void demo_opencv_parallel_queue_rgb(const std::string& path) {
     parallel_for(n_threads, n_queue, std::move(par_queue));
 }
 } // namespace mgr
-#else
-namespace mgr {
-void demo_opencv(const std::string& path) {}
-void demo_opencv_queue(const std::string& path) {}
-void demo_opencv_parallel_queue(const std::string& path) {}
-} // namespace mgr
-#endif

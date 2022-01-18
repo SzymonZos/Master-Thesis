@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 
 set(CMAKE_CXX_STANDARD 20)
-option(BUILD_EXTERNALS OFF)
+option(BUILD_OPENCV OFF)
 option(BUILD_TESTS OFF)
 option(USE_LIBCPP OFF)
 
@@ -43,6 +43,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
+if(NOT BUILD_OPENCV)
+    find_package(OpenCV 4.5 REQUIRED)
+endif()
+
 add_subdirectory(src)
 
 if(BUILD_TESTS)
@@ -51,7 +55,7 @@ if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
-if(BUILD_EXTERNALS)
+if(BUILD_OPENCV)
     add_subdirectory(${OPENCV_PATH})
 endif()
 
