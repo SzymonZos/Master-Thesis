@@ -13,7 +13,8 @@
 #include <thread>
 #include <vector>
 
-#ifndef __clang__
+#include <version>
+#ifdef __cpp_lib_execution
 #include <execution>
 #endif
 
@@ -38,7 +39,7 @@ auto demo_sequential_() {
     return vec;
 }
 
-#ifndef __clang__
+#ifdef __cpp_lib_execution
 auto demo_parallel_() {
     std::vector<matrix<float>> vec(detail::get_queue_size());
     alignas(64) std::atomic<std::size_t> i{0};
@@ -90,7 +91,7 @@ void demo_sequential() {
 
 void demo_parallel() {
     std::cout << "\n\nPARALLEL VERSION\n";
-#ifndef __clang__
+#ifdef __cpp_lib_execution
     auto vec_par = demo_parallel_();
     for (auto&& mat : vec_par) {
         std::cout << mat << "\n\n";

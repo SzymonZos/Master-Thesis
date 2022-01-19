@@ -45,7 +45,7 @@ target_link_libraries(jpeg2000 PRIVATE
     opencv_core
     opencv_imgcodecs
     opencv_imgproc
-    tbb
+    TBB::tbb
 )
 
 if(EXISTS ${JP3D_PATH})

@@ -7,5 +7,6 @@ case "$1" in
     ;;
   *macos*)
     brew install tbb opencv
+    ln -s /usr/local/Cellar/tbb/2021.5.0/include/tbb /usr/local/include/tbb
     ;;
 esac

@@ -46,6 +46,7 @@ endif()
 if(NOT BUILD_OPENCV)
     find_package(OpenCV 4.2 REQUIRED)
 endif()
+find_package(TBB REQUIRED)
 
 add_subdirectory(src)
 
