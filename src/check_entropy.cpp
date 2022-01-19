@@ -12,7 +12,10 @@
 #include "opencv.hpp"
 #include <opencv2/imgproc.hpp>
 
+#include <version>
+#ifdef __cpp_lib_execution
 #include <execution>
+#endif
 #include <iostream>
 
 namespace mgr {
@@ -114,6 +117,7 @@ void check_entropy_threads(const std::string& path, unsigned int n_threads) {
 }
 
 void check_entropy_exec_policies(const std::string& path) {
+#ifdef __cpp_lib_execution
     std::vector<float> entropies(detail::get_queue_size());
     alignas(64) std::atomic<std::size_t> i{0};
 
@@ -189,5 +193,6 @@ void check_entropy_exec_policies(const std::string& path) {
         entropies.begin(),
         std::min_element(entropies.begin(), entropies.end()));
     std::cout << min << "\n";
+#endif
 }
 } // namespace mgr
