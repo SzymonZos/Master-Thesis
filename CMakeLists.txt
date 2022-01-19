@@ -44,7 +44,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(NOT BUILD_OPENCV)
-    find_package(OpenCV 4.5 REQUIRED)
+    find_package(OpenCV 4.2 REQUIRED)
 endif()
 
 add_subdirectory(src)

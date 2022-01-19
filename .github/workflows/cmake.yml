@@ -1,0 +1,55 @@
+name: CMake
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+        compiler: [ gcc, clang ]
+        build_type: [ Release, Debug ]
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install opencv2
+        run: ./ci/install_opencv.sh ${{matrix.os}}
+
+      - name: Configure compiler
+        run: ./ci/config_compiler.sh ${{matrix.compiler}}
+
+      - name: Configure CMake
+        run: >
+          . ./ci/activate_venv.sh &&
+          cmake -B ${{github.workspace}}/build
+          -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+          -DCMAKE_C_COMPILER=${{env.CC}}
+          -DCMAKE_CXX_COMPILER=${{env.CXX}}
+          -DBUILD_TESTS=ON
+
+      - name: Build
+        run: >
+          . ./venv/bin/activate &&
+          cmake --build ${{github.workspace}}/build
+          --config ${{matrix.build_type}}
+          --target jpeg2000 jpeg2000_test install -- -j $(nproc)
+
+      - name: Test
+        run: |
+          . ./venv/bin/activate
+          pytest ./test/test.py
