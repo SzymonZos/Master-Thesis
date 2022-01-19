@@ -6,6 +6,6 @@ case "$1" in
     sudo apt-get install -y libopencv-dev
     ;;
   *macos*)
-    brew install opencv
+    brew install opencv --with-tbb
     ;;
 esac
