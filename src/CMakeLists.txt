@@ -51,3 +51,10 @@ target_link_libraries(jpeg2000 PRIVATE
 if(EXISTS ${JP3D_PATH})
     target_link_libraries(jpeg2000 PRIVATE jp3d)
 endif()
+
+set_target_properties(jpeg2000
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
