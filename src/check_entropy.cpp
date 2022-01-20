@@ -10,7 +10,6 @@
 
 #include "Timer.hpp"
 #include "opencv.hpp"
-#include <opencv2/imgproc.hpp>
 
 #include <version>
 #ifdef __cpp_lib_execution

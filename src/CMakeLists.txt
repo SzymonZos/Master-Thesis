@@ -45,6 +45,7 @@ target_link_libraries(jpeg2000 PRIVATE
     opencv_core
     opencv_imgcodecs
     opencv_imgproc
+    ${OpenCV_LIBS}
     TBB::tbb
 )
 

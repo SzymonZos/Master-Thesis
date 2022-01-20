@@ -8,8 +8,9 @@
 #include <string>
 #include <tuple>
 
-#include <opencv2/core/core.hpp>
+#include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/opencv.hpp>
 
 namespace mgr {
 bool imwrite(auto&&... params) {
