@@ -11,10 +11,10 @@
     void name(const T* restrict input, \
               std::size_t rows, \
               std::size_t cols, \
-              const U* restrict filter, \
-              std::size_t n_filter, \
+              [[maybe_unused]] const U* restrict filter, \
+              [[maybe_unused]] std::size_t n_filter, \
               T* restrict output, \
-              padding_mode mode)
+              [[maybe_unused]] padding_mode mode)
 
 namespace mgr {
 template<typename T, typename U>

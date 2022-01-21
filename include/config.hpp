@@ -5,6 +5,8 @@
 #include <cstdint>
 #define restrict __restrict__
 
+#define INSTANTIATE(func, ...) template decltype(func<__VA_ARGS__>) func
+
 namespace mgr {
 enum class padding_mode {
     invalid = -1,

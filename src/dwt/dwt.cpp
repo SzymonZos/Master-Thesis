@@ -1,16 +1,6 @@
 #include "dwt.hpp"
 
-#define INSTANTIATE_CONV(T, U) \
-    template void dwt_1d<T, U>(const T* restrict input, \
-                               std::size_t n_input, \
-                               const U* restrict filter, \
-                               std::size_t n_filter, \
-                               T* restrict output, \
-                               padding_mode mode, \
-                               std::size_t offset)
-
 namespace mgr {
-
 template<typename T, typename U>
 void dwt_1d(const T* restrict input,
             std::size_t n_input,
@@ -136,7 +126,6 @@ void dwt_1d(const T* restrict input,
     }
 }
 
-INSTANTIATE_CONV(float, float);
-INSTANTIATE_CONV(double, double);
-
+INSTANTIATE(dwt_1d, float, float);
+INSTANTIATE(dwt_1d, double, double);
 } // namespace mgr
