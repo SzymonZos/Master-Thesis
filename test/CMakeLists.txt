@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.17)
 project(jpeg2000_test)
 
+add_subdirectory(ut)
+
 pybind11_add_module(jpeg2000_test
     dwt.cpp
     dwt_2d_f.cpp

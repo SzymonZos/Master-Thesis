@@ -51,10 +51,13 @@ jobs:
           . ./venv/bin/activate &&
           cmake --build ${{github.workspace}}/build
           --config ${{matrix.build_type}}
-          --target jpeg2000 jpeg2000_test install -- -j $(nproc)
+          --target jpeg2000 jpeg2000_test jpeg2000_ut install -- -j $(nproc)
 
       - name: Main app
         run: ./ci/run_main_app.sh
+
+      - name: UT
+        run: ./build/bin/jpeg2000_ut
 
       - name: Test
         run: |
