@@ -17,9 +17,20 @@ set(SOURCES
 
 add_executable(jpeg2000 ${SOURCES})
 
-set_target_properties(jpeg2000 PROPERTIES COMPILE_FLAGS "-save-temps")
+set_target_properties(jpeg2000
+    PROPERTIES
+    COMPILE_FLAGS "-save-temps"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
 
-target_include_directories(jpeg2000 SYSTEM PRIVATE ${CXXOPTS_PATH}/include)
+target_include_directories(jpeg2000
+    SYSTEM PRIVATE
+    ${CXXOPTS_PATH}/include
+    ${CMAKE_SOURCE_DIR}
+    ${TIMER_PATH}
+)
 
 if(BUILD_OPENCV)
     target_include_directories(jpeg2000 SYSTEM PRIVATE
@@ -34,28 +45,15 @@ else()
     )
 endif()
 
-target_include_directories(jpeg2000 SYSTEM PRIVATE
-    ${CMAKE_SOURCE_DIR}
-    ${TIMER_PATH}
-)
-
 target_link_libraries(jpeg2000 PRIVATE
     dwt
     cxxopts
     opencv_core
     opencv_imgcodecs
     opencv_imgproc
-    ${OpenCV_LIBS}
     TBB::tbb
 )
 
 if(EXISTS ${JP3D_PATH})
     target_link_libraries(jpeg2000 PRIVATE jp3d)
 endif()
-
-set_target_properties(jpeg2000
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)

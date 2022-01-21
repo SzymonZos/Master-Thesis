@@ -21,10 +21,9 @@ endif()
 set(CXXOPTS_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(CXXOPTS_BUILD_TESTS OFF CACHE BOOL "")
 set(CXXOPTS_ENABLE_INSTALL OFF CACHE BOOL "")
+set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
 
 project(jpeg2000)
-
-set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
 
 if(USE_LIBCPP AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(
@@ -43,21 +42,18 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
-if(NOT BUILD_OPENCV)
+find_package(TBB REQUIRED)
+if(BUILD_OPENCV)
+    add_subdirectory(${OPENCV_PATH})
+else()
     find_package(OpenCV 4.2 REQUIRED)
 endif()
-find_package(TBB REQUIRED)
 
 add_subdirectory(src)
+add_subdirectory(${CXXOPTS_PATH})
 
 if(BUILD_TESTS)
     find_package(Python COMPONENTS Interpreter Development REQUIRED)
     add_subdirectory(${PYBIND11_PATH})
     add_subdirectory(test)
 endif()
-
-if(BUILD_OPENCV)
-    add_subdirectory(${OPENCV_PATH})
-endif()
-
-add_subdirectory(${CXXOPTS_PATH})
