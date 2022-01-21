@@ -15,6 +15,10 @@ jobs:
         os: [ ubuntu-latest, macos-latest ]
         compiler: [ gcc, clang ]
         build_type: [ Release, Debug ]
+        exclude:
+          # https://github.com/SzymonZos/Master-Thesis/issues/3
+          - os: macos-latest
+            compiler: gcc
 
     steps:
       - name: Checkout repository and submodules
