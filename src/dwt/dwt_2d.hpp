@@ -26,9 +26,6 @@ using dwt_2d_cb = void (*)(const T* restrict input,
                            T* restrict output,
                            padding_mode mode);
 
-using dwt_2d_cb_f = dwt_2d_cb<float, float>;
-using dwt_2d_cb_d = dwt_2d_cb<double, double>;
-
 REGISTER_DWT_2D(no_dwt_2d);
 REGISTER_DWT_2D(dwt_2d_rows);
 REGISTER_DWT_2D(dwt_2d_cols);
