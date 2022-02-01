@@ -8,7 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-native:
+    if: ${{ false }}  # Disable non-docker jobs to reduce pipeline time
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -56,10 +57,55 @@ jobs:
       - name: Main app
         run: ./ci/run_main_app.sh
 
-      - name: UT
+      - name: Unit Tests
         run: ./build/bin/jpeg2000_ut
 
-      - name: Test
+      - name: Acceptance Tests
+        run: |
+          . ./venv/bin/activate
+          pytest ./test/test.py
+
+  build-docker:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/szymonzos/ubuntu-opencv:latest
+    strategy:
+      matrix:
+        compiler: [ gcc, clang ]
+        build_type: [ Release, Debug ]
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Configure compiler
+        run: ./ci/config_compiler.sh ${{matrix.compiler}}
+
+      - name: Configure CMake
+        run: >
+          . ./ci/activate_venv.sh &&
+          cmake -B ${{github.workspace}}/build
+          -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+          -DCMAKE_C_COMPILER=${{env.CC}}
+          -DCMAKE_CXX_COMPILER=${{env.CXX}}
+          -DBUILD_TESTS=ON
+
+      - name: Build
+        run: >
+          . ./venv/bin/activate &&
+          cmake --build ${{github.workspace}}/build
+          --config ${{matrix.build_type}}
+          --target jpeg2000 jpeg2000_test jpeg2000_ut install -- -j $(nproc)
+
+      - name: Main app
+        run: ./ci/run_main_app.sh
+
+      - name: Unit Tests
+        run: ./build/bin/jpeg2000_ut
+
+      - name: Acceptance Tests
         run: |
           . ./venv/bin/activate
           pytest ./test/test.py
