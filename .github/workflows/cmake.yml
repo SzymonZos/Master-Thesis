@@ -68,7 +68,7 @@ jobs:
   build-docker:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/szymonzos/ubuntu-opencv:latest
+      image: ghcr.io/szymonzos/ubuntu-opencv:master
     strategy:
       matrix:
         compiler: [ gcc, clang ]
@@ -85,7 +85,6 @@ jobs:
 
       - name: Configure CMake
         run: >
-          . ./ci/activate_venv.sh &&
           cmake -B ${{github.workspace}}/build
           -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
           -DCMAKE_C_COMPILER=${{env.CC}}
@@ -94,7 +93,6 @@ jobs:
 
       - name: Build
         run: >
-          . ./venv/bin/activate &&
           cmake --build ${{github.workspace}}/build
           --config ${{matrix.build_type}}
           --target jpeg2000 jpeg2000_test jpeg2000_ut install -- -j $(nproc)
@@ -106,6 +104,4 @@ jobs:
         run: ./build/bin/jpeg2000_ut
 
       - name: Acceptance Tests
-        run: |
-          . ./venv/bin/activate
-          pytest ./test/test.py
+        run: pytest ./test/test.py
