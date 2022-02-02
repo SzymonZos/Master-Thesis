@@ -27,6 +27,19 @@ if((NOT CMAKE_SYSTEM_NAME STREQUAL "Windows") AND BUILD_TESTS)
     )
 endif()
 
+# As for now MSYS2 does not provide ASAN support apart from clang64 toolchain
+# https://github.com/msys2/MINGW-packages/issues/3163
+# https://github.com/msys2/MINGW-packages/issues/8552
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(DWT_SANITIZER_OPTIONS -fsanitize=undefined,address)
+    target_compile_options(dwt PUBLIC
+        "$<$<CONFIG:Debug>:${DWT_SANITIZER_OPTIONS}>"
+    )
+    target_link_options(dwt PUBLIC
+        "$<$<CONFIG:Debug>:${DWT_SANITIZER_OPTIONS}>"
+    )
+endif()
+
 target_include_directories(dwt PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/include
