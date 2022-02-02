@@ -1,15 +1,12 @@
-name: CMake
+name: Build native
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * 1'
   workflow_dispatch:
 
 jobs:
   build-native:
-    if: ${{ false }}  # Disable non-docker jobs to reduce pipeline time
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -64,44 +61,3 @@ jobs:
         run: |
           . ./venv/bin/activate
           pytest ./test/test.py
-
-  build-docker:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/szymonzos/ubuntu-opencv:master
-    strategy:
-      matrix:
-        compiler: [ gcc, clang ]
-        build_type: [ Release, Debug ]
-
-    steps:
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-
-      - name: Configure compiler
-        run: ./ci/config_compiler.sh ${{matrix.compiler}}
-
-      - name: Configure CMake
-        run: >
-          cmake -B ./build
-          -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
-          -DCMAKE_C_COMPILER=${{env.CC}}
-          -DCMAKE_CXX_COMPILER=${{env.CXX}}
-          -DBUILD_TESTS=ON
-
-      - name: Build
-        run: >
-          cmake --build ./build
-          --config ${{matrix.build_type}}
-          --target jpeg2000 jpeg2000_test jpeg2000_ut install -- -j $(nproc)
-
-      - name: Main app
-        run: ./ci/run_main_app.sh
-
-      - name: Unit Tests
-        run: ./build/bin/jpeg2000_ut
-
-      - name: Acceptance Tests
-        run: pytest ./test/test.py
