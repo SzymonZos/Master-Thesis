@@ -42,7 +42,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
-find_package(TBB REQUIRED)
+find_package(TBB 2021.5 REQUIRED)
 if(BUILD_OPENCV)
     add_subdirectory(${OPENCV_PATH})
 else()
