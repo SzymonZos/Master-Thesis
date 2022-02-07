@@ -30,7 +30,7 @@ endif()
 # As for now MSYS2 does not provide ASAN support apart from clang64 toolchain
 # https://github.com/msys2/MINGW-packages/issues/3163
 # https://github.com/msys2/MINGW-packages/issues/8552
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+if(USE_SANITIZERS AND NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(DWT_SANITIZER_OPTIONS -fsanitize=undefined,address)
     target_compile_options(dwt PUBLIC
         "$<$<CONFIG:Debug>:${DWT_SANITIZER_OPTIONS}>"

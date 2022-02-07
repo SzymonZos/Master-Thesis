@@ -33,6 +33,7 @@ jobs:
           -DCMAKE_C_COMPILER=${{env.CC}}
           -DCMAKE_CXX_COMPILER=${{env.CXX}}
           -DBUILD_TESTS=ON
+          -DUSE_SANITIZERS=ON
 
       - name: Build
         run: >
