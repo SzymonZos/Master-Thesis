@@ -47,5 +47,10 @@ jobs:
       - name: Unit Tests
         run: ./build/bin/jpeg2000_ut
 
+      # Investigate if it is possible to run sanitizers only on shared lib
+      # https://stackoverflow.com/a/55692977
+      # export LD_PRELOAD=$(gcc-11 -print-file-name=libasan.so)
       - name: Acceptance Tests
-        run: pytest ./test/test.py
+        run: |
+          export ASAN_OPTIONS=verify_asan_link_order=0         
+          pytest -s ./test/test.py

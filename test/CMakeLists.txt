@@ -10,6 +10,10 @@ pybind11_add_module(jpeg2000_test
     utils.cpp
 )
 
+target_link_options(jpeg2000_test PRIVATE
+    "$<$<AND:$<BOOL:USE_SANITIZERS>,$<CXX_COMPILER_ID:Clang>>:-shared-libasan>"
+)
+
 target_include_directories(jpeg2000_test PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
