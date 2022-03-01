@@ -10,6 +10,9 @@ on:
 jobs:
   build-docker:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     container:
       image: ghcr.io/szymonzos/ubuntu-opencv:master
     strategy:
@@ -28,12 +31,13 @@ jobs:
 
       - name: Configure CMake
         run: >
+          USE_SANITIZERS=${{ matrix.build_type == 'Debug' && 'ON' || 'OFF' }} &&
           cmake -B ./build
           -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
           -DCMAKE_C_COMPILER=${{env.CC}}
           -DCMAKE_CXX_COMPILER=${{env.CXX}}
           -DBUILD_TESTS=ON
-          -DUSE_SANITIZERS=ON
+          -DUSE_SANITIZERS="$USE_SANITIZERS"
 
       - name: Build
         run: >
@@ -47,10 +51,7 @@ jobs:
       - name: Unit Tests
         run: ./build/bin/jpeg2000_ut
 
-      # Investigate if it is possible to run sanitizers only on shared lib
-      # https://stackoverflow.com/a/55692977
-      # export LD_PRELOAD=$(gcc-11 -print-file-name=libasan.so)
       - name: Acceptance Tests
         run: |
-          export ASAN_OPTIONS=verify_asan_link_order=0         
+          . ./build/export_asan_config.sh 2> /dev/null || true
           pytest -s ./test/test.py
