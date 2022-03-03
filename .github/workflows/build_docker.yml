@@ -7,18 +7,26 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build-docker:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
     container:
       image: ghcr.io/szymonzos/ubuntu-opencv:master
     strategy:
       matrix:
         compiler: [ gcc, clang ]
-        build_type: [ Release, Debug ]
+        build_type: # [build_type, sanitizer]
+          - [ Release, OFF ]
+          - [ Debug, ASAN ]
+          - [ Debug, MSAN ]
+          - [ Debug, TSAN ]
+        exclude:
+          - compiler: gcc
+            build_type: [ Debug, MSAN ]
 
     steps:
       - name: Checkout repository and submodules
@@ -31,18 +39,17 @@ jobs:
 
       - name: Configure CMake
         run: >
-          USE_SANITIZERS=${{ matrix.build_type == 'Debug' && 'ON' || 'OFF' }} &&
           cmake -B ./build
-          -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+          -DCMAKE_BUILD_TYPE=${{matrix.build_type[0]}}
           -DCMAKE_C_COMPILER=${{env.CC}}
           -DCMAKE_CXX_COMPILER=${{env.CXX}}
           -DBUILD_TESTS=ON
-          -DUSE_SANITIZERS="$USE_SANITIZERS"
+          -DUSE_SANITIZERS=${{matrix.build_type[1]}}
 
       - name: Build
         run: >
           cmake --build ./build
-          --config ${{matrix.build_type}}
+          --config ${{matrix.build_type[0]}}
           --target jpeg2000 jpeg2000_test jpeg2000_ut install -- -j $(nproc)
 
       - name: Main app

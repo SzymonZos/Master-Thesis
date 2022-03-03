@@ -21,7 +21,7 @@ target_compile_options(dwt PUBLIC
     -fconstexpr-depth=1024
 )
 
-if((NOT CMAKE_SYSTEM_NAME STREQUAL "Windows") AND BUILD_TESTS)
+if((NOT CMAKE_SYSTEM_NAME STREQUAL "Windows") AND (NOT USE_SANITIZERS STREQUAL "MSAN") AND BUILD_TESTS)
     target_compile_options(dwt PRIVATE
         -fPIC
     )
@@ -30,13 +30,28 @@ endif()
 # As for now MSYS2 does not provide ASAN support apart from clang64 toolchain
 # https://github.com/msys2/MINGW-packages/issues/3163
 # https://github.com/msys2/MINGW-packages/issues/8552
-if(USE_SANITIZERS AND NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set(DWT_SANITIZER_OPTIONS -fsanitize=undefined,address)
+if((NOT USE_SANITIZERS STREQUAL "OFF") AND (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows"))
+    if(USE_SANITIZERS STREQUAL "ASAN")
+        set(DWT_LINK_SANITIZER_OPTIONS -fsanitize=undefined,address,leak)
+        set(DWT_COMPILE_SANITIZER_OPTIONS ${DWT_LINK_SANITIZER_OPTIONS})
+    elseif(USE_SANITIZERS STREQUAL "MSAN")
+        set(DWT_LINK_SANITIZER_OPTIONS -fsanitize=memory)
+        set(DWT_COMPILE_SANITIZER_OPTIONS ${DWT_LINK_SANITIZER_OPTIONS};-fPIE;-pie)
+    elseif(USE_SANITIZERS STREQUAL "TSAN")
+        set(DWT_LINK_SANITIZER_OPTIONS -fsanitize=thread)
+        set(DWT_COMPILE_SANITIZER_OPTIONS ${DWT_LINK_SANITIZER_OPTIONS})
+    else()
+        message(WARNING "Unsupported sanitizer: ${USE_SANITIZERS}")
+    endif()
+    set(DWT_COMPILE_SANITIZER_OPTIONS
+        -fno-omit-frame-pointer
+        ${DWT_COMPILE_SANITIZER_OPTIONS}
+    )
     target_compile_options(dwt PUBLIC
-        "$<$<CONFIG:Debug>:${DWT_SANITIZER_OPTIONS}>"
+        "$<$<CONFIG:Debug>:${DWT_COMPILE_SANITIZER_OPTIONS}>"
     )
     target_link_options(dwt PUBLIC
-        "$<$<CONFIG:Debug>:${DWT_SANITIZER_OPTIONS}>"
+        "$<$<CONFIG:Debug>:${DWT_LINK_SANITIZER_OPTIONS}>"
     )
 endif()
 

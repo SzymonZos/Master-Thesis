@@ -10,7 +10,7 @@ pybind11_add_module(jpeg2000_test
     utils.cpp
 )
 
-if(USE_SANITIZERS)
+if(NOT USE_SANITIZERS STREQUAL "OFF")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(LIB_ASAN libclang_rt.asan-x86_64.so)
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
