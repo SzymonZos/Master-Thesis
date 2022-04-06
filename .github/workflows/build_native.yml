@@ -1,63 +1,63 @@
-name: Build native
+# name: Build native
 
-on:
-  schedule:
-    - cron: '0 0 * * 1'
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: '0 0 * * 1'
+#   workflow_dispatch:
 
-jobs:
-  build-native:
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest ]
-        compiler: [ gcc, clang ]
-        build_type: [ Release, Debug ]
-        exclude:
-          # https://github.com/SzymonZos/Master-Thesis/issues/3
-          - os: macos-latest
-            compiler: gcc
+# jobs:
+#   build-native:
+#     runs-on: ${{matrix.os}}
+#     strategy:
+#       matrix:
+#         os: [ ubuntu-latest, macos-latest ]
+#         compiler: [ gcc, clang ]
+#         build_type: [ Release, Debug ]
+#         exclude:
+#           # https://github.com/SzymonZos/Master-Thesis/issues/3
+#           - os: macos-latest
+#             compiler: gcc
 
-    steps:
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
+#     steps:
+#       - name: Checkout repository and submodules
+#         uses: actions/checkout@v2
+#         with:
+#           submodules: recursive
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+#       - name: Set up Python 3.8
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: 3.8
 
-      - name: Install opencv2
-        run: ./ci/install_opencv.sh ${{matrix.os}}
+#       - name: Install opencv2
+#         run: ./ci/install_opencv.sh ${{matrix.os}}
 
-      - name: Configure compiler
-        run: ./ci/config_compiler.sh ${{matrix.compiler}}
+#       - name: Configure compiler
+#         run: ./ci/config_compiler.sh ${{matrix.compiler}}
 
-      - name: Configure CMake
-        run: >
-          . ./ci/activate_venv.sh &&
-          cmake -B ${{github.workspace}}/build
-          -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
-          -DCMAKE_C_COMPILER=${{env.CC}}
-          -DCMAKE_CXX_COMPILER=${{env.CXX}}
-          -DBUILD_TESTS=ON
+#       - name: Configure CMake
+#         run: >
+#           . ./ci/activate_venv.sh &&
+#           cmake -B ${{github.workspace}}/build
+#           -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+#           -DCMAKE_C_COMPILER=${{env.CC}}
+#           -DCMAKE_CXX_COMPILER=${{env.CXX}}
+#           -DBUILD_TESTS=ON
 
-      - name: Build
-        run: >
-          . ./venv/bin/activate &&
-          cmake --build ${{github.workspace}}/build
-          --config ${{matrix.build_type}}
-          --target jpeg2000 jpeg2000_test jpeg2000_ut install -- -j $(nproc)
+#       - name: Build
+#         run: >
+#           . ./venv/bin/activate &&
+#           cmake --build ${{github.workspace}}/build
+#           --config ${{matrix.build_type}}
+#           --target jpeg2000 jpeg2000_test jpeg2000_ut install -- -j $(nproc)
 
-      - name: Main app
-        run: ./ci/run_main_app.sh
+#       - name: Main app
+#         run: ./ci/run_main_app.sh
 
-      - name: Unit Tests
-        run: ./build/bin/jpeg2000_ut
+#       - name: Unit Tests
+#         run: ./build/bin/jpeg2000_ut
 
-      - name: Acceptance Tests
-        run: |
-          . ./venv/bin/activate
-          pytest ./test/test.py
+#       - name: Acceptance Tests
+#         run: |
+#           . ./venv/bin/activate
+#           pytest ./test/test.py
